@@ -2,26 +2,16 @@ import {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
 import {Client, Guild, Message, TextChannel, VoiceConnection} from "discord.js";
 import {AxiosResponse} from "axios";
 
+import Discord from "discord.js";
+import axios from "axios";
+import async from "async";
+
+import {emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
+
 require("dotenv").config();
-
-
-const Discord = require("discord.js");
 const client: Client = new Discord.Client();
-
-const axios = require("axios").default;
 axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
-const async = require("async");
-
-let emojiAnnotation: Record<string, string>;
-
-(async() => {
-	const res = await axios.get("https://raw.githubusercontent.com/elecdeer/emoji-pronunciation-ja/master/data/pronunciation.json");
-	// console.log(json);
-	emojiAnnotation =  res.data;
-})();
-
-// type SessionState = "Connecting" | "Disconnected"
 
 type SpeechParam = Partial<{
 	Text: string,
@@ -44,7 +34,7 @@ type Session = {
 	connection: VoiceConnection,
 	textChannel: TextChannel,
 	speechQueue: AsyncQueue<SpeechParam>,
-	lastSpeaker: string
+	lastMessage: Message | null
 };
 
 type ServerConfig = {
@@ -52,9 +42,6 @@ type ServerConfig = {
 	connectCommand: string,
 	disconnectCommand: string,
 };
-// interface SessionState{
-//
-// }
 
 //各ボイス接続時の状態など
 const sessionStateMap: Record<string, Session> = {};
@@ -128,7 +115,7 @@ const handleCommand = async (message: Message, session: Session, config: ServerC
 				connection: connection,
 				textChannel: channel,
 				speechQueue: queue,
-				lastSpeaker: ""
+				lastMessage: null,
 			};
 
 		}else {
@@ -155,65 +142,6 @@ const disconnect = (session: Session, guild: Guild) => {
 }
 
 
-type TextProcessor = (text: string) => Promise<string>;
-
-
-const LinkType = {
-	Image: "画像",
-	ValidUrl: "URL省略",
-	InvalidUrl: "無効なURL",
-} as const;
-type LinkType = typeof LinkType[keyof typeof LinkType];
-
-
-const urlReg = new RegExp("https?://[\\w!?/+\\-_~;.,*&@#$%()'[\\]]+", "igm");
-const urlProcessor: TextProcessor = async text => {
-	const urls = text.match(urlReg);
-
-	if(! urls) return text;
-
-	return async.map(urls, (item:string, cb: AsyncResultCallback<[string, LinkType], Error>) => {
-		axios.head(item)
-			.then((res: AxiosResponse<AxiosResponse>) => {
-				console.log(res);
-				if(res.headers["content-type"].startsWith("image")){
-					cb(null, [item, LinkType.Image]);
-				}else{
-					cb(null, [item, LinkType.ValidUrl]);
-				}
-			})
-			.catch(() => {
-				cb(null, [item, LinkType.InvalidUrl])
-			});
-	}).then((map: Array<[string, LinkType]>) => (
-		map.reduce((result: string, item: [string, LinkType]) => (
-			result.replace(item[0], item[1])
-		), text)
-	));
-}
-
-
-const emojiReg = /\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
-
-const emojiProcessor: TextProcessor = async text => {
-	// console.log("絵文字: " + text.match(reg));
-
-	return text.replace(emojiReg, (match => {
-		console.log(`${match} => ${emojiAnnotation[match]}`)
-		return emojiAnnotation[match];
-	}))
-
-}
-
-
-const guildEmojiReg = /<:.+:\d+>/g;
-const guildEmojiProcessor: TextProcessor = async text => {
-	return text.replace(guildEmojiReg, str => {
-		const match = str.match(/\w+/);
-		if(!match) return str;
-		return match[0];
-	})
-}
 
 const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	console.log(message);
@@ -222,20 +150,24 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 
 	console.log("handleText");
 
+	console.log(session);
 	if(!session) return;
 
 
 	let baseText = message.content;
 
+	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
+	// console.log("messageTime: " + message.createdTimestamp);
+
 	//名前読み上げ
-	if(session.lastSpeaker !== message.author.id){
-		baseText = `${message.author.username}　${baseText}`;
+	if(session.lastMessage?.author.id !== message.author.id || session.lastMessage.createdTimestamp - message.createdTimestamp > 30){
+		baseText = `${message.member?.displayName}　${baseText}`;
 	}
 
 	const text = await
 		urlProcessor(baseText)
 			.then(emojiProcessor)
-			.then(guildEmojiProcessor)
+			.then(guildEmojiProcessor);
 
 	const param: SpeechParam = {
 		Text: text,
@@ -246,7 +178,7 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 
 	console.log("push")
 	session.speechQueue.push(param);
-	session.lastSpeaker = message.author.id;
+	session.lastMessage = message;
 
 	// const port = process.env.VOICEROID_DEAMON_URL || "";
 	// const url = URL.resolve(port, )
@@ -297,7 +229,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		}
 
 		session.speechQueue.push(param);
-		session.lastSpeaker = client.user?.id || "";
 	}
 	if(!!oldState.channel && !newState.channel){
 		if(session.connection.channel.id !== oldState.channelID) return;
@@ -321,7 +252,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		}
 
 		session.speechQueue.push(param);
-		session.lastSpeaker = client.user?.id || "";
 
 	}
 
