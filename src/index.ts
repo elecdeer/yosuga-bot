@@ -1,8 +1,11 @@
+import {AsyncQueue, ErrorCallback} from "async";
+
 require("dotenv").config();
 
 
-import {Channel, Client, Message, TextChannel, VoiceConnection} from "discord.js";
-import {AxiosPromise, AxiosResponse} from "axios";
+import {Channel, Client, Message, VoiceConnection} from "discord.js";
+import {AxiosResponse} from "axios";
+
 
 
 const Discord = require("discord.js");
@@ -13,26 +16,31 @@ axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
 const async = require("async");
 
+
 // type SessionState = "Connecting" | "Disconnected"
 
 type SpeechParam = Partial<{
 	Text: string,
 	Kana: string,
-	Speaker: {
+	Speaker: Partial<{
 		Volume: number,
 		Speed: number,
 		Emphasis: number,
 		PauseMiddle: number,
 		PauseLong: number,
 		PauseSentence: number
-	}
+	}>
 }>
+
+
 
 
 type Session = {
 	// state: SessionState
 	connection: VoiceConnection,
-	textChannel: Channel
+	textChannel: Channel,
+	speechQueue: AsyncQueue<SpeechParam>,
+	lastSpeaker: string
 };
 
 type ServerConfig = {
@@ -91,9 +99,27 @@ const handleCommand = async (message: Message, sessionState: Session, config: Se
 		if(message.member.voice.channel){
 			const connection = await message.member.voice.channel.join();
 
+			const queue = async.queue((param: SpeechParam, cb: ErrorCallback<Error>) => {
+				speech(connection, param).then(value => {
+
+					//TODO 話す間隔も調整できるように
+					setTimeout(() => {
+						cb();
+					}, 500)
+
+				})
+			}, 1);
+
+			queue.drain(() => {
+				console.log("queue empty");
+			})
+
+
 			sessionStateMap[message.channel.id] = {
 				connection: connection,
 				textChannel: message.channel,
+				speechQueue: queue,
+				lastSpeaker: ""
 			};
 
 		}else {
@@ -116,49 +142,71 @@ const handleCommand = async (message: Message, sessionState: Session, config: Se
 	}
 }
 
+type TextMiddleware = (text: string) => string;
 
-const handleText = async (message: Message, sessionState: Session, config: ServerConfig) => {
+
+
+const textProcessors: Array<TextMiddleware> = [
+	(text => {
+		return text;
+	}),
+]
+
+const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	//読み上げ
-	//ミドルウェアで加工する
 
-	console.log("read");
+	console.log("read push");
 
-	if(!sessionState) return;
+	if(!session) return;
 
-	const text = message.content;
+	const baseText = message.content;
+
+	const text = textProcessors.reduce((prev, middleware) => middleware(prev), baseText)
+
 	const param: SpeechParam = {
-		"Text": text
+		Text: text,
+		Speaker: {
+			Speed: 1.5
+		}
 	}
+
+	session.speechQueue.push(param);
 
 	// const port = process.env.VOICEROID_DEAMON_URL || "";
 	// const url = URL.resolve(port, )
 
+}
 
+
+const speech = async (connection: VoiceConnection, param: SpeechParam) => (
 	axios({
 		method: "POST",
 		url: "/api/speechtext",
 		responseType: "stream",
 		data: param
 	})
-		.then((res: AxiosResponse) => {
+		.then((res: AxiosResponse) => new Promise((resolve, reject) => {
 			console.log("got wav");
-			sessionState.connection.play(res.data).once("finish", () => {
+			connection.play(res.data).once("finish", () => {
 				console.log("playFinish");
+				resolve();
 			})
-		})
+
+			//タイムアウトもここに?
+		}))
 		.catch((reason: any) => {
 			console.log(reason);
 			return;
 		})
-}
+)
 
 
 
 
-
-
-
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN).then(r => {
+	console.log("login")
+	console.log(r);
+});
 
 
 // process.on("beforeExit", function() {
