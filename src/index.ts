@@ -1,4 +1,4 @@
-import {AsyncQueue, ErrorCallback} from "async";
+import {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
 
 require("dotenv").config();
 
@@ -142,26 +142,72 @@ const handleCommand = async (message: Message, sessionState: Session, config: Se
 	}
 }
 
-type TextMiddleware = (text: string) => string;
+type TextProcessor = (text: string) => Promise<string>;
 
 
+const LinkType = {
+	Image: "画像",
+	ValidUrl: "URL省略",
+	InvalidUrl: "無効なURL",
+} as const;
+type LinkType = typeof LinkType[keyof typeof LinkType];
 
-const textProcessors: Array<TextMiddleware> = [
-	(text => {
-		return text;
-	}),
-]
+const urlProcessor: TextProcessor = async text => {
+	const reg = new RegExp("https?://[\\w!?/+\\-_~;.,*&@#$%()'[\\]]+", "igm");
+	const urls = text.match(reg);
+
+	if(! urls) return text;
+
+	return async.map(urls, (item:string, cb: AsyncResultCallback<[string, LinkType], Error>) => {
+		axios.head(item)
+			.then((res: AxiosResponse<AxiosResponse>) => {
+				console.log(res);
+				if(res.headers["content-type"].startsWith("image")){
+					cb(null, [item, LinkType.Image]);
+				}else{
+					cb(null, [item, LinkType.ValidUrl]);
+				}
+			})
+			.catch(() => {
+				cb(null, [item, LinkType.InvalidUrl])
+			});
+	}).then((map: Array<[string, LinkType]>) => (
+		map.reduce((result: string, item: [string, LinkType]) => (
+			result.replace(item[0], item[1])
+		), text)
+	));
+}
+
+
+const emojiProcessor: TextProcessor = async text => {
+
+
+	return text;
+}
+
+
 
 const handleText = async (message: Message, session: Session, config: ServerConfig) => {
+	console.log(message);
+
 	//読み上げ
 
 	console.log("read push");
 
 	if(!session) return;
 
-	const baseText = message.content;
 
-	const text = textProcessors.reduce((prev, middleware) => middleware(prev), baseText)
+
+	let baseText = message.content;
+
+	//名前読み上げ
+	if(session.lastSpeaker !== message.author.id){
+		baseText = `${message.author.username}　${baseText}`;
+	}
+
+	const text = await
+		urlProcessor(baseText)
+			.then(emojiProcessor)
 
 	const param: SpeechParam = {
 		Text: text,
@@ -171,6 +217,7 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 	}
 
 	session.speechQueue.push(param);
+	session.lastSpeaker = message.author.id;
 
 	// const port = process.env.VOICEROID_DEAMON_URL || "";
 	// const url = URL.resolve(port, )
