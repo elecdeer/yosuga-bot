@@ -1,11 +1,8 @@
 import {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
-
-require("dotenv").config();
-
-
-import {Channel, Client, Guild, Message, TextChannel, VoiceConnection} from "discord.js";
+import {Client, Guild, Message, TextChannel, VoiceConnection} from "discord.js";
 import {AxiosResponse} from "axios";
 
+require("dotenv").config();
 
 
 const Discord = require("discord.js");
@@ -16,11 +13,12 @@ axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
 const async = require("async");
 
-const emojiAnnotation = (async () => {
+let emojiAnnotation: Record<string, string>;
+
+(async() => {
 	const res = await axios.get("https://raw.githubusercontent.com/elecdeer/emoji-pronunciation-ja/master/data/pronunciation.json");
-	const json = res.data;
 	// console.log(json);
-	return json;
+	emojiAnnotation =  res.data;
 })();
 
 // type SessionState = "Connecting" | "Disconnected"
@@ -167,9 +165,10 @@ const LinkType = {
 } as const;
 type LinkType = typeof LinkType[keyof typeof LinkType];
 
+
+const urlReg = new RegExp("https?://[\\w!?/+\\-_~;.,*&@#$%()'[\\]]+", "igm");
 const urlProcessor: TextProcessor = async text => {
-	const reg = new RegExp("https?://[\\w!?/+\\-_~;.,*&@#$%()'[\\]]+", "igm");
-	const urls = text.match(reg);
+	const urls = text.match(urlReg);
 
 	if(! urls) return text;
 
@@ -194,13 +193,27 @@ const urlProcessor: TextProcessor = async text => {
 }
 
 
+const emojiReg = /\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
+
 const emojiProcessor: TextProcessor = async text => {
+	// console.log("絵文字: " + text.match(reg));
 
+	return text.replace(emojiReg, (match => {
+		console.log(`${match} => ${emojiAnnotation[match]}`)
+		return emojiAnnotation[match];
+	}))
 
-	return text;
 }
 
 
+const guildEmojiReg = /<:.+:\d+>/g;
+const guildEmojiProcessor: TextProcessor = async text => {
+	return text.replace(guildEmojiReg, str => {
+		const match = str.match(/\w+/);
+		if(!match) return str;
+		return match[0];
+	})
+}
 
 const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	console.log(message);
@@ -222,6 +235,7 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 	const text = await
 		urlProcessor(baseText)
 			.then(emojiProcessor)
+			.then(guildEmojiProcessor)
 
 	const param: SpeechParam = {
 		Text: text,
@@ -289,7 +303,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		if(session.connection.channel.id !== oldState.channelID) return;
 
 		if(oldState.channel.members.size <= 1){
-			session.textChannel.send("ボイスチャンネルに誰もいなくなったため退出しました").then(value => {
+			session.textChannel.send("ボイスチャンネルに誰もいなくなったため退出しました").then(() => {
 				console.log("disconnect");
 				disconnect(session, oldState.guild);
 			});
