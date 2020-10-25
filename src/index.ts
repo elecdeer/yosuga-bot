@@ -1,63 +1,71 @@
-import {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
-import {Client, Guild, Message, TextChannel, VoiceConnection} from "discord.js";
+import async, {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
+import {Client, Guild, Message, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
 import {AxiosResponse} from "axios";
 
 import Discord from "discord.js";
 import axios from "axios";
-import async from "async";
 
-import {emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
+import {handleCommand} from "./commands";
+import {handleText} from "./textSpeech";
 
 require("dotenv").config();
 const client: Client = new Discord.Client();
 axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
 
-type SpeechParam = Partial<{
+export type SpeechParam = Partial<{
 	Text: string,
 	Kana: string,
-	Speaker: Partial<{
-		Volume: number,
-		Speed: number,
-		Emphasis: number,
-		PauseMiddle: number,
-		PauseLong: number,
-		PauseSentence: number
-	}>
+	Speaker: SpeakerParam,
+}>
+
+export type SpeakerParam = Partial<{
+	Volume: number,
+	Speed: number,
+	Emphasis: number,
+	PauseMiddle: number,
+	PauseLong: number,
+	PauseSentence: number
 }>
 
 
 
 
-type Session = {
+export type Session = {
 	// state: SessionState
 	connection: VoiceConnection,
 	textChannel: TextChannel,
 	speechQueue: AsyncQueue<SpeechParam>,
-	lastMessage: Message | null
+
+	lastMessageTimestamp: number,
+	lastMessageAuthorId: string
 };
 
-type ServerConfig = {
+export type ServerConfig = {
 	commandPrefix: string,
-	connectCommand: string,
-	disconnectCommand: string,
+	defaultSpeakerParam: SpeakerParam
+	// connectCommand: string,
+	// disconnectCommand: string,
 };
 
 //各ボイス接続時の状態など
-const sessionStateMap: Record<string, Session> = {};
+export const sessionStateMap: Record<string, Session> = {};
 
 //各サーバ上でのbot設定
-const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
+export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
+
 
 const defaultConfig: ServerConfig = {
 	commandPrefix: "yosuga",
-	connectCommand: "s",
-	disconnectCommand: "e"
+	defaultSpeakerParam: {
+		Speed: 1.5
+	}
 }
 
 client.once("ready", () => {
 	console.log("ready!");
 });
+
 
 client.on("message", async message => {
 	if(!message.guild) return;
@@ -65,7 +73,7 @@ client.on("message", async message => {
 
 	const sessionState = sessionStateMap[message.guild.id];
 	const config = {...defaultConfig, ...serverConfigMap[message.guild.id]};
-	console.log(config);
+	// console.log(config);
 
 	if(message.content.startsWith(config.commandPrefix)){
 		await handleCommand(message, sessionState, config);
@@ -74,126 +82,48 @@ client.on("message", async message => {
 
 	await handleText(message, sessionState, config);
 
-
 })
 
 
-const handleCommand = async (message: Message, session: Session, config: ServerConfig) => {
-	if(!message.guild) return;
+export const connect = async (voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild) => {
+	const connection = await voiceChannel.join();
 
-	const channel = message.channel;
-	if(! (channel instanceof TextChannel)) return;
+	const queue = async.queue((param: SpeechParam, cb) => {
+		const config = {...defaultConfig, ...serverConfigMap[guild.id]};
 
-	const args = message.content.slice(config.commandPrefix.length).trim().split(" ");
-	const command = args.shift() || "";
-
-	if(command === config.connectCommand){
-		console.log("connect");
-		if(! message.member) return;
-
-
-		if(message.member.voice.channel){
-			const connection = await message.member.voice.channel.join();
-
-			const queue = async.queue((param: SpeechParam, cb: ErrorCallback<Error>) => {
-				speech(connection, param).then(value => {
-
-					//TODO 話す間隔も調整できるように
-					setTimeout(() => {
-						cb();
-					}, 500)
-
-				})
-			}, 1);
-
-			queue.drain(() => {
-				console.log("queue empty");
-			})
-
-
-			sessionStateMap[message.guild.id] = {
-				connection: connection,
-				textChannel: channel,
-				speechQueue: queue,
-				lastMessage: null,
-			};
-
-		}else {
-			await message.reply('You need to join a voice channel first!');
+		const connectedParam: SpeechParam = {
+			Text: param.Text,
+			Kana: param.Kana,
+			Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
 		}
 
-		return;
-	}
+		speech(connection, connectedParam).then(value => {
+			cb();
+		})
+	}, 1);
 
-	if(command === config.disconnectCommand){
-		console.log("disconnect");
+	queue.drain(() => {
+		console.log("queue empty");
+	})
 
-		if(!session?.connection) return;
 
-		disconnect(session, message.guild);
+	sessionStateMap[guild.id] = {
+		connection: connection,
+		textChannel: textChannel,
+		speechQueue: queue,
+		lastMessageTimestamp: 0,
+		lastMessageAuthorId: client.user?.id || "unknown"
+	};
 
-		return;
-	}
 }
 
-const disconnect = (session: Session, guild: Guild) => {
+export const disconnect = (session: Session, guild: Guild) => {
 	session.connection.disconnect();
 	delete sessionStateMap[guild.id];
 }
 
 
-
-const handleText = async (message: Message, session: Session, config: ServerConfig) => {
-	console.log(message);
-
-	//読み上げ
-
-	console.log("handleText");
-
-	// console.log(session);
-	if(!session) return;
-
-
-	let baseText = message.content;
-
-	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
-	// console.log("messageTime: " + message.createdTimestamp);
-
-	if(message.attachments.size > 0){
-		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).toString();
-	}
-
-	//名前読み上げ
-
-	const difMs = message.createdTimestamp - (session.lastMessage?.createdTimestamp || 0);
-	console.log("timeDif: " + difMs);
-	if(session.lastMessage?.author.id !== message.author.id || difMs > 30000){
-		baseText = `${message.member?.displayName}　${baseText}`;
-	}
-
-	const text = await
-		urlProcessor(baseText)
-			.then(emojiProcessor)
-			.then(guildEmojiProcessor);
-
-	const param: SpeechParam = {
-		Text: text,
-		Speaker: {
-			Speed: 1.5
-		}
-	}
-
-	console.log("push")
-	session.speechQueue.push(param);
-	session.lastMessage = message;
-
-	// const port = process.env.VOICEROID_DEAMON_URL || "";
-	// const url = URL.resolve(port, )
-
-}
-
-
-const speech = async (connection: VoiceConnection, param: SpeechParam) => (
+export const speech = async (connection: VoiceConnection, param: SpeechParam) => (
 	axios({
 		method: "POST",
 		url: "/api/speechtext",
@@ -215,6 +145,17 @@ const speech = async (connection: VoiceConnection, param: SpeechParam) => (
 		})
 )
 
+
+export const pushSpeech = ({session, param, authorId, timestamp}: {
+	session: Session, param: SpeechParam, timestamp?: number, authorId?: string
+}) => {
+	// console.log("push")
+	session.speechQueue.push(param);
+	session.lastMessageTimestamp = timestamp || Date.now();
+	session.lastMessageAuthorId = authorId || client.user?.id || "unknown";
+}
+
+
 client.on("voiceStateUpdate", (oldState, newState) => {
 	const session = sessionStateMap[newState.guild.id];
 	const config = {...defaultConfig, ...serverConfigMap[newState.guild.id]};
@@ -227,15 +168,15 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		console.log("join");
 		// console.log(newState.member?.user);
 
+		// pushSpeech(session, )
 
-		const param: SpeechParam = {
-			Text: `${newState.member?.user.username}が入室しました`,
-			Speaker: {
-				Speed: 1.5
-			}
-		}
+		pushSpeech({
+			session: session,
+			param: {
+				Text: `${newState.member?.user.username}が入室しました`
+			},
+		});
 
-		session.speechQueue.push(param);
 	}
 	if(!!oldState.channel && !newState.channel){
 		if(session.connection.channel.id !== oldState.channelID) return;
@@ -251,14 +192,13 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		console.log("leave")
 		// console.log(newState.member?.user);
 
-		const param: SpeechParam = {
-			Text: `${newState.member?.user.username}が退室しました`,
-			Speaker: {
-				Speed: 1.5
-			}
-		}
 
-		session.speechQueue.push(param);
+		pushSpeech({
+			session: session,
+			param: {
+				Text: `${newState.member?.user.username}が退室しました`
+			},
+		});
 
 	}
 
