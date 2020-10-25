@@ -150,7 +150,7 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 
 	console.log("handleText");
 
-	console.log(session);
+	// console.log(session);
 	if(!session) return;
 
 
@@ -159,8 +159,15 @@ const handleText = async (message: Message, session: Session, config: ServerConf
 	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
 	// console.log("messageTime: " + message.createdTimestamp);
 
+	if(message.attachments.size > 0){
+		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).toString();
+	}
+
 	//名前読み上げ
-	if(session.lastMessage?.author.id !== message.author.id || session.lastMessage.createdTimestamp - message.createdTimestamp > 30){
+
+	const difMs = message.createdTimestamp - (session.lastMessage?.createdTimestamp || 0);
+	console.log("timeDif: " + difMs);
+	if(session.lastMessage?.author.id !== message.author.id || difMs > 30000){
 		baseText = `${message.member?.displayName}　${baseText}`;
 	}
 
@@ -218,7 +225,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		if(session.connection.channel.id !== newState.channelID) return;
 
 		console.log("join");
-		console.log(newState.member?.user);
+		// console.log(newState.member?.user);
 
 
 		const param: SpeechParam = {
@@ -242,7 +249,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 
 
 		console.log("leave")
-		console.log(newState.member?.user);
+		// console.log(newState.member?.user);
 
 		const param: SpeechParam = {
 			Text: `${newState.member?.user.username}が退室しました`,
