@@ -6,7 +6,7 @@ services:
     build:
       context: ./
     environment:
-      DISCORD_TOKEN: your-discord-token
-      VOICEROID_DEAMON_URL: http://~
+      DISCORD_TOKEN: your-discord-bot-token
+      VOICEROID_DEAMON_URL: http://192.~:8080
     restart: always
     container_name: node-yosuga
