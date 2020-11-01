@@ -1,17 +1,21 @@
 FROM node:13-alpine
 
-COPY package*.json /app/
-COPY tsconfig.json /app/
-
 WORKDIR /app
+
+COPY package*.json ./
+COPY tsconfig.json ./
+
 
 RUN npm install
 
-COPY /src /src
+COPY src src
+
+#RUN ls -lra
 
 RUN npm run build
 
 EXPOSE 80
 EXPOSE 443
+
 CMD ["node", "dist/index.js"]
 
