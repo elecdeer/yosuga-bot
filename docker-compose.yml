@@ -1,0 +1,12 @@
+
+version: "3"
+
+services:
+  yosuga:
+    build:
+      context: ./
+    environment:
+      DISCORD_TOKEN: your-discord-token
+      VOICEROID_DEAMON_URL: http://~
+    restart: always
+    container_name: node-yosuga
