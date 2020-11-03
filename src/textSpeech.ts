@@ -1,5 +1,5 @@
 import {Message} from "discord.js";
-import {emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
+import {codeBlockProcessor, emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
 import {pushSpeech, ServerConfig, Session, SpeechParam} from "./index";
 
 
@@ -38,7 +38,8 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	const text = await
 		urlProcessor(baseText)
 			.then(emojiProcessor)
-			.then(guildEmojiProcessor);
+			.then(guildEmojiProcessor)
+			.then(codeBlockProcessor)
 
 
 	pushSpeech({

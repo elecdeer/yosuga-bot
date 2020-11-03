@@ -73,3 +73,13 @@ export const guildEmojiProcessor: TextProcessor = async text => {
 	})
 }
 
+
+const codeBlockReg = /```(.*\n?)*```/g;
+
+export const codeBlockProcessor: TextProcessor = async text => {
+	console.log(text);
+	console.log("matches", text.match(codeBlockReg));
+
+	return text.replace(codeBlockReg, "コードブロック");
+}
+
