@@ -5,7 +5,7 @@ import {AxiosResponse} from "axios";
 import Discord from "discord.js";
 import axios from "axios";
 
-import {handleCommand} from "./commands";
+import {createEmbedBase, handleCommand} from "./commands";
 import {handleText} from "./textSpeech";
 
 require("dotenv").config();
@@ -182,7 +182,11 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		if(session.connection.channel.id !== oldState.channelID) return;
 
 		if(oldState.channel.members.size <= 1){
-			session.textChannel.send("ボイスチャンネルに誰もいなくなったため退出しました").then(() => {
+
+			const embed = createEmbedBase()
+				.setDescription("ボイスチャンネルに誰もいなくなったため退出しました.");
+
+			session.textChannel.send(embed).then(() => {
 				console.log("disconnect");
 				disconnect(session, oldState.guild);
 			});

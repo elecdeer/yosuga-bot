@@ -1,4 +1,4 @@
-import {Message, TextChannel} from "discord.js";
+import {Message, MessageEmbed, TextChannel} from "discord.js";
 import async, {ErrorCallback} from "async";
 import {connect, disconnect, ServerConfig, Session, sessionStateMap, speech, SpeechParam} from "./index";
 
@@ -9,6 +9,13 @@ const commandMap: Record<string, Command> = {};
 
 const command = (commandText: string, action: Command) => {
 	commandMap[commandText] = action;
+}
+
+
+export const createEmbedBase = () => {
+	return new MessageEmbed()
+		.setTitle("Yosuga")
+		.setColor(0xffb6c1);
 }
 
 const initCommands = () => {
@@ -23,8 +30,16 @@ const initCommands = () => {
 
 		if(message.member.voice.channel){
 			await connect(message.member.voice.channel, channel, message.guild);
+
+			const embed = createEmbedBase()
+				.setDescription("接続しました！");
+
+			await channel.send(embed);
 		}else {
-			await message.reply('You need to join a voice channel first!');
+			const embed = createEmbedBase()
+				.setDescription("先にボイスチャンネルに入る必要があります.");
+
+			await message.reply(embed);
 		}
 	});
 
@@ -37,7 +52,15 @@ const initCommands = () => {
 		if(!message.guild) return;
 
 		disconnect(session, message.guild);
-	})
+
+		const embed = createEmbedBase()
+			.setDescription("退出しました.");
+
+		await message.channel.send(embed);
+	});
+
+
+
 }
 
 initCommands();
