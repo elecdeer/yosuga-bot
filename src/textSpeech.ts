@@ -13,8 +13,12 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	// console.log(session);
 	if(!session) return;
 
+	// console.log(message.content);
+	// console.log(message.cleanContent);
+	// console.log(message.embeds);
 
-	let baseText = message.content;
+
+	let baseText = message.cleanContent;
 
 	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
 	// console.log("messageTime: " + message.createdTimestamp);
