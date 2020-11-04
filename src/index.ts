@@ -5,7 +5,7 @@ import {AxiosResponse} from "axios";
 import Discord from "discord.js";
 import axios from "axios";
 
-import {createEmbedBase, handleCommand} from "./commands";
+import {createEmbedBase, handleCommand} from "./commandManager";
 import {handleText} from "./textSpeech";
 
 require("dotenv").config();
