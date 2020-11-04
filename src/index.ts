@@ -5,7 +5,7 @@ import {AxiosResponse} from "axios";
 import Discord from "discord.js";
 import axios from "axios";
 
-import {createEmbedBase, handleCommand} from "./commandManager";
+import {assignCommands, createEmbedBase, handleCommand} from "./commandManager";
 import {handleText} from "./textSpeech";
 
 require("dotenv").config();
@@ -58,9 +58,14 @@ export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
 const defaultConfig: ServerConfig = {
 	commandPrefix: "yosuga",
 	defaultSpeakerParam: {
-		Speed: 1.5
+		Speed: 1.2
 	}
 }
+
+
+
+
+
 
 client.once("ready", () => {
 	console.log("ready!");
@@ -216,9 +221,22 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 
 
 
+assignCommands();
+
 client.login(process.env.DISCORD_TOKEN).then(r => {
-	console.log("login")
+	console.log("login");
 	console.log(r);
+});
+
+
+
+process.on("exit", function() {
+	console.log("Exit...");
+	client.destroy();
+	console.log("Destroy");
+})
+process.on("SIGINT", function () {
+	process.exit(0);
 });
 
 

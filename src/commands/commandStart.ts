@@ -3,7 +3,7 @@ import {connect} from "../index";
 import {Command, command, createEmbedBase} from "../commandManager";
 
 
-const handleStart: Command = async(args, message, session, config) => {
+export const handleStart: Command = async(args, message, session, config) => {
 	console.log("connect");
 	if(!message.member) return;
 	if(!message.guild) return;
@@ -27,5 +27,3 @@ const handleStart: Command = async(args, message, session, config) => {
 	}
 };
 
-
-command("s", "ボイスチャンネルに接続し,読み上げを開始する.", handleStart);
