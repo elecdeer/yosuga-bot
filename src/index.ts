@@ -8,6 +8,10 @@ import axios from "axios";
 import {assignCommands, createEmbedBase, handleCommand} from "./commandManager";
 import {handleText} from "./textSpeech";
 
+import low from "lowdb";
+import FileSync from "lowdb/adapters/FileSync";
+
+
 require("dotenv").config();
 const client: Client = new Discord.Client();
 axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
@@ -53,6 +57,8 @@ export const sessionStateMap: Record<string, Session> = {};
 
 //各サーバ上でのbot設定
 export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
+
+const adapter = new FileSync("eachServerSettings.json");
 
 
 const defaultConfig: ServerConfig = {
