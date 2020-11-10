@@ -56,13 +56,14 @@ export type ServerConfig = {
 export const sessionStateMap: Record<string, Session> = {};
 
 //各サーバ上でのbot設定
-export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
+// export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
 
-const adapter = new FileSync("eachServerSettings.json");
-
+const adapter = new FileSync<Record<string, Partial<ServerConfig>>>("guildSettings.json");
+const serverConfDB = low(adapter);
+serverConfDB.read();
 
 const defaultConfig: ServerConfig = {
-	commandPrefix: "yosuga",
+	commandPrefix: "yosugat",
 	defaultSpeakerParam: {
 		Speed: 1.2
 	}
@@ -78,18 +79,39 @@ client.once("ready", () => {
 });
 
 
+const getGuildConfig = (guildId: string): ServerConfig => {
+	// console.log("getGuildConfig");
+	// console.log(guildId);
+	// console.log(serverConfDB.getState());
+
+	// console.log(serverConfDB.get(guildId).value());
+	if(! serverConfDB.has(guildId).value()){
+		serverConfDB.set(guildId, {}).write();
+	}
+	return {
+		...defaultConfig,
+		...serverConfDB.get(guildId).value()
+	};
+}
+
 client.on("message", async message => {
 	if(!message.guild) return;
 	if(message.author.bot) return;
 
-	const sessionState = sessionStateMap[message.guild.id];
-	const config = {...defaultConfig, ...serverConfigMap[message.guild.id]};
+	const guildId = message.guild.id;
+	const sessionState = sessionStateMap[guildId];
+
+
+	// .get(message.guild.id).
+	const config = getGuildConfig(guildId);
 	// console.log(config);
 
 	if(message.content.startsWith(config.commandPrefix)){
 		await handleCommand(message, sessionState, config);
 		return;
 	}
+
+
 
 	await handleText(message, sessionState, config);
 
@@ -100,7 +122,7 @@ export const connect = async (voiceChannel: VoiceChannel, textChannel: TextChann
 	const connection = await voiceChannel.join();
 
 	const queue = async.queue((param: SpeechParam, cb) => {
-		const config = {...defaultConfig, ...serverConfigMap[guild.id]};
+		const config = getGuildConfig(guild.id);
 
 		const connectedParam: SpeechParam = {
 			Text: param.Text,
@@ -169,7 +191,7 @@ export const pushSpeech = ({session, param, authorId, timestamp}: {
 
 client.on("voiceStateUpdate", (oldState, newState) => {
 	const session = sessionStateMap[newState.guild.id];
-	const config = {...defaultConfig, ...serverConfigMap[newState.guild.id]};
+	// const config = getGuildConfig(newState.guild.id);
 
 	if(!session) return;
 
