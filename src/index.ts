@@ -111,7 +111,7 @@ client.on("message", async message => {
 		return;
 	}
 
-	if(sessionState.textChannel.id === message.channel.id){
+	if(sessionState.textChannel?.id === message.channel.id){
 		await handleText(message, sessionState, config);
 	}
 
