@@ -24,7 +24,9 @@ const LinkType = {
 type LinkType = typeof LinkType[keyof typeof LinkType];
 
 
-const urlReg = new RegExp("https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+", "igm");
+const urlReg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "igm");
+
+
 export const urlProcessor: TextProcessor = async text => {
 	const urls = text.match(urlReg);
 
