@@ -197,6 +197,8 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 
 	if(!session) return;
 
+	// console.log(newState);
+
 	if(!oldState.channel && !!newState.channel){
 		if(session.connection.channel.id !== newState.channelID) return;
 
@@ -208,7 +210,7 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		pushSpeech({
 			session: session,
 			param: {
-				Text: `${newState.member?.user.username}が入室しました`
+				Text: `${newState.member?.user.username}が入室しました。`
 			},
 		});
 
@@ -235,11 +237,35 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 		pushSpeech({
 			session: session,
 			param: {
-				Text: `${newState.member?.user.username}が退室しました`
+				Text: `${newState.member?.user.username}が退室しました。`
 			},
 		});
 
 	}
+
+	if(!oldState.selfVideo && newState.selfVideo){
+		if(session.connection.channel.id !== oldState.channelID) return;
+		if(oldState.member !== newState.member) return;
+		pushSpeech({
+			session: session,
+			param: {
+				Text: `${newState.member?.user.username}がカメラをオンにしました。`
+			},
+		});
+	}
+
+	if(!oldState.streaming && newState.streaming){
+		if(session.connection.channel.id !== oldState.channelID) return;
+		if(oldState.member !== newState.member) return;
+
+		pushSpeech({
+			session: session,
+			param: {
+				Text: `${newState.member?.user.username}がゴーライブを開始しました。`
+			},
+		});
+	}
+
 
 	// console.log("===old================================================================================")
 	// console.log(oldState.channel);
