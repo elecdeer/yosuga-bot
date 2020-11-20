@@ -218,7 +218,9 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 	if(!!oldState.channel && !newState.channel){
 		if(session.connection.channel.id !== oldState.channelID) return;
 
-		if(oldState.channel.members.size <= 1){
+		const memberNumExcludedBot = oldState.channel.members.filter(member => !member.user.bot).size;
+
+		if(memberNumExcludedBot <= 0){
 
 			const embed = createEmbedBase()
 				.setDescription("ボイスチャンネルに誰もいなくなったため退出しました.");
