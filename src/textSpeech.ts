@@ -13,19 +13,22 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	// console.log(session);
 	if(!session) return;
 
-	// console.log(message.content);
+	console.log(message.content);
 	// console.log(message.cleanContent);
 	// console.log(message.embeds);
 
 
 	let baseText = message.cleanContent;
+	console.log(message.cleanContent);
 
 	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
 	// console.log("messageTime: " + message.createdTimestamp);
 
 	if(message.attachments.size > 0){
-		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).toString();
+		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).join(" ");
 	}
+
+	console.log("[baseText] " + baseText);
 
 	//名前読み上げ
 

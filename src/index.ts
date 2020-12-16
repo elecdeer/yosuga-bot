@@ -70,10 +70,6 @@ const defaultConfig: ServerConfig = {
 }
 
 
-
-
-
-
 client.once("ready", () => {
 	console.log("ready!");
 });
