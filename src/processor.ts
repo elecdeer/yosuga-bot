@@ -26,6 +26,7 @@ const LinkType = {
 	ValidUrl: "URL省略",
 	InvalidUrl: "無効なURL",
 } as const;
+
 type LinkType = typeof LinkType[keyof typeof LinkType];
 
 const urlReg = urlRegex({
@@ -40,14 +41,18 @@ export const urlProcessor: TextProcessor = async text => {
 
 	if(! urls) return text;
 
-	const replaceTuple: Array<[string, LinkType]> = await Promise.all(
+	const replaceTuple: Array<[string, string]> = await Promise.all(
 		urls.map(async url => {
 			const urlType = await checkUrlType(url);
-			return [url, urlType] as [string, LinkType];
+			const urlObj = new URL(url);
+
+			const altText = urlType === LinkType.ValidUrl ? urlObj.hostname.replace(/^www./, "") : urlType;
+
+			return [url, altText] as [string, string];
 		})
 	);
 
-	return replaceTuple.reduce((result: string, next:[string, LinkType]) => {
+	return replaceTuple.reduce((result: string, next:[string, string]) => {
 		return result.replace(next[0], next[1]);
 	}, text);
 
