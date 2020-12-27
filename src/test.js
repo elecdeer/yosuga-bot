@@ -1,9 +1,12 @@
+// import {AxiosResponse} from "axios";
+
+const urlRegex = require('url-regex');
 
 require("dotenv").config({path: "../.env"});
 
 const axios = require("axios").default;
 const async = require("async");
-const URL = require("url");
+// const URL = require("url");
 
 const port = process.env.VOICEROID_DEAMON_URL || "";
 // const url = URL.resolve(port, "");
@@ -18,7 +21,42 @@ const regexTest = () => {
 
 
 }
-regexTest();
+// regexTest();
+
+
+
+const urlTest = () => {
+  const urlReg = urlRegex({
+    exact: true
+  });
+
+  const url = "https://tenor.com/view/kitten-cat-typing-typing-cat-gif-5751430";
+
+  console.log(url.match(urlReg));
+
+  console.log(urlReg.test(url));
+
+  const urlObj = new URL(url);
+  if(urlObj.hostname === "tenor.com"){
+    console.log(urlObj.pathname);
+
+    // urlObj.pathname.match("")
+  }
+
+  // axios.head(url)
+  //   .then(res => {
+  //     console.log(res);
+  //   })
+
+
+
+  // axios.get(url)
+  //   .then(res =>{
+  //     res.
+  //   })
+
+}
+urlTest();
 
 //
 // const urls = [
