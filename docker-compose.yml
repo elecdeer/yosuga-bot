@@ -8,5 +8,6 @@ services:
     environment:
       DISCORD_TOKEN: your-discord-bot-token
       VOICEROID_DEAMON_URL: http://192.~:8080
+      COMMAND_PREFIX: yosuga
     restart: always
     container_name: node-yosuga

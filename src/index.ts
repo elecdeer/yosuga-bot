@@ -63,7 +63,7 @@ const serverConfDB = low(adapter);
 serverConfDB.read();
 
 const defaultConfig: ServerConfig = {
-	commandPrefix: "yosugat",
+	commandPrefix: process.env.COMMAND_PREFIX || "yosuga",
 	defaultSpeakerParam: {
 		Speed: 1.2
 	}
