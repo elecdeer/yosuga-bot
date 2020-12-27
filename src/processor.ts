@@ -51,8 +51,8 @@ export const urlProcessor: TextProcessor = async text => {
 	));
 }
 
-
-const emojiReg = /\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
+const RGI_Emoji = require('emoji-regex/RGI_Emoji.js');
+const emojiReg = RGI_Emoji();
 
 export const emojiProcessor: TextProcessor = async text => {
 	// console.log("絵文字: " + text.match(reg));
@@ -61,10 +61,9 @@ export const emojiProcessor: TextProcessor = async text => {
 		console.log(`${match} => ${emojiAnnotation[match]}`)
 		return emojiAnnotation[match];
 	}))
-
 }
 
-
+//サーバのカスタム絵文字
 const guildEmojiReg = /<:.+:\d+>/g;
 export const guildEmojiProcessor: TextProcessor = async text => {
 	return text.replace(guildEmojiReg, str => {
