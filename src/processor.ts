@@ -41,6 +41,7 @@ export const urlProcessor: TextProcessor = async text => {
 
 	if(! urls) return text;
 
+	//元のurlと置換後の文字列のtuple
 	const replaceTuple: Array<[string, string]> = await Promise.all(
 		urls.map(async url => {
 			const urlType = await checkUrlType(url);
