@@ -1,10 +1,10 @@
 import {TextChannel} from "discord.js";
 import {connect} from "../index";
-import {Command, command, createEmbedBase} from "../commandManager";
+import {Command, command, createEmbedBase, logger} from "../commandManager";
 
 
 export const handleStart: Command = async(args, message, session, config) => {
-	console.log("connect");
+	logger.info(`try connect: ${message.guild?.id}`);
 	if(!message.member) return;
 	if(!message.guild) return;
 

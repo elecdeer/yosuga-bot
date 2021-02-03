@@ -11,8 +11,27 @@ import {handleText} from "./textSpeech";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 
+import log4js from 'log4js';
+log4js.configure({
+	appenders: {
+		out: {type: "stdout"},
+		app: {type: "file", filename: "yosuga.log"},
+		wrapErr: {type: "logLevelFilter", appender: "app", level: "warn"}
+	},
+	categories: {
+		default: {
+			appenders: ["out", "app"],
+			level: "all"
+		},
+
+	}
+});
+const logger = log4js.getLogger();
+logger.info("start process");
+
 
 require("dotenv").config();
+logger.debug("environment", process.env);
 const client: Client = new Discord.Client();
 axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
@@ -71,7 +90,7 @@ const defaultConfig: ServerConfig = {
 
 
 client.once("ready", () => {
-	console.log("ready!");
+	logger.info("bot ready");
 });
 
 
@@ -277,17 +296,17 @@ client.on("voiceStateUpdate", (oldState, newState) => {
 
 assignCommands();
 
-client.login(process.env.DISCORD_TOKEN).then(r => {
-	console.log("login");
-	console.log(r);
+client.login(process.env.DISCORD_TOKEN).then(res => {
+	logger.info("bot login");
+	logger.info(`token: ${res}`);
 });
 
 
-
 process.on("exit", function() {
-	console.log("Exit...");
+	logger.info("Exit...");
+	log4js.shutdown();
 	client.destroy();
-	console.log("Destroy");
+	logger.info("Destroy");
 })
 process.on("SIGINT", function () {
 	process.exit(0);

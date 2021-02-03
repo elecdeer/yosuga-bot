@@ -3,6 +3,8 @@ import {ServerConfig, Session} from "./index";
 import {handleEnd} from "./commands/commandEnd";
 import {handleStart} from "./commands/commandStart";
 
+import log4js from 'log4js';
+export const logger = log4js.getLogger("command");
 
 export type Command = (args: Array<string>,message: Message, session: Session, config: ServerConfig) => Promise<void>;
 
@@ -10,7 +12,7 @@ export type Command = (args: Array<string>,message: Message, session: Session, c
 const commandMap: Record<string, Command> = {};
 
 export const command = (commandText: string, discription: string, action: Command) => {
-	console.log(`assignCommand: ${commandText}`);
+	logger.debug(`assignCommand: ${commandText}`)
 	commandMap[commandText] = action;
 }
 
@@ -23,6 +25,7 @@ export const createEmbedBase = () => {
 
 
 export const assignCommands = () => {
+	logger.debug("assign commands");
 	command("e", "ボイスチャンネルから退出し,読み上げを終了する", handleEnd);
 	command("s", "ボイスチャンネルに接続し,読み上げを開始する.", handleStart);
 }
