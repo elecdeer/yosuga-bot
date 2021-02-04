@@ -4,6 +4,7 @@ import {getLogger} from "log4js";
 export const processorLogger = getLogger("processor");
 
 export type TextProcessor = (text: string) => Promise<string>;
+export type ProcessorProvider<T> = (arg: T) => TextProcessor;
 
 
 export class ProcessorChain{

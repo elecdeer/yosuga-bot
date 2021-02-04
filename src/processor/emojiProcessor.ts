@@ -1,6 +1,6 @@
 import axios from "axios";
 import RGI_Emoji from "emoji-regex";
-import {processorLogger, TextProcessor} from "../processor";
+import {processorLogger, ProcessorProvider, TextProcessor} from "../processor";
 
 let emojiAnnotation: Record<string, string>;
 
@@ -12,7 +12,7 @@ let emojiAnnotation: Record<string, string>;
 
 const emojiReg = RGI_Emoji();
 
-export const emojiProcessor: TextProcessor = async text => {
+export const emojiProcessor: ProcessorProvider<void> = () => async text => {
 	// console.log("絵文字: " + text.match(reg));
 
 	return text.replace(emojiReg, (match => {

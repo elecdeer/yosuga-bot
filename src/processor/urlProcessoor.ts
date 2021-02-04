@@ -1,7 +1,7 @@
 import urlRegex from "url-regex";
 import httpStatus from "http-status";
 import axios, {AxiosResponse} from "axios";
-import {processorLogger, TextProcessor} from "../processor";
+import {processorLogger, ProcessorProvider, TextProcessor} from "../processor";
 
 const LinkType = {
 	Image: "画像",
@@ -16,7 +16,7 @@ const urlReg = urlRegex({
 
 });
 
-export const urlProcessor: TextProcessor = async text => {
+export const urlProcessor: ProcessorProvider<void> = () => async text => {
 	const urls = text.match(urlReg);
 
 	processorLogger.debug("urlProcessor");

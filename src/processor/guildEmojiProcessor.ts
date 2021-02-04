@@ -1,9 +1,9 @@
 //サーバのカスタム絵文字
-import {processorLogger, TextProcessor} from "../processor";
+import {processorLogger, ProcessorProvider, TextProcessor} from "../processor";
 import {client} from "../index";
 
 const guildEmojiReg = /<:.+:\d+>/g;
-export const guildEmojiProcessor: TextProcessor = async text => {
+export const guildEmojiProcessor: ProcessorProvider<void> = () =>  async text => {
 
 
 	return text.replace(guildEmojiReg, str => {
