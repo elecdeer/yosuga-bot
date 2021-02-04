@@ -91,6 +91,7 @@ export class Session{
 	disconnect(){
 		logger.info(`disconnect: ${this.voiceChannel.id}`);
 		this.connection?.disconnect();
+		this.speechQueue.kill();
 		delete sessionStateMap[this.guild.id];
 	}
 
