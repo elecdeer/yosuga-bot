@@ -29,8 +29,9 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	// console.log(session);
 	if(!session) return;
 
-	logger.debug(`content: ${message.content}`);
+	logger.debug(`content: ${message.content}  escape: ${escape(message.content)}`);
 	logger.debug(`cleanContent: ${message.cleanContent}`);
+
 	logger.debug(`embeds: ${message.embeds}`);
 	logger.debug(`attachments: ${message.attachments}`);
 	// logger.debug(`stickers] ${message.stickers}`);

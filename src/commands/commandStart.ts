@@ -1,6 +1,7 @@
 import {TextChannel} from "discord.js";
 import {Command, createEmbedBase, logger} from "../commandManager";
 import {Session} from "../session";
+import {client} from "../index";
 
 
 export const handleStart: Command = async(args, message, session, config) => {
@@ -20,6 +21,9 @@ export const handleStart: Command = async(args, message, session, config) => {
 			.setDescription("接続しました！");
 
 		await channel.send(embed);
+
+
+		logger.debug(`emojiList: ${message.guild.emojis}`)
 	}else{
 		const embed = createEmbedBase()
 			.setDescription("先にボイスチャンネルに入る必要があります.");
