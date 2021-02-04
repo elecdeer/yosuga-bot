@@ -1,25 +1,28 @@
 import {Message} from "discord.js";
 import {codeBlockProcessor, emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
-import {pushSpeech, ServerConfig, Session, SpeechParam} from "./index";
+import log4js from 'log4js';
+import {Session} from "./session";
+import {ServerConfig} from "./guildConfig";
 
+const logger = log4js.getLogger("text");
 
 export const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	// console.log(message);
 
 	//読み上げ
 
-	console.log("handleText");
+	logger.debug("handleText");
 
 	// console.log(session);
 	if(!session) return;
 
-	console.log(message.content);
-	// console.log(message.cleanContent);
-	// console.log(message.embeds);
-
+	logger.debug(`content: ${message.content}`);
+	logger.debug(`cleanContent: ${message.cleanContent}`);
+	logger.debug(`embeds: ${message.embeds}`);
+	logger.debug(`attachments: ${message.attachments}`);
+	// logger.debug(`stickers] ${message.stickers}`);
 
 	let baseText = message.cleanContent;
-	console.log(message.cleanContent);
 
 	// console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
 	// console.log("messageTime: " + message.createdTimestamp);
@@ -28,12 +31,12 @@ export const handleText = async (message: Message, session: Session, config: Ser
 		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).join(" ");
 	}
 
-	console.log("[baseText] " + baseText);
+	logger.debug("[baseText] " + baseText);
 
 	//名前読み上げ
 
 	const difMs = message.createdTimestamp - session.lastMessageTimestamp;
-	console.log("timeDif: " + difMs);
+	logger.debug("timeDif: " + difMs);
 	if(session.lastMessageAuthorId !== message.author.id || difMs > 30000){
 		baseText = `${message.member?.displayName}　${baseText}`;
 	}
@@ -44,14 +47,11 @@ export const handleText = async (message: Message, session: Session, config: Ser
 			.then(guildEmojiProcessor)
 			.then(codeBlockProcessor)
 
+	logger.debug(`text: ${text}`);
 
-	pushSpeech({
-		session: session,
-		param: {
-			Text: text,
-		},
-		timestamp: message.createdTimestamp,
-		authorId: message.author.id
-	});
+	session.pushSpeech({
+		Text: text,
+	}, message.createdTimestamp, message.author.id);
+
 
 }

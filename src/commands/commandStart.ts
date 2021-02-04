@@ -1,6 +1,6 @@
 import {TextChannel} from "discord.js";
-import {connect} from "../index";
-import {Command, command, createEmbedBase, logger} from "../commandManager";
+import {Command, createEmbedBase, logger} from "../commandManager";
+import {Session} from "../session";
 
 
 export const handleStart: Command = async(args, message, session, config) => {
@@ -13,7 +13,8 @@ export const handleStart: Command = async(args, message, session, config) => {
 
 
 	if(message.member.voice.channel){
-		await connect(message.member.voice.channel, channel, message.guild);
+		const session = new Session(message.member.voice.channel, channel, message.guild)
+		await session.connectVoiceChannel();
 
 		const embed = createEmbedBase()
 			.setDescription("接続しました！");

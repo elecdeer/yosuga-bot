@@ -1,12 +1,15 @@
 import {Message, MessageEmbed, TextChannel} from "discord.js";
-import {ServerConfig, Session} from "./index";
+
 import {handleEnd} from "./commands/commandEnd";
 import {handleStart} from "./commands/commandStart";
 
 import log4js from 'log4js';
+import {Session} from "./session";
+import {ServerConfig} from "./guildConfig";
+
 export const logger = log4js.getLogger("command");
 
-export type Command = (args: Array<string>,message: Message, session: Session, config: ServerConfig) => Promise<void>;
+export type Command = (args: Array<string>,message: Message, session: Session | null, config: ServerConfig) => Promise<void>;
 
 
 const commandMap: Record<string, Command> = {};
@@ -30,14 +33,17 @@ export const assignCommands = () => {
 	command("s", "ボイスチャンネルに接続し,読み上げを開始する.", handleStart);
 }
 
-export const handleCommand = async (message: Message, session: Session, config: ServerConfig) => {
+export const handleCommand = async (message: Message, session: Session | null, config: ServerConfig) => {
+	logger.debug("handleCommand");
 	if(!message.guild) return;
 
 	const channel = message.channel;
 	if(! (channel instanceof TextChannel)) return;
 
+
 	const args = message.content.slice(config.commandPrefix.length).trim().split(" ");
-	const command = args.shift() || "";
+	const command = args.shift() ?? "";
+	logger.debug(`content: ${message.content} command: ${command} args: ${args}`);
 
 	if(command in commandMap){
 		await commandMap[command](args, message, session, config);

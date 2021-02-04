@@ -1,5 +1,4 @@
-import {disconnect} from "../index";
-import {Command, command, createEmbedBase} from "../commandManager";
+import {Command, createEmbedBase} from "../commandManager";
 
 export const handleEnd: Command  = async (args, message, session, config) => {
 	console.log("disconnect");
@@ -7,7 +6,7 @@ export const handleEnd: Command  = async (args, message, session, config) => {
 	if(!session?.connection) return;
 	if(!message.guild) return;
 
-	disconnect(session, message.guild);
+	session.disconnect();
 
 	const embed = createEmbedBase()
 		.setDescription("退出しました.");

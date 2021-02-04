@@ -1,17 +1,13 @@
-import async, {AsyncQueue, AsyncResultCallback, ErrorCallback} from "async";
-import {Client, Guild, Message, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
-import {AxiosResponse} from "axios";
 
-import Discord from "discord.js";
-import axios from "axios";
-
-import {assignCommands, createEmbedBase, handleCommand} from "./commandManager";
-import {handleText} from "./textSpeech";
-
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
+require("dotenv").config();
 
 import log4js from 'log4js';
+import Discord, {Client} from "discord.js";
+import axios from "axios";
+
+import {setHandler} from "./eventHandler";
+import {assignCommands} from "./commandManager";
+
 log4js.configure({
 	appenders: {
 		out: {type: "stdout"},
@@ -26,13 +22,14 @@ log4js.configure({
 
 	}
 });
+
 const logger = log4js.getLogger();
+
 logger.info("start process");
-
-
-require("dotenv").config();
 logger.debug("environment", process.env);
-const client: Client = new Discord.Client();
+
+
+export const client: Client = new Discord.Client();
 axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
 
@@ -54,251 +51,249 @@ export type SpeakerParam = Partial<{
 
 
 
-export type Session = {
-	// state: SessionState
-	connection: VoiceConnection,
-	textChannel: TextChannel,
-	speechQueue: AsyncQueue<SpeechParam>,
+// export type Session = {
+// 	// state: SessionState
+// 	connection: VoiceConnection,
+// 	textChannel: TextChannel,
+// 	speechQueue: AsyncQueue<SpeechParam>,
+//
+// 	lastMessageTimestamp: number,
+// 	lastMessageAuthorId: string
+// };
 
-	lastMessageTimestamp: number,
-	lastMessageAuthorId: string
-};
-
-export type ServerConfig = {
-	commandPrefix: string,
-	defaultSpeakerParam: SpeakerParam
-	// connectCommand: string,
-	// disconnectCommand: string,
-};
+// export type ServerConfig = {
+// 	commandPrefix: string,
+// 	defaultSpeakerParam: SpeakerParam
+// 	// connectCommand: string,
+// 	// disconnectCommand: string,
+// };
 
 //各ボイス接続時の状態など
-export const sessionStateMap: Record<string, Session> = {};
+// export const sessionStateMap: Record<string, Session> = {};
 
 //各サーバ上でのbot設定
 // export const serverConfigMap: Record<string, Partial<ServerConfig>> = {};
+//
+// const adapter = new FileSync<Record<string, Partial<ServerConfig>>>("guildSettings.json");
+// const serverConfDB = low(adapter);
+// serverConfDB.read();
+//
+// const defaultConfig: ServerConfig = {
+// 	commandPrefix: process.env.COMMAND_PREFIX || "yosuga",
+// 	defaultSpeakerParam: {
+// 		Speed: 1.2
+// 	}
+// }
 
-const adapter = new FileSync<Record<string, Partial<ServerConfig>>>("guildSettings.json");
-const serverConfDB = low(adapter);
-serverConfDB.read();
-
-const defaultConfig: ServerConfig = {
-	commandPrefix: process.env.COMMAND_PREFIX || "yosuga",
-	defaultSpeakerParam: {
-		Speed: 1.2
-	}
-}
-
-
-client.once("ready", () => {
-	logger.info("bot ready");
-});
-
-
-const getGuildConfig = (guildId: string): ServerConfig => {
-	// console.log("getGuildConfig");
-	// console.log(guildId);
-	// console.log(serverConfDB.getState());
-
-	// console.log(serverConfDB.get(guildId).value());
-	if(! serverConfDB.has(guildId).value()){
-		serverConfDB.set(guildId, {}).write();
-	}
-	return {
-		...defaultConfig,
-		...serverConfDB.get(guildId).value()
-	};
-}
-
-client.on("message", async message => {
-	if(!message.guild) return;
-	if(message.author.bot) return;
-
-	const guildId = message.guild.id;
-	const sessionState = sessionStateMap[guildId];
+//
+// client.once("ready", () => {
+// 	logger.info("bot ready");
+// });
 
 
-	// .get(message.guild.id).
-	const config = getGuildConfig(guildId);
-	// console.log(config);
+// const getGuildConfig = (guildId: string): ServerConfig => {
+// 	// console.log("getGuildConfig");
+// 	// console.log(guildId);
+// 	// console.log(serverConfDB.getState());
+//
+// 	// console.log(serverConfDB.get(guildId).value());
+// 	if(! serverConfDB.has(guildId).value()){
+// 		serverConfDB.set(guildId, {}).write();
+// 	}
+// 	return {
+// 		...defaultConfig,
+// 		...serverConfDB.get(guildId).value()
+// 	};
+// }
 
-	if(message.content.startsWith(config.commandPrefix)){
-		await handleCommand(message, sessionState, config);
-		return;
-	}
+// client.on("message", async message => {
+// 	if(!message.guild) return;
+// 	if(message.author.bot) return;
+//
+// 	const guildId = message.guild.id;
+// 	const sessionState = sessionStateMap[guildId];
+//
+//
+// 	// .get(message.guild.id).
+// 	const config = getGuildConfig(guildId);
+// 	// console.log(config);
+//
+// 	if(message.content.startsWith(config.commandPrefix)){
+// 		await handleCommand(message, sessionState, config);
+// 		return;
+// 	}
+//
+// 	if(sessionState?.textChannel?.id === message.channel.id){
+// 		await handleText(message, sessionState, config);
+// 	}
+//
+// })
 
-	if(sessionState?.textChannel?.id === message.channel.id){
-		await handleText(message, sessionState, config);
-	}
+//
+// export const connect = async (voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild) => {
+// 	const connection = await voiceChannel.join();
+//
+// 	const queue = async.queue((param: SpeechParam, cb) => {
+// 		const config = getGuildConfig(guild.id);
+//
+// 		const connectedParam: SpeechParam = {
+// 			Text: param.Text,
+// 			Kana: param.Kana,
+// 			Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
+// 		}
+//
+// 		speech(connection, connectedParam).then(value => {
+// 			cb();
+// 		})
+// 	}, 1);
+//
+// 	queue.drain(() => {
+// 		console.log("queue empty");
+// 	})
+//
+//
+// 	sessionStateMap[guild.id] = {
+// 		connection: connection,
+// 		textChannel: textChannel,
+// 		speechQueue: queue,
+// 		lastMessageTimestamp: 0,
+// 		lastMessageAuthorId: client.user?.id || "unknown"
+// 	};
+//
+// }
 
-
-
-})
-
-
-export const connect = async (voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild) => {
-	const connection = await voiceChannel.join();
-
-	const queue = async.queue((param: SpeechParam, cb) => {
-		const config = getGuildConfig(guild.id);
-
-		const connectedParam: SpeechParam = {
-			Text: param.Text,
-			Kana: param.Kana,
-			Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
-		}
-
-		speech(connection, connectedParam).then(value => {
-			cb();
-		})
-	}, 1);
-
-	queue.drain(() => {
-		console.log("queue empty");
-	})
-
-
-	sessionStateMap[guild.id] = {
-		connection: connection,
-		textChannel: textChannel,
-		speechQueue: queue,
-		lastMessageTimestamp: 0,
-		lastMessageAuthorId: client.user?.id || "unknown"
-	};
-
-}
-
-export const disconnect = (session: Session, guild: Guild) => {
-	session.connection.disconnect();
-	delete sessionStateMap[guild.id];
-}
-
-
-export const speech = async (connection: VoiceConnection, param: SpeechParam) => (
-	axios({
-		method: "POST",
-		url: "/api/speechtext",
-		responseType: "stream",
-		data: param
-	})
-		.then((res: AxiosResponse) => new Promise((resolve, reject) => {
-			console.log("got wav");
-			connection.play(res.data).once("finish", () => {
-				console.log("playFinish");
-				resolve();
-			})
-
-			//タイムアウトもここに?
-		}))
-		.catch((reason: any) => {
-			console.log(reason);
-			return;
-		})
-)
+// export const disconnect = (session: Session, guild: Guild) => {
+// 	session.connection.disconnect();
+// 	delete sessionStateMap[guild.id];
+// }
 
 
-export const pushSpeech = ({session, param, authorId, timestamp}: {
-	session: Session, param: SpeechParam, timestamp?: number, authorId?: string
-}) => {
-	// console.log("push")
-	session.speechQueue.push(param);
-	session.lastMessageTimestamp = timestamp || Date.now();
-	session.lastMessageAuthorId = authorId || client.user?.id || "unknown";
-}
+// export const speech = async (connection: VoiceConnection, param: SpeechParam) => (
+// 	axios({
+// 		method: "POST",
+// 		url: "/api/speechtext",
+// 		responseType: "stream",
+// 		data: param
+// 	})
+// 		.then((res: AxiosResponse) => new Promise((resolve, reject) => {
+// 			console.log("got wav");
+// 			connection.play(res.data).once("finish", () => {
+// 				console.log("playFinish");
+// 				resolve(null);
+// 			})
+//
+// 			//タイムアウトもここに?
+// 		}))
+// 		.catch((reason: any) => {
+// 			console.log(reason);
+// 			return;
+// 		})
+// )
 
 
-client.on("voiceStateUpdate", (oldState, newState) => {
-	const session = sessionStateMap[newState.guild.id];
-	// const config = getGuildConfig(newState.guild.id);
-
-	if(!session) return;
-
-	// console.log(newState);
-
-	if(!oldState.channel && !!newState.channel){
-		if(session.connection.channel.id !== newState.channelID) return;
-
-		console.log("join");
-		// console.log(newState.member?.user);
-
-		// pushSpeech(session, )
-
-		pushSpeech({
-			session: session,
-			param: {
-				Text: `${newState.member?.user.username}が入室しました。`
-			},
-		});
-
-	}
-	if(!!oldState.channel && !newState.channel){
-		if(session.connection.channel.id !== oldState.channelID) return;
-
-		const memberNumExcludedBot = oldState.channel.members.filter(member => !member.user.bot).size;
-
-		if(memberNumExcludedBot <= 0){
-
-			const embed = createEmbedBase()
-				.setDescription("ボイスチャンネルに誰もいなくなったため退出しました.");
-
-			session.textChannel.send(embed).then(() => {
-				console.log("disconnect");
-				disconnect(session, oldState.guild);
-			});
-		}
+// export const pushSpeech = ({session, param, authorId, timestamp}: {
+// 	session: Session, param: SpeechParam, timestamp?: number, authorId?: string
+// }) => {
+// 	// console.log("push")
+// 	session.speechQueue.push(param);
+// 	session.lastMessageTimestamp = timestamp || Date.now();
+// 	session.lastMessageAuthorId = authorId || client.user?.id || "unknown";
+// }
 
 
-		console.log("leave")
-		// console.log(newState.member?.user);
+// client.on("voiceStateUpdate", (oldState, newState) => {
+// 	const session = sessionStateMap[newState.guild.id];
+// 	// const config = getGuildConfig(newState.guild.id);
+//
+// 	if(!session) return;
+//
+// 	// console.log(newState);
+//
+// 	if(!oldState.channel && !!newState.channel){
+// 		if(session.connection.channel.id !== newState.channelID) return;
+//
+// 		console.log("join");
+// 		// console.log(newState.member?.user);
+//
+// 		// pushSpeech(session, )
+//
+// 		pushSpeech({
+// 			session: session,
+// 			param: {
+// 				Text: `${newState.member?.user.username}が入室しました。`
+// 			},
+// 		});
+//
+// 	}
+// 	if(!!oldState.channel && !newState.channel){
+// 		if(session.connection.channel.id !== oldState.channelID) return;
+//
+// 		const memberNumExcludedBot = oldState.channel.members.filter(member => !member.user.bot).size;
+//
+// 		if(memberNumExcludedBot <= 0){
+//
+// 			const embed = createEmbedBase()
+// 				.setDescription("ボイスチャンネルに誰もいなくなったため退出しました.");
+//
+// 			session.textChannel.send(embed).then(() => {
+// 				console.log("disconnect");
+// 				disconnect(session, oldState.guild);
+// 			});
+// 		}
+//
+//
+// 		console.log("leave")
+// 		// console.log(newState.member?.user);
+//
+//
+// 		pushSpeech({
+// 			session: session,
+// 			param: {
+// 				Text: `${newState.member?.user.username}が退室しました。`
+// 			},
+// 		});
+//
+// 	}
+//
+// 	if(!oldState.selfVideo && newState.selfVideo){
+// 		if(session.connection.channel.id !== oldState.channelID) return;
+// 		if(oldState.member !== newState.member) return;
+// 		pushSpeech({
+// 			session: session,
+// 			param: {
+// 				Text: `${newState.member?.user.username}がカメラをオンにしました。`
+// 			},
+// 		});
+// 	}
+//
+// 	if(!oldState.streaming && newState.streaming){
+// 		if(session.connection.channel.id !== oldState.channelID) return;
+// 		if(oldState.member !== newState.member) return;
+//
+// 		pushSpeech({
+// 			session: session,
+// 			param: {
+// 				Text: `${newState.member?.user.username}がゴーライブを開始しました。`
+// 			},
+// 		});
+// 	}
+//
+//
+// 	// console.log("===old================================================================================")
+// 	// console.log(oldState.channel);
+// 	//
+// 	// console.log("===new================================================================================")
+// 	// console.log(newState.channel);
+// 	// // console.log(newState.member);
+// })
 
-
-		pushSpeech({
-			session: session,
-			param: {
-				Text: `${newState.member?.user.username}が退室しました。`
-			},
-		});
-
-	}
-
-	if(!oldState.selfVideo && newState.selfVideo){
-		if(session.connection.channel.id !== oldState.channelID) return;
-		if(oldState.member !== newState.member) return;
-		pushSpeech({
-			session: session,
-			param: {
-				Text: `${newState.member?.user.username}がカメラをオンにしました。`
-			},
-		});
-	}
-
-	if(!oldState.streaming && newState.streaming){
-		if(session.connection.channel.id !== oldState.channelID) return;
-		if(oldState.member !== newState.member) return;
-
-		pushSpeech({
-			session: session,
-			param: {
-				Text: `${newState.member?.user.username}がゴーライブを開始しました。`
-			},
-		});
-	}
-
-
-	// console.log("===old================================================================================")
-	// console.log(oldState.channel);
-	//
-	// console.log("===new================================================================================")
-	// console.log(newState.channel);
-	// // console.log(newState.member);
-})
-
-
-
+setHandler(client);
 assignCommands();
 
 client.login(process.env.DISCORD_TOKEN).then(res => {
 	logger.info("bot login");
 	logger.info(`token: ${res}`);
+
 });
 
 
@@ -311,17 +306,3 @@ process.on("exit", function() {
 process.on("SIGINT", function () {
 	process.exit(0);
 });
-
-
-// process.on("beforeExit", function() {
-// 	console.log("Exitting...");
-// 	for(let key in sessionStateMap){
-// 		const session = sessionStateMap[key];
-// 		if(!!session.connection){
-// 			session.connection.disconnect();
-// 		}
-// 	}
-// })
-// process.on("SIGINT", function () {
-// 	process.exit(0);
-// });
