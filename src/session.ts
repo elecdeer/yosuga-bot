@@ -1,7 +1,11 @@
-import {Guild, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
+import {Guild, TextChannel, VoiceBroadcast, VoiceChannel, VoiceConnection} from "discord.js";
 import async, {QueueObject} from "async";
-import {client, SpeechParam} from "./index";
+import {client} from "./index";
 import {logger} from "./commandManager";
+import {Speaker, SpeechParam} from "./speaker/speaker";
+import {getGuildConfig} from "./guildConfig";
+import {VoiceroidSpeaker} from "./speaker/voiceroidSpeaker";
+import {Readable} from "stream";
 
 const sessionStateMap: Record<string, Session> = {};
 
@@ -20,6 +24,9 @@ export class Session{
 	speechQueue: QueueObject<SpeechParam>;
 	guild: Guild;
 
+	//仮
+	speaker: Speaker
+
 	lastMessageTimestamp: number;
 	lastMessageAuthorId: string;
 
@@ -34,6 +41,8 @@ export class Session{
 		this.lastMessageTimestamp = 0;
 		this.lastMessageAuthorId = "";
 
+		this.speaker = new VoiceroidSpeaker();
+
 		sessionStateMap[guild.id] = this;
 
 	}
@@ -42,33 +51,37 @@ export class Session{
 		const queue = async.queue(async (param: SpeechParam) => {
 			logger.debug("consume queue");
 			logger.debug(param);
+
+			const config = getGuildConfig(this.guild.id);
+			const connectedParam: SpeechParam = {
+				Text: param.Text,
+				Kana: param.Kana,
+				Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
+			}
+
+			await this.broadcastSpeech(connectedParam);
+
 		});
 
 		return queue;
-
-
-
-		// const queue = async.queue((param: SpeechParam, cb) => {
-		// 	const config = getGuildConfig(guild.id);
-		//
-		// 	const connectedParam: SpeechParam = {
-		// 		Text: param.Text,
-		// 		Kana: param.Kana,
-		// 		Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
-		// 	}
-		//
-		// 	speech(connection, connectedParam).then(value => {
-		// 		cb();
-		// 	})
-		// }, 1);
-		//
-		// queue.drain(() => {
-		// 	console.log("queue empty");
-		// })
 	}
 
-	async broadcastSpeech(param: SpeechParam){
+	broadcastSpeech(param: SpeechParam){
+		const connection = this.connection;
+		if(!connection){
+			logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
+			return;
+		}
 
+		return this.speaker.getSpeech(param)
+			.then((data) => new Promise((resolve, reject) => {
+				connection.play(data).once("finish", () => {
+					resolve(null);
+				})
+			}))
+			.catch(reason => {
+				logger.error(reason);
+			})
 	}
 
 	async connectVoiceChannel(){
