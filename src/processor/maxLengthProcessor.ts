@@ -10,5 +10,5 @@ export const maxLengthProcessor: ProcessorProvider<number> = (max: number) => as
 		return text;
 	}
 
-	return charArray.slice(0, max).join();
+	return charArray.slice(0, max).join() + " 以下略";
 }
