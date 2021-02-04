@@ -1,10 +1,23 @@
 import {Message} from "discord.js";
-import {codeBlockProcessor, emojiProcessor, guildEmojiProcessor, urlProcessor} from "./processor";
+import {ProcessorChain} from "./processor";
 import log4js from 'log4js';
 import {Session} from "./session";
 import {ServerConfig} from "./guildConfig";
+import {urlProcessor} from "./processor/urlProcessoor";
+import {emojiProcessor} from "./processor/emojiProcessor";
+import {guildEmojiProcessor} from "./processor/guildEmojiProcessor";
+import {codeBlockProcessor} from "./processor/codeBlockProcessor";
 
 const logger = log4js.getLogger("text");
+
+
+const processor = new ProcessorChain()
+	.use(urlProcessor)
+	.use(emojiProcessor)
+	.use(guildEmojiProcessor)
+	.use(codeBlockProcessor);
+
+
 
 export const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	// console.log(message);
@@ -41,11 +54,7 @@ export const handleText = async (message: Message, session: Session, config: Ser
 		baseText = `${message.member?.displayName}　${baseText}`;
 	}
 
-	const text = await
-		urlProcessor(baseText)
-			.then(emojiProcessor)
-			.then(guildEmojiProcessor)
-			.then(codeBlockProcessor)
+	const text = await processor.process(baseText);
 
 	logger.debug(`text: ${text}`);
 
