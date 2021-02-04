@@ -7,15 +7,17 @@ import {urlProcessor} from "./processor/urlProcessoor";
 import {emojiProcessor} from "./processor/emojiProcessor";
 import {guildEmojiProcessor} from "./processor/guildEmojiProcessor";
 import {codeBlockProcessor} from "./processor/codeBlockProcessor";
+import {maxLengthProcessor} from "./processor/MaxLengthProcessor";
 
 const logger = log4js.getLogger("text");
 
 
 const processor = new ProcessorChain()
-	.use(urlProcessor)
-	.use(emojiProcessor)
-	.use(guildEmojiProcessor)
-	.use(codeBlockProcessor);
+	.use(maxLengthProcessor(500))
+	.use(urlProcessor())
+	.use(emojiProcessor())
+	.use(guildEmojiProcessor())
+	.use(codeBlockProcessor());
 
 
 
