@@ -7,7 +7,7 @@ import {urlProcessor} from "./processor/urlProcessoor";
 import {emojiProcessor} from "./processor/emojiProcessor";
 import {guildEmojiProcessor} from "./processor/guildEmojiProcessor";
 import {codeBlockProcessor} from "./processor/codeBlockProcessor";
-import {maxLengthProcessor} from "./processor/MaxLengthProcessor";
+import {maxLengthProcessor} from "./processor/maxLengthProcessor";
 
 const logger = log4js.getLogger("text");
 
