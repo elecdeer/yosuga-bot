@@ -7,6 +7,7 @@ import {ServerConfig} from "../guildConfig";
 import {startCommand} from "./startCommand";
 import {endCommand} from "./endCommand";
 import {clearCommand} from "./clearCommand";
+import {helpCommand} from "./helpCommand";
 
 export const logger = log4js.getLogger("command");
 
@@ -20,7 +21,7 @@ export type Command = {
 	execute: CommandExecutor
 }
 
-const commandList = new Set<Command>();
+export const commandList = new Set<Command>();
 const commandExeRecord:Record<string, CommandExecutor> = {};
 
 export const assign = (command: Command) => {
@@ -44,10 +45,6 @@ export const createEmbedBase = () => {
 		.setColor(0xffb6c1);
 }
 
-export const getCommandList = () => {
-	return Object.freeze(commandList);
-}
-
 
 
 export const assignCommands = () => {
@@ -55,10 +52,7 @@ export const assignCommands = () => {
 	assign(startCommand);
 	assign(endCommand);
 	assign(clearCommand);
-
-	// command("e", "ボイスチャンネルから退出し,読み上げを終了する", handleEnd);
-	// command("s", "ボイスチャンネルに接続し,読み上げを開始する.", handleStart);
-	// command("clear", "読み上げを強制的に停止し,キューをクリアする.", handleClear);
+	assign(helpCommand);
 }
 
 export const handleCommand = async (message: Message, session: Session | null, config: ServerConfig) => {
