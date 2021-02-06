@@ -2,12 +2,15 @@ import urlRegex from "url-regex";
 import httpStatus from "http-status";
 import axios, {AxiosResponse} from "axios";
 import {processorLogger, ProcessorProvider, TextProcessor} from "../processor";
+import ogs from "open-graph-scraper";
+import {logger} from "../commands/commands";
 
 const LinkType = {
 	Image: "画像",
 	GifImage: "ジフ画像",
 	ValidUrl: "URL省略",
-	InvalidUrl: "無効なURL",
+	OGUrl: "URL",
+	InvalidUrl: "不明なURL",
 } as const;
 
 type LinkType = typeof LinkType[keyof typeof LinkType];
@@ -30,8 +33,7 @@ export const urlProcessor: ProcessorProvider<void> = () => async text => {
 			const urlType = await checkUrlType(url);
 			const urlObj = new URL(url);
 
-			const altText = urlType === LinkType.ValidUrl ? urlObj.hostname.replace(/^www./, "") : urlType;
-
+			const altText = urlType.read ?? urlType.type;
 			return [url, altText] as [string, string];
 		})
 	);
@@ -48,38 +50,51 @@ const redirectStatus = [
 	httpStatus.SEE_OTHER
 ]
 
-const checkUrlType = async (url: string) => {
-	return axios.head(url)
-		.then((res: AxiosResponse<AxiosResponse>) => {
-			// console.log(res);
-			processorLogger.debug(`status: ${res.status} content-type: ${res.headers["content-type"]}`);
+const checkUrlType: (url: string) => Promise<{type: LinkType, read?: string}> = async (url) => {
+	if(!url) return {type: LinkType.InvalidUrl};
 
-			//怪しい
-			if(redirectStatus.includes(res.status)){
-				return new Promise((resolve, reject) => {
-					checkUrlType(res.headers["Location"])
-						.then(result => {
-							resolve(result);
-						})
-				});
-			}
+	processorLogger.debug(`check: ${url}`);
 
-			const urlObj = new URL(url);
-			if(urlObj.hostname === "tenor.com"){
-				return LinkType.GifImage;
-			}
+	const res = await axios({
+		method: "GET",
+		url: url,
+		validateStatus: status => (200 <= status || status < 400),
+		headers: {
+			"User-Agent": "bot"
+		}
+	});
 
-			if(res.headers["content-type"] === "image/gif"){
-				return LinkType.GifImage;
-			}else if(res.headers["content-type"].startsWith("image")){
-				return LinkType.Image;
-			}else{
-				return LinkType.ValidUrl;
-			}
+	//リダイレクト
+	if(redirectStatus.includes(res.status)){
+		return checkUrlType(res.headers["Location"]);
+	}
+
+	const contentType = res.headers["content-type"];
+	if(contentType === "image/gif"){
+		return {type: LinkType.GifImage};
+	}
+	if(contentType.startsWith("image")){
+		return {type: LinkType.Image};
+	}
+
+	if(contentType.startsWith("text/html")){
+		const ogRes = await ogs({
+			url: "",
+			html: (res.data as string),
 		})
-		.catch(() => {
-			return LinkType.InvalidUrl;
-		});
+
+		if(ogRes.error){
+			return {type: LinkType.ValidUrl};
+		}else{
+			return {
+				type: LinkType.ValidUrl,
+				read: `URL ${ogRes.result.ogTitle}`
+			};
+		}
+		// processorLogger.debug(ogRes.result);
+	}
+
+	return {type: LinkType.InvalidUrl};
 }
 
 

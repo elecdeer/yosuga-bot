@@ -33,6 +33,8 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	// console.log(session);
 	if(!session) return;
 
+	// logger.debug(message);
+
 	logger.debug(`content: ${message.content}  escape: ${escape(message.content)}`);
 	logger.debug(`cleanContent: ${message.cleanContent}`);
 
