@@ -21,6 +21,8 @@ const processor = new ProcessorChain()
 
 
 
+const nameOmitMs = 30000;
+
 export const handleText = async (message: Message, session: Session, config: ServerConfig) => {
 	// console.log(message);
 
@@ -47,19 +49,18 @@ export const handleText = async (message: Message, session: Session, config: Ser
 		baseText = baseText + " " + message.attachments.map(attachment => attachment.url).join(" ");
 	}
 
-	logger.debug("[baseText] " + baseText);
+	logger.debug("baseText " + baseText);
+
+	let text = await processor.process(baseText);
+	logger.debug(`text: ${text}`);
+
 
 	//名前読み上げ
-
 	const difMs = message.createdTimestamp - session.lastMessageTimestamp;
-	logger.debug("timeDif: " + difMs);
-	if(session.lastMessageAuthorId !== message.author.id || difMs > 30000){
-		baseText = `${message.member?.displayName}　${baseText}`;
+	logger.debug(`name omit? ${difMs} > ${nameOmitMs}`);
+	if(session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs){
+		text = `${message.member?.displayName} ${text}`
 	}
-
-	const text = await processor.process(baseText);
-
-	logger.debug(`text: ${text}`);
 
 	session.pushSpeech({
 		Text: text,

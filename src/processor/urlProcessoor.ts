@@ -19,10 +19,10 @@ const urlReg = urlRegex({
 export const urlProcessor: ProcessorProvider<void> = () => async text => {
 	const urls = text.match(urlReg);
 
+	if(! urls) return text;
+
 	processorLogger.debug("urlProcessor");
 	processorLogger.debug(urls);
-
-	if(! urls) return text;
 
 	//元のurlと置換後の文字列のtuple
 	const replaceTuple: Array<[string, string]> = await Promise.all(

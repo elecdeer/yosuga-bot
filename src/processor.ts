@@ -22,11 +22,11 @@ export class ProcessorChain{
 	process(text: string){
 		return this.processors.reduce((prev, cur) => {
 			return prev
+				.then(cur)
 				.then(text => {
-					processorLogger.debug(`processor: ${cur.name} text:${text}`);
+					processorLogger.debug(`=> ${text}`);
 					return text;
-				})
-				.then(cur);
+				});
 		}, Promise.resolve(text));
 	}
 }
