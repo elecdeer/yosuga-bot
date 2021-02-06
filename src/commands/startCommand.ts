@@ -5,7 +5,7 @@ import {Session} from "../session";
 
 export const startCommand: Command = {
 	trigger: ["s", "start"],
-	description: "ボイスチャンネルから退出し,読み上げを終了する.",
+	description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
 	usage: "",
 
 	execute: async (args, message, session, config) => {
