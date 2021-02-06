@@ -1,7 +1,7 @@
 import {Guild, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
 import async, {QueueObject} from "async";
 import {client} from "./index";
-import {createEmbedBase, logger} from "./commandManager";
+import {createEmbedBase, logger} from "./commands/commands";
 import {Speaker, SpeechParam} from "./speaker/speaker";
 import {getGuildConfig} from "./guildConfig";
 import {VoiceroidSpeaker} from "./speaker/voiceroidSpeaker";

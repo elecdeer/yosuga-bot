@@ -2,7 +2,7 @@ import {Client, VoiceState} from "discord.js";
 import log4js from "log4js";
 import {getGuildConfig} from "./guildConfig";
 import {getSession, Session} from "./session";
-import {createEmbedBase, handleCommand} from "./commandManager";
+import {createEmbedBase, handleCommand} from "./commands/commands";
 import {handleText} from "./textSpeech";
 
 

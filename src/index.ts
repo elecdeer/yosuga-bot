@@ -6,7 +6,7 @@ import Discord, {Client} from "discord.js";
 import axios from "axios";
 
 import {setHandler} from "./eventHandler";
-import {assignCommands} from "./commandManager";
+import {assignCommands} from "./commands/commands";
 
 log4js.configure({
 	appenders: {
