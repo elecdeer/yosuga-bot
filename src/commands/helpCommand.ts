@@ -5,7 +5,7 @@ import {Command, commandList, createEmbedBase, logger} from "./commands";
 export const helpCommand: Command = {
 	trigger: ["help"],
 	description: "Yosugaのコマンド一覧を表示する.",
-	usage: "",
+	usage: "<trigger filter>...",
 
 	execute: async (args, message, session, config) => {
 		let commands = Array.from(commandList);
@@ -20,7 +20,7 @@ export const helpCommand: Command = {
 			embed.setDescription(`Yosugaのコマンド一覧 (filter: ${args.join(", ")})`);
 
 			//関係あるものだけ取り出す
-			commands = commands.filter((command, index, self) => {
+			commands = commands.filter((command) => {
 				return command.trigger.filter(trig => args.indexOf(trig) !== -1).length > 0;
 			})
 		}
