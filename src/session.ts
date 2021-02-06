@@ -46,6 +46,11 @@ export class Session{
 
 	}
 
+	initializeQueue(){
+		this.speechQueue.kill();
+		this.speechQueue = this.createQueue();
+	}
+
 	private createQueue(){
 		//tsだと変換されるからなのか、async functionだとうまく動かない
 

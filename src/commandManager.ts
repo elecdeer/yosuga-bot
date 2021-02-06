@@ -6,6 +6,7 @@ import {handleStart} from "./commands/commandStart";
 import log4js from 'log4js';
 import {Session} from "./session";
 import {ServerConfig} from "./guildConfig";
+import {handleClear} from "./commands/commandClear";
 
 export const logger = log4js.getLogger("command");
 
@@ -31,6 +32,7 @@ export const assignCommands = () => {
 	logger.debug("assign commands");
 	command("e", "ボイスチャンネルから退出し,読み上げを終了する", handleEnd);
 	command("s", "ボイスチャンネルに接続し,読み上げを開始する.", handleStart);
+	command("clear", "読み上げを強制的に停止し,キューをクリアする.", handleClear);
 }
 
 export const handleCommand = async (message: Message, session: Session | null, config: ServerConfig) => {

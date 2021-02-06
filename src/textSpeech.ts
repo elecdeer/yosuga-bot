@@ -13,7 +13,7 @@ const logger = log4js.getLogger("text");
 
 
 const processor = new ProcessorChain()
-	.use(maxLengthProcessor(500))
+	.use(maxLengthProcessor(150))
 	.use(urlProcessor())
 	.use(emojiProcessor())
 	.use(guildEmojiProcessor())
