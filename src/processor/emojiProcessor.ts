@@ -17,6 +17,7 @@ export const emojiProcessor: ProcessorProvider<void> = () => async text => {
 
 	return text.replace(emojiReg, (match => {
 		processorLogger.debug(`${match} => ${emojiAnnotation[match]}`);
-		return emojiAnnotation[match];
+
+		return emojiAnnotation[match] ?? "絵文字";
 	}))
 }

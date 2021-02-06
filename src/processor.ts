@@ -24,7 +24,7 @@ export class ProcessorChain{
 			return prev
 				.then(cur)
 				.then(text => {
-					processorLogger.debug(`=> ${text}`);
+					processorLogger.debug(`process => ${text}`);
 					return text;
 				});
 		}, Promise.resolve(text));
