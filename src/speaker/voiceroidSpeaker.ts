@@ -19,7 +19,7 @@ export class VoiceroidSpeaker implements Speaker{
 	test(): Promise<"ok" | Error>{
 		return new Promise((resolve, reject) => {
 			axios({
-				method: "HEAD",
+				method: "GET",
 				url: `${process.env.VOICEROID_DEAMON_URL}/`,
 			})
 				.then(res => {

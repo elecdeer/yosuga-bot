@@ -1,5 +1,9 @@
 // import {AxiosResponse} from "axios";
 
+
+
+
+
 const urlRegex = require('url-regex');
 
 require("dotenv").config({path: "../.env"});
@@ -24,6 +28,18 @@ const regexTest = () => {
 // regexTest();
 
 
+const speakerTest = () => {
+  const speaker = new VoiceroidSpeaker();
+  speaker.test()
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+}
+
+speakerTest();
 
 const urlTest = () => {
   const urlReg = urlRegex({
@@ -57,6 +73,10 @@ const urlTest = () => {
 
 }
 urlTest();
+
+// export const out = () => {
+//
+// };
 
 //
 // const urls = [

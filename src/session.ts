@@ -1,11 +1,10 @@
-import {Guild, TextChannel, VoiceBroadcast, VoiceChannel, VoiceConnection} from "discord.js";
+import {Guild, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
 import async, {QueueObject} from "async";
 import {client} from "./index";
-import {logger} from "./commandManager";
+import {createEmbedBase, logger} from "./commandManager";
 import {Speaker, SpeechParam} from "./speaker/speaker";
 import {getGuildConfig} from "./guildConfig";
 import {VoiceroidSpeaker} from "./speaker/voiceroidSpeaker";
-import {Readable} from "stream";
 
 const sessionStateMap: Record<string, Session> = {};
 
@@ -48,9 +47,11 @@ export class Session{
 	}
 
 	private createQueue(){
-		const queue = async.queue(async (param: SpeechParam) => {
-			logger.debug("consume queue");
-			logger.debug(param);
+		//tsだと変換されるからなのか、async functionだとうまく動かない
+
+		const queue = async.queue((param: SpeechParam, cb) => {
+			// logger.debug("consume queue");
+			// logger.debug(param);
 
 			const config = getGuildConfig(this.guild.id);
 			const connectedParam: SpeechParam = {
@@ -59,7 +60,13 @@ export class Session{
 				Speaker: {...config.defaultSpeakerParam, ...param.Speaker}
 			}
 
-			await this.broadcastSpeech(connectedParam);
+			this.broadcastSpeech(connectedParam)
+				.then(() => {
+					cb();
+				})
+				.catch(err => {
+					cb(err);
+				});
 
 		});
 
@@ -70,12 +77,13 @@ export class Session{
 		const connection = this.connection;
 		if(!connection){
 			logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
-			return;
+			return Promise.reject();
 		}
 
 		return this.speaker.getSpeech(param)
 			.then((data) => new Promise((resolve, reject) => {
 				connection.play(data).once("finish", () => {
+					logger.debug("resolve");
 					resolve(null);
 				})
 			}))
@@ -86,6 +94,16 @@ export class Session{
 
 	async connectVoiceChannel(){
 		this.connection = await this.voiceChannel.join();
+
+		const testResult = await this.speaker.test().catch((err) => {
+			logger.warn("音声合成システムが無効です");
+			logger.warn(err);
+
+			const embed = createEmbedBase()
+				.setDescription("⚠ 音声合成システムが無効となっています");
+			this.textChannel.send(embed);
+		});
+
 	}
 
 	disconnect(){
@@ -96,9 +114,15 @@ export class Session{
 	}
 
 	pushSpeech(param: SpeechParam, timestamp?: number, authorId?: string){
-		this.speechQueue.push(param);
+		// logger.debug("push speeech queue", param.Text);
+		this.speechQueue.push(param).then(r => {
+			// logger.debug("finish task");
+		});
 		this.lastMessageTimestamp = timestamp ?? Date.now();
 		this.lastMessageAuthorId = authorId ?? client.user?.id ?? "unknown";
+
+
+		// logger.debug(this.speechQueue);
 	}
 
 
