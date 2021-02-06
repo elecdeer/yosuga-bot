@@ -18,6 +18,7 @@
     "@types/async": "^3.2.3",
     "@types/lowdb": "^1.0.9",
     "@types/node": "^14.11.5",
+    "@types/open-graph-scraper": "^4.3.0",
     "lowdb": "^1.0.0",
     "nodemon": "^2.0.4",
     "ts-node": "^9.0.0"
