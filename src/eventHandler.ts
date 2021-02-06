@@ -14,8 +14,11 @@ export const setHandler = (client: Client): void => {
 
 	client.on("message", (message) => {
 		logger.debug("on message");
+
 		if(!message.guild) return;
 		if(message.author.bot) return;
+
+		logger.debug("process message");
 
 		const guildId = message.guild.id;
 		const sessionState = getSession(guildId);

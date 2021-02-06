@@ -14,16 +14,34 @@ export const handleStart: Command = async(args, message, session, config) => {
 
 
 	if(message.member.voice.channel){
-		const session = new Session(message.member.voice.channel, channel, message.guild)
-		await session.connectVoiceChannel();
+		if(session){
+			//既に接続済み
+			if(session.textChannel.id === channel.id){
+				//同じテキストルーム
+				const embed = createEmbedBase()
+					.setDescription("接続済みです");
+				await channel.send(embed);
 
-		const embed = createEmbedBase()
-			.setDescription("接続しました！");
+				return;
+			}else{
+				//別テキストルーム
+				await session.textChannel.send(createEmbedBase().setDescription(`読み上げチャンネルが${channel.name}に変更されました`));
 
-		await channel.send(embed);
+				session.textChannel = channel;
+				await channel.send(createEmbedBase().setDescription(`接続しました!`));
 
+				return;
+			}
+		}else{
+			const session = new Session(message.member.voice.channel, channel, message.guild)
+			await session.connectVoiceChannel();
 
-		logger.debug(`emojiList: ${message.guild.emojis}`)
+			const embed = createEmbedBase()
+				.setDescription("接続しました！");
+
+			await channel.send(embed);
+		}
+
 	}else{
 		const embed = createEmbedBase()
 			.setDescription("先にボイスチャンネルに入る必要があります.");
