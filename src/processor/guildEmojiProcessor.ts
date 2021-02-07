@@ -17,6 +17,6 @@ export const guildEmojiProcessor: ProcessorProvider<void> = () =>  async text =>
 
 		processorLogger.debug(emojiId, emoji?.name);
 
-		return emoji?.name ?? "emoji";
+		return (emoji?.name ?? "emoji") + " ";
 	})
 }
