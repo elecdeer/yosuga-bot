@@ -2,7 +2,7 @@
 import {processorLogger, ProcessorProvider, TextProcessor} from "../processor";
 import {client} from "../index";
 
-const guildEmojiReg = /<:.+:\d+>/g;
+const guildEmojiReg = /<.?:.+:\d+>/g;
 export const guildEmojiProcessor: ProcessorProvider<void> = () =>  async text => {
 
 
