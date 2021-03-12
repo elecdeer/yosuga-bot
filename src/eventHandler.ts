@@ -44,16 +44,15 @@ export const setHandler = (client: Client): void => {
 		const session = getSession(newState.guild.id);
 		if(!session?.connection) return;
 
-		if(session.connection.channel.id !== oldState.channelID) return;
-
-		if(!oldState.channel && !!newState.channel){
-			handleEnterRoom(oldState, newState, session);
-			return;
-		}
-
-		if(!!oldState.channel && !newState.channel){
-			handleLeaveRoom(oldState, newState, session);
-			return;
+		//チャンネルが変わった
+		if(oldState.channel?.id !== newState.channel?.id){
+			if(newState.channel?.id === session.connection.channel.id){
+				handleEnterRoom(oldState, newState, session);
+				return;
+			}else{
+				handleLeaveRoom(oldState, newState, session);
+				return;
+			}
 		}
 
 
