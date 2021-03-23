@@ -1,21 +1,18 @@
-
-import {Command, createEmbedBase, logger} from "./commands";
+import { Command, createEmbedBase, logger } from "./commands";
 
 export const endCommand: Command = {
-	trigger: ["e", "end"],
-	description: "ボイスチャンネルから退出し,読み上げを終了する.",
-	usage: "",
+  trigger: ["e", "end"],
+  description: "ボイスチャンネルから退出し,読み上げを終了する.",
+  usage: "",
 
-	execute: async (args, message, session, config) => {
-		if(!session?.connection) return;
-		if(!message.guild) return;
+  execute: async (args, message, session, config) => {
+    if (!session?.connection) return;
+    if (!message.guild) return;
 
-		session.disconnect();
+    session.disconnect();
 
-		const embed = createEmbedBase()
-			.setDescription("退出しました.");
+    const embed = createEmbedBase().setDescription("退出しました.");
 
-		await message.channel.send(embed);
-
-	}
+    await message.channel.send(embed);
+  },
 };
