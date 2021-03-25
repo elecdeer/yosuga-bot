@@ -1,4 +1,4 @@
-import urlRegex from "url-regex";
+import urlRegex from "url-regex-safe";
 import httpStatus from "http-status";
 import axios, { AxiosResponse } from "axios";
 import {
