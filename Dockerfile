@@ -1,6 +1,6 @@
-FROM jrottenberg/ffmpeg:4.1-alpine
-FROM node:13-alpine
-COPY --from=0 / /
+#FROM jrottenberg/ffmpeg:4.1-alpine
+FROM node:15-alpine
+#COPY --from=0 / /
 
 
 WORKDIR /app
@@ -8,13 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-
-RUN npm install
-
+RUN npm ci
 
 COPY src src
-
-#RUN ls -lra
 
 RUN npm run build
 
