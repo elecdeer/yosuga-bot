@@ -13,7 +13,7 @@
     "check": "npm-run-all check:*",
     "check:type": "tsc",
     "check:format": "prettier --check src/**/*.ts",
-    "check:lint": "npm eslint src/**/*.ts"
+    "check:lint": "eslint src/**/*.ts"
   },
   "keywords": [],
   "author": "",
