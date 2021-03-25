@@ -1,6 +1,6 @@
 #FROM jrottenberg/ffmpeg:4.1-alpine
 FROM node:13-alpine
-COPY --from=0 / /
+#COPY --from=0 / /
 
 
 WORKDIR /app
