@@ -8,13 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-
-RUN npm install
-
+RUN npm ci
 
 COPY src src
-
-#RUN ls -lra
 
 RUN npm run build
 
