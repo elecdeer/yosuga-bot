@@ -1,4 +1,7 @@
 # yosuga-bot
+
+![code check](https://github.com/elecdeer/yosuga-bot/workflows/code%20check/badge.svg)
+
 japanese voice bot for discord
 
 ## 使い方
@@ -8,6 +11,7 @@ japanese voice bot for discord
 
 `$ git clone https://github.com/elecdeer/yosuga-bot.git`
 
-docker-compose.ymlでトークンなどの環境変数を指定
+docker-compose.yml でトークンなどの環境変数を指定
 
 `$docker-compose up -d`
+

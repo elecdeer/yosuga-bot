@@ -1,14 +1,16 @@
-import {ProcessorProvider} from "../processor";
+import { ProcessorProvider } from "../processor";
 
-export const maxLengthProcessor: ProcessorProvider<number> = (max: number) => async text => {
-	const charArray = Array.from(text)
+export const maxLengthProcessor: ProcessorProvider<number> = (
+  max: number
+) => async (text) => {
+  const charArray = Array.from(text);
 
-	//サロゲートペアを考慮した長さ
-	const length = charArray.length;
+  //サロゲートペアを考慮した長さ
+  const length = charArray.length;
 
-	if(length <= max){
-		return text;
-	}
+  if (length <= max) {
+    return text;
+  }
 
-	return charArray.slice(0, max).join("") + " 以下略";
-}
+  return charArray.slice(0, max).join("") + " 以下略";
+};
