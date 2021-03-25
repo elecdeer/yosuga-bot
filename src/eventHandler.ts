@@ -93,7 +93,7 @@ const handleEnterRoom = (oldState: VoiceState, newState: VoiceState, session: Se
 	logger.debug("handleEnterRoom");
 
 	session.pushSpeech({
-		Text: `${newState.member?.user.username}が入室しました。`
+		Text: `${session.getUsernamePronunciation(newState.member)}が入室しました。`
 	});
 }
 
@@ -114,7 +114,7 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
 		});
 	}else{
 		session.pushSpeech({
-			Text: `${newState.member?.user.username}が退室しました。`
+			Text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`
 		});
 	}
 }
@@ -122,7 +122,7 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
 const handleTurnOnVideo = (oldState: VoiceState, newState: VoiceState, session: Session) => {
 	logger.debug("handleTurnOnVideo");
 	session.pushSpeech({
-		Text: `${newState.member?.user.username}がカメラをオンにしました。`
+		Text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`
 	});
 }
 
@@ -133,7 +133,7 @@ const handleTurnOffVideo = (oldState: VoiceState, newState: VoiceState, session:
 const handleTurnOnLive = (oldState: VoiceState, newState: VoiceState, session: Session) => {
 	logger.debug("handleTurnOnLive");
 	session.pushSpeech({
-		Text: `${newState.member?.user.username}がゴーライブを開始しました。`
+		Text: `${session.getUsernamePronunciation(newState.member)}がゴーライブを開始しました。`
 	});
 }
 

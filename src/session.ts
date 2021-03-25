@@ -1,4 +1,4 @@
-import {Guild, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
+import {Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection} from "discord.js";
 import async, {QueueObject} from "async";
 import {client} from "./index";
 import {createEmbedBase, logger} from "./commands/commands";
@@ -128,6 +128,10 @@ export class Session{
 
 
 		// logger.debug(this.speechQueue);
+	}
+
+	getUsernamePronunciation(member: (GuildMember | null)){
+		return member?.displayName ?? "不明なユーザ";
 	}
 
 

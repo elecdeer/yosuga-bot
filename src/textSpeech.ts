@@ -61,7 +61,7 @@ export const handleText = async (message: Message, session: Session, config: Ser
 	const difMs = message.createdTimestamp - session.lastMessageTimestamp;
 	logger.debug(`name omit? ${difMs} > ${nameOmitMs}`);
 	if(session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs){
-		text = `${message.member?.displayName} ${text}`
+		text = `${session.getUsernamePronunciation(message.member)} ${text}`
 	}
 
 	session.pushSpeech({
