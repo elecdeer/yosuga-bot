@@ -3,8 +3,7 @@ version: "3"
 
 services:
   yosuga:
-    build:
-      context: ./
+    image: ghcr.io/elecdeer/yosuga-bot:latest
     environment:
       DISCORD_TOKEN: your-discord-bot-token
       VOICEROID_DEAMON_URL: http://192.~:8080
