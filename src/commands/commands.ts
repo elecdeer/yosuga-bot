@@ -28,7 +28,7 @@ export type Command = {
 export const commandList = new Set<Command>();
 const commandExeRecord: Record<string, CommandExecutor> = {};
 
-export const assign = (command: Command) => {
+export const assign = (command: Command): void => {
   // logger.debug(`assignCommand: ${commandText}`)
   // commandMap[commandText] = action;
   commandList.add(command);
@@ -42,11 +42,11 @@ export const assign = (command: Command) => {
   });
 };
 
-export const createEmbedBase = () => {
+export const createEmbedBase = (): MessageEmbed => {
   return new MessageEmbed().setTitle("Yosuga").setColor(0xffb6c1);
 };
 
-export const assignCommands = () => {
+export const assignCommands = (): void => {
   logger.debug("assign commands");
   assign(startCommand);
   assign(endCommand);
@@ -58,7 +58,7 @@ export const handleCommand = async (
   message: Message,
   session: Session | null,
   config: ServerConfig
-) => {
+): Promise<void> => {
   logger.debug("handleCommand");
   if (!message.guild) return;
 

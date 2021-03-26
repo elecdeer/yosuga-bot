@@ -1,13 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import urlRegex from "url-regex-safe";
 import httpStatus from "http-status";
-import axios, { AxiosResponse } from "axios";
-import {
-  processorLogger,
-  ProcessorProvider,
-  TextProcessor,
-} from "../processor";
+import axios from "axios";
+import { processorLogger, ProcessorProvider } from "../processor";
 import ogs from "open-graph-scraper";
-import { logger } from "../commands/commands";
 
 const LinkType = {
   Image: "画像",
@@ -22,7 +18,7 @@ type LinkType = typeof LinkType[keyof typeof LinkType];
 const urlReg = urlRegex({});
 
 export const urlProcessor: ProcessorProvider<void> = () => async (text) => {
-  const urls = text.match(urlReg);
+  const urls = urlReg.exec(text);
 
   if (!urls) return text;
 
@@ -33,7 +29,6 @@ export const urlProcessor: ProcessorProvider<void> = () => async (text) => {
   const replaceTuple: Array<[string, string]> = await Promise.all(
     urls.map(async (url) => {
       const urlType = await checkUrlType(url);
-      const urlObj = new URL(url);
 
       const altText = urlType.read ?? urlType.type;
       return [url, altText] as [string, string];
@@ -72,7 +67,7 @@ const checkUrlType: (
     return checkUrlType(res.headers["Location"]);
   }
 
-  const contentType = res.headers["content-type"];
+  const contentType = String(res.headers["content-type"]);
   if (contentType === "image/gif") {
     return { type: LinkType.GifImage };
   }

@@ -1,20 +1,27 @@
 import axios from "axios";
 import RGI_Emoji from "emoji-regex";
-import {
-  processorLogger,
-  ProcessorProvider,
-  TextProcessor,
-} from "../processor";
+import { processorLogger, ProcessorProvider } from "../processor";
+import { logger } from "../commands/commands";
 
 let emojiAnnotation: Record<string, string>;
 
-(async () => {
-  const res = await axios.get(
+const fetchEmojiPronunciationMap = async (): Promise<
+  Record<string, string>
+> => {
+  const res = await axios.get<Record<string, string>>(
     "https://raw.githubusercontent.com/elecdeer/emoji-pronunciation-ja/master/data/pronunciation.json"
   );
-  // console.log(json);
-  emojiAnnotation = res.data;
-})();
+  return res.data;
+};
+
+fetchEmojiPronunciationMap()
+  .then((data) => {
+    emojiAnnotation = data;
+  })
+  .catch((err) => {
+    logger.info("絵文字発音リストの取得に失敗しました");
+    logger.info(err);
+  });
 
 const emojiReg = RGI_Emoji();
 

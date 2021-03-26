@@ -10,12 +10,13 @@ export class VoiceroidSpeaker implements Speaker {
   ): Promise<string | VoiceBroadcast | Readable> {
     logger.debug("post param", JSON.stringify(param));
 
-    const res = await axios({
-      method: "POST",
-      url: `${process.env.VOICEROID_DEAMON_URL}/api/speechtext`,
-      responseType: "stream",
-      data: param,
-    });
+    const res = await axios.post<Readable>(
+      `${process.env.VOICEROID_DEAMON_URL}/api/speechtext`,
+      param,
+      {
+        responseType: "stream",
+      }
+    );
 
     return res.data;
   }
@@ -26,7 +27,7 @@ export class VoiceroidSpeaker implements Speaker {
         method: "GET",
         url: `${process.env.VOICEROID_DEAMON_URL}/`,
       })
-        .then((res) => {
+        .then((_) => {
           resolve("ok");
         })
         .catch((reason) => {
