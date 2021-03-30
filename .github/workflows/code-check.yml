@@ -32,8 +32,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install
+        run: yarn install --prefer-offline
 
       - name: Code Check
         run: yarn run check
