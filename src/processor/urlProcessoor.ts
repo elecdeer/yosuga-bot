@@ -61,7 +61,7 @@ const checkUrlType: (
       "User-Agent": "bot",
     },
   }).catch((err: Error) => err);
-  if(res instanceof Error){
+  if (res instanceof Error) {
     return { type: LinkType.InvalidUrl };
   }
 
