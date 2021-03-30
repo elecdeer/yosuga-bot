@@ -55,12 +55,15 @@ const checkUrlType: (
 
   const res = await axios({
     method: "GET",
-    url: url,
+    url: encodeURI(url),
     validateStatus: (status) => 200 <= status || status < 400,
     headers: {
       "User-Agent": "bot",
     },
-  });
+  }).catch((err: Error) => err);
+  if(res instanceof Error){
+    return { type: LinkType.InvalidUrl };
+  }
 
   //リダイレクト
   if (redirectStatus.includes(res.status)) {
