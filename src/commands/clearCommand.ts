@@ -10,7 +10,10 @@ export const clearCommand: Command = {
 
     if (!session?.connection) return;
 
-    session.connection.dispatcher.destroy();
+    if (session.connection.dispatcher) {
+      session.connection.dispatcher.destroy();
+    }
+
     session.initializeQueue();
 
     const embed = createEmbedBase().setDescription(
