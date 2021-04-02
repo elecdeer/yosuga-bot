@@ -1,10 +1,8 @@
-import { processorLogger, ProcessorProvider } from "../processor";
+import { ProcessorProvider } from "../processor";
 
 const codeBlockReg = /```(.*\n?)*```/g;
 
-export const codeBlockProcessor: ProcessorProvider<void> = () => async (
-  text
-) => {
+export const codeBlockProcessor: ProcessorProvider<void> = () => async (text) => {
   // processorLogger.debug(text);
   // processorLogger.debug("matches", text.match(codeBlockReg));
 

@@ -19,9 +19,7 @@ export const helpCommand: Command = {
 
       //関係あるものだけ取り出す
       commands = commands.filter((command) => {
-        return (
-          command.trigger.filter((trig) => args.indexOf(trig) !== -1).length > 0
-        );
+        return command.trigger.filter((trig) => args.indexOf(trig) !== -1).length > 0;
       });
     }
 

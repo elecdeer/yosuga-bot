@@ -5,9 +5,7 @@ import { logger } from "../commands/commands";
 
 let emojiAnnotation: Record<string, string>;
 
-const fetchEmojiPronunciationMap = async (): Promise<
-  Record<string, string>
-> => {
+const fetchEmojiPronunciationMap = async (): Promise<Record<string, string>> => {
   const res = await axios.get<Record<string, string>>(
     "https://raw.githubusercontent.com/elecdeer/emoji-pronunciation-ja/master/data/pronunciation.json"
   );

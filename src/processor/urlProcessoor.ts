@@ -40,15 +40,9 @@ export const urlProcessor: ProcessorProvider<void> = () => async (text) => {
   }, text);
 };
 
-const redirectStatus = [
-  httpStatus.MOVED_PERMANENTLY,
-  httpStatus.FOUND,
-  httpStatus.SEE_OTHER,
-];
+const redirectStatus = [httpStatus.MOVED_PERMANENTLY, httpStatus.FOUND, httpStatus.SEE_OTHER];
 
-const checkUrlType: (
-  url: string
-) => Promise<{ type: LinkType; read?: string }> = async (url) => {
+const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> = async (url) => {
   if (!url) return { type: LinkType.InvalidUrl };
 
   processorLogger.debug(`check: ${url}`);

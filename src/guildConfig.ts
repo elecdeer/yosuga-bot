@@ -2,9 +2,7 @@ import FileSync from "lowdb/adapters/FileSync";
 import low from "lowdb";
 import { SpeakerParam } from "./speaker/speaker";
 
-const adapter = new FileSync<Record<string, Partial<ServerConfig>>>(
-  "guildSettings.json"
-);
+const adapter = new FileSync<Record<string, Partial<ServerConfig>>>("guildSettings.json");
 const serverConfDB = low(adapter);
 serverConfDB.read();
 

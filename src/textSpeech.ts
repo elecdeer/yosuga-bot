@@ -36,9 +36,7 @@ export const handleText = async (
 
   // logger.debug(message);
 
-  logger.debug(
-    `content: ${message.content}  escape: ${escape(message.content)}`
-  );
+  logger.debug(`content: ${message.content}  escape: ${escape(message.content)}`);
   logger.debug(`cleanContent: ${message.cleanContent}`);
 
   logger.debug(`embeds: ${message.embeds}`);
@@ -51,10 +49,7 @@ export const handleText = async (
   // console.log("messageTime: " + message.createdTimestamp);
 
   if (message.attachments.size > 0) {
-    baseText =
-      baseText +
-      " " +
-      message.attachments.map((attachment) => attachment.url).join(" ");
+    baseText = baseText + " " + message.attachments.map((attachment) => attachment.url).join(" ");
   }
 
   logger.debug("baseText " + baseText);

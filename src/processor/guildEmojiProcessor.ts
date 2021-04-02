@@ -3,9 +3,7 @@ import { processorLogger, ProcessorProvider } from "../processor";
 import { client } from "../index";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
-export const guildEmojiProcessor: ProcessorProvider<void> = () => async (
-  text
-) => {
+export const guildEmojiProcessor: ProcessorProvider<void> = () => async (text) => {
   return text.replace(guildEmojiReg, (str) => {
     const emojiId = pickEmojiId(str);
     const emoji = client.emojis.resolve(emojiId);

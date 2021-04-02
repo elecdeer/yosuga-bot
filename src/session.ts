@@ -1,10 +1,4 @@
-import {
-  Guild,
-  GuildMember,
-  TextChannel,
-  VoiceChannel,
-  VoiceConnection,
-} from "discord.js";
+import { Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 import async, { QueueObject } from "async";
 import { client } from "./index";
 import { createEmbedBase, logger } from "./commands/commands";
@@ -35,11 +29,7 @@ export class Session {
   lastMessageTimestamp: number;
   lastMessageAuthorId: string;
 
-  constructor(
-    voiceChannel: VoiceChannel,
-    textChannel: TextChannel,
-    guild: Guild
-  ) {
+  constructor(voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild) {
     this.connection = null;
     this.voiceChannel = voiceChannel;
     this.textChannel = textChannel;
@@ -87,9 +77,7 @@ export class Session {
   broadcastSpeech(param: SpeechParam): Promise<void> {
     const connection = this.connection;
     if (!connection) {
-      logger.error(
-        "broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある"
-      );
+      logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
       return Promise.reject();
     }
 
@@ -116,9 +104,7 @@ export class Session {
       logger.warn("音声合成システムが無効です");
       logger.warn(err);
 
-      const embed = createEmbedBase().setDescription(
-        "⚠ 音声合成システムが無効となっています"
-      );
+      const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
       void this.textChannel.send(embed);
     });
   }

@@ -65,10 +65,7 @@ export const handleCommand = async (
   const channel = message.channel;
   if (!(channel instanceof TextChannel)) return;
 
-  const args = message.content
-    .slice(config.commandPrefix.length)
-    .trim()
-    .split(" ");
+  const args = message.content.slice(config.commandPrefix.length).trim().split(" ");
   const command = args.shift() ?? "";
   logger.debug(`content: ${message.content} command: ${command} args: ${args}`);
 

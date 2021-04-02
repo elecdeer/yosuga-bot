@@ -5,9 +5,7 @@ import { Speaker, SpeechParam } from "./speaker";
 import { logger } from "../commands/commands";
 
 export class VoiceroidSpeaker implements Speaker {
-  async getSpeech(
-    param: SpeechParam
-  ): Promise<string | VoiceBroadcast | Readable> {
+  async getSpeech(param: SpeechParam): Promise<string | VoiceBroadcast | Readable> {
     logger.debug("post param", JSON.stringify(param));
 
     const res = await axios.post<Readable>(

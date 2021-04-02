@@ -89,32 +89,20 @@ export const setHandler = (client: Client): void => {
 //
 // }
 
-const handleEnterRoom = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleEnterRoom = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleEnterRoom");
 
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(
-      newState.member
-    )}が入室しました。`,
+    Text: `${session.getUsernamePronunciation(newState.member)}が入室しました。`,
   });
 };
 
-const handleLeaveRoom = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleLeaveRoom");
 
   const channel = oldState.channel;
   if (!channel) return; //既にチェック済みではある
-  const memberNumExcludedBot = channel.members.filter(
-    (member) => !member.user.bot
-  ).size;
+  const memberNumExcludedBot = channel.members.filter((member) => !member.user.bot).size;
 
   //bot以外の接続者が0
   if (memberNumExcludedBot <= 0) {
@@ -127,51 +115,29 @@ const handleLeaveRoom = (
     });
   } else {
     session.pushSpeech({
-      Text: `${session.getUsernamePronunciation(
-        newState.member
-      )}が退室しました。`,
+      Text: `${session.getUsernamePronunciation(newState.member)}が退室しまし。`,
     });
   }
 };
 
-const handleTurnOnVideo = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleTurnOnVideo = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOnVideo");
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(
-      newState.member
-    )}がカメラをオンにしました。`,
+    Text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`,
   });
 };
 
-const handleTurnOffVideo = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleTurnOffVideo = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOffVideo");
 };
 
-const handleTurnOnLive = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleTurnOnLive = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOnLive");
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(
-      newState.member
-    )}がゴーライブを開始しました。`,
+    Text: `${session.getUsernamePronunciation(newState.member)}がゴーライブを開始しました。`,
   });
 };
 
-const handleTurnOffLive = (
-  oldState: VoiceState,
-  newState: VoiceState,
-  session: Session
-) => {
+const handleTurnOffLive = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOffLive");
 };

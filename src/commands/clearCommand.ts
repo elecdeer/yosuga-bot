@@ -16,9 +16,7 @@ export const clearCommand: Command = {
 
     session.initializeQueue();
 
-    const embed = createEmbedBase().setDescription(
-      "読み上げキューをクリアしました."
-    );
+    const embed = createEmbedBase().setDescription("読み上げキューをクリアしました.");
     await session.textChannel.send(embed);
   },
 };

@@ -21,9 +21,7 @@ export interface Speaker {
    * SpeechParamから再生可能な音声データを取得
    * @param param
    */
-  getSpeech: (
-    param: SpeechParam
-  ) => Promise<string | VoiceBroadcast | Readable>;
+  getSpeech: (param: SpeechParam) => Promise<string | VoiceBroadcast | Readable>;
 
   /**
    * バックで動いている音声合成エンジンが機能しているかテストする

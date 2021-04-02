@@ -1,8 +1,6 @@
 import { ProcessorProvider } from "../processor";
 
-export const maxLengthProcessor: ProcessorProvider<number> = (
-  max: number
-) => async (text) => {
+export const maxLengthProcessor: ProcessorProvider<number> = (max: number) => async (text) => {
   const charArray = Array.from(text);
 
   //サロゲートペアを考慮した長さ

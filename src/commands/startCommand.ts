@@ -4,8 +4,7 @@ import { Session } from "../session";
 
 export const startCommand: Command = {
   trigger: ["s", "start"],
-  description:
-    "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
+  description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
   usage: "",
 
   execute: async (args, message, session, config) => {
@@ -28,9 +27,7 @@ export const startCommand: Command = {
         } else {
           //別テキストルーム
           await session.textChannel.send(
-            createEmbedBase().setDescription(
-              `読み上げチャンネルが${channel.name}に変更されました`
-            )
+            createEmbedBase().setDescription(`読み上げチャンネルが${channel.name}に変更されました`)
           );
 
           session.textChannel = channel;
@@ -39,11 +36,7 @@ export const startCommand: Command = {
           return;
         }
       } else {
-        const session = new Session(
-          message.member.voice.channel,
-          channel,
-          message.guild
-        );
+        const session = new Session(message.member.voice.channel, channel, message.guild);
         await session.connectVoiceChannel();
 
         const embed = createEmbedBase().setDescription("接続しました！");
@@ -51,9 +44,7 @@ export const startCommand: Command = {
         await channel.send(embed);
       }
     } else {
-      const embed = createEmbedBase().setDescription(
-        "先にボイスチャンネルに入る必要があります."
-      );
+      const embed = createEmbedBase().setDescription("先にボイスチャンネルに入る必要があります.");
 
       await message.reply(embed);
     }
