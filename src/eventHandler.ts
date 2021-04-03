@@ -115,7 +115,7 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
     });
   } else {
     session.pushSpeech({
-      Text: `${session.getUsernamePronunciation(newState.member)}が退室しまし。`,
+      Text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`,
     });
   }
 };
