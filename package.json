@@ -49,6 +49,8 @@
     "log4js": "^6.3.0",
     "lowdb": "^1.0.0",
     "open-graph-scraper": "^4.8.1",
+    "socket.io-client": "^4.0.1",
+    "socket.io-stream": "^0.9.1",
     "url-regex-safe": "^2.0.2"
   }
 }

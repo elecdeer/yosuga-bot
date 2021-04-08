@@ -5,6 +5,7 @@ import { getGuildConfig } from "./guildConfig";
 import { createEmbedBase, logger } from "./commands/commands";
 import { client } from "./index";
 import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
+import { AIVoiceSpeaker } from "./speaker/aivoiceSpeaker";
 
 const sessionStateMap: Record<string, Session> = {};
 
@@ -47,7 +48,7 @@ export class Session {
     this.lastMessageTimestamp = 0;
     this.lastMessageAuthorId = "";
 
-    this.speaker = new VoiceroidSpeaker();
+    this.speaker = new AIVoiceSpeaker();
 
     sessionStateMap[guild.id] = this;
   }
