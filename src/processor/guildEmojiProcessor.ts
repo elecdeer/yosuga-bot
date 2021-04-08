@@ -4,7 +4,7 @@ import { client } from "index";
 import { ProcessorProvider } from "types";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
-export const guildEmojiProcessor: ProcessorProvider<void> = () => async(speechText) => {
+export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechText) => {
   return {
     ...speechText,
     text: speechText.text.replace(guildEmojiReg, (str) => {
@@ -14,7 +14,7 @@ export const guildEmojiProcessor: ProcessorProvider<void> = () => async(speechTe
       processorLogger.debug(emojiId, emoji?.name);
 
       return (emoji?.name ?? "emoji") + " ";
-    })
+    }),
   };
 };
 
