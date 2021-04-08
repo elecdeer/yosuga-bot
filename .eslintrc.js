@@ -21,4 +21,13 @@ module.exports = {
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/require-await": "off",
   },
+  settings: {
+    settings: {
+      "import/resolver": {
+        typescript: {
+          project: "./tsconfig.eslint.json",
+        },
+      },
+    },
+  },
 };

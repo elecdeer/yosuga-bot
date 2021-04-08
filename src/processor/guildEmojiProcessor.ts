@@ -1,17 +1,21 @@
 //サーバのカスタム絵文字
-import { processorLogger, ProcessorProvider } from "../processor";
-import { client } from "../index";
+import { processorLogger } from "processor";
+import { client } from "index";
+import { ProcessorProvider } from "types";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
-export const guildEmojiProcessor: ProcessorProvider<void> = () => async (text) => {
-  return text.replace(guildEmojiReg, (str) => {
-    const emojiId = pickEmojiId(str);
-    const emoji = client.emojis.resolve(emojiId);
+export const guildEmojiProcessor: ProcessorProvider<void> = () => async(speechText) => {
+  return {
+    ...speechText,
+    text: speechText.text.replace(guildEmojiReg, (str) => {
+      const emojiId = pickEmojiId(str);
+      const emoji = client.emojis.resolve(emojiId);
 
-    processorLogger.debug(emojiId, emoji?.name);
+      processorLogger.debug(emojiId, emoji?.name);
 
-    return (emoji?.name ?? "emoji") + " ";
-  });
+      return (emoji?.name ?? "emoji") + " ";
+    })
+  };
 };
 
 const emojiIdReg = /\d+/;

@@ -1,12 +1,10 @@
 import { getLogger } from "log4js";
+import { SpeechText, TextProcessor } from "types";
 
 export const processorLogger = getLogger("processor");
 
-export type TextProcessor = (text: string) => Promise<string>;
-export type ProcessorProvider<T> = (arg: T) => TextProcessor;
-
 export class ProcessorChain {
-  processors: Array<TextProcessor>;
+  processors: TextProcessor[];
 
   constructor() {
     this.processors = [];
@@ -17,12 +15,32 @@ export class ProcessorChain {
     return this;
   }
 
-  process(text: string): Promise<string> {
-    return this.processors.reduce((prev, cur) => {
-      return prev.then(cur).then((text) => {
-        processorLogger.debug(`process => ${text}`);
-        return text;
-      });
-    }, Promise.resolve(text));
+  async process(text: SpeechText | SpeechText[], collectSameParams = false): Promise<SpeechText[]> {
+    //reduceでもう少しうまく書ける気もする
+
+    let prevTexts: SpeechText[] = ([] as SpeechText[]).concat(text);
+    for await (const processor of this.processors) {
+      const eachResults = await Promise.all(prevTexts.map((textItem) => processor(textItem)));
+      //展開
+      prevTexts = eachResults.reduce(
+        (acc: SpeechText[], cur: SpeechText[] | SpeechText) => acc.concat(cur),
+        []
+      );
+    }
+
+    //同一のvolume,speedのものはくっつける
+    if (collectSameParams) {
+      prevTexts = prevTexts.reduce((acc: SpeechText[], cur: SpeechText) => {
+        const prevLast = acc[acc.length - 1];
+        if (prevLast.volume === cur.volume && prevLast.speed === cur.speed) {
+          prevLast.text = `${prevLast.text} ${cur.text}`;
+        } else {
+          acc.push(cur);
+        }
+        return acc;
+      }, []);
+    }
+
+    return prevTexts;
   }
 }

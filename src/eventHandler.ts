@@ -1,9 +1,9 @@
 import { Client, VoiceState } from "discord.js";
 import log4js from "log4js";
-import { getGuildConfig } from "./guildConfig";
-import { getSession, Session } from "./session";
-import { createEmbedBase, handleCommand } from "./commands/commands";
-import { handleText } from "./textSpeech";
+import { getGuildConfig } from "guildConfig";
+import { getSession, Session } from "session";
+import { createEmbedBase, handleCommand } from "commands/commands";
+import { handleText } from "textSpeech";
 
 const logger = log4js.getLogger();
 export const setHandler = (client: Client): void => {
@@ -93,7 +93,9 @@ const handleEnterRoom = (oldState: VoiceState, newState: VoiceState, session: Se
   logger.debug("handleEnterRoom");
 
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(newState.member)}が入室しました。`,
+    text: `${session.getUsernamePronunciation(newState.member)}が入室しました。`,
+    speed: 1,
+    volume: 1,
   });
 };
 
@@ -115,7 +117,9 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
     });
   } else {
     session.pushSpeech({
-      Text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`,
+      text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`,
+      speed: 1,
+      volume: ,
     });
   }
 };
@@ -123,7 +127,9 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
 const handleTurnOnVideo = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOnVideo");
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`,
+    text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`,
+    speed: 1,
+    volume: 1
   });
 };
 
@@ -134,7 +140,9 @@ const handleTurnOffVideo = (oldState: VoiceState, newState: VoiceState, session:
 const handleTurnOnLive = (oldState: VoiceState, newState: VoiceState, session: Session) => {
   logger.debug("handleTurnOnLive");
   session.pushSpeech({
-    Text: `${session.getUsernamePronunciation(newState.member)}がゴーライブを開始しました。`,
+    text: `${session.getUsernamePronunciation(newState.member)}がゴーライブを開始しました。`,
+    speed: 1,
+    volume: 1
   });
 };
 

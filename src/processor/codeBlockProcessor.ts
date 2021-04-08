@@ -1,10 +1,14 @@
-import { ProcessorProvider } from "../processor";
+import { ProcessorProvider } from "types";
 
 const codeBlockReg = /```(.*\n?)*```/g;
 
-export const codeBlockProcessor: ProcessorProvider<void> = () => async (text) => {
+export const codeBlockProcessor: ProcessorProvider<void> = () => async (speechText) => {
   // processorLogger.debug(text);
   // processorLogger.debug("matches", text.match(codeBlockReg));
 
-  return text.replace(codeBlockReg, "コードブロック");
+  return {
+    ...speechText,
+    text: speechText.text.replace(codeBlockReg, "コードブロック"),
+  };
+  // return text.replace(codeBlockReg, "コードブロック");
 };

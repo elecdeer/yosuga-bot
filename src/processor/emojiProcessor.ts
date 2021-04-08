@@ -1,7 +1,8 @@
 import axios from "axios";
 import RGI_Emoji from "emoji-regex";
-import { processorLogger, ProcessorProvider } from "../processor";
-import { logger } from "../commands/commands";
+import { processorLogger } from "processor";
+import { logger } from "commands/commands";
+import { ProcessorProvider } from "types";
 
 let emojiAnnotation: Record<string, string>;
 
@@ -23,12 +24,13 @@ fetchEmojiPronunciationMap()
 
 const emojiReg = RGI_Emoji();
 
-export const emojiProcessor: ProcessorProvider<void> = () => async (text) => {
-  // console.log("絵文字: " + text.match(reg));
-
-  return text.replace(emojiReg, (match) => {
-    processorLogger.debug(`${match} => ${emojiAnnotation[match]}`);
-
-    return emojiAnnotation[match] ?? "絵文字";
-  });
+export const emojiProcessor: ProcessorProvider<void> = () => async(speechText) => {
+  // console.log("絵文字: " + speechText.match(reg));
+  return {
+    ...speechText,
+    text: speechText.text.replace(emojiReg, (match) => {
+      processorLogger.debug(`${match} => ${emojiAnnotation[match]}`);
+      return emojiAnnotation[match] ?? "絵文字";
+    },
+  };
 };

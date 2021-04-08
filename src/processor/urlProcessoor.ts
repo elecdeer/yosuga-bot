@@ -2,8 +2,9 @@
 import urlRegex from "url-regex-safe";
 import httpStatus from "http-status";
 import axios from "axios";
-import { processorLogger, ProcessorProvider } from "../processor";
+import { processorLogger } from "processor";
 import ogs from "open-graph-scraper";
+import { ProcessorProvider } from "types";
 
 const LinkType = {
   Image: "画像",
@@ -17,10 +18,10 @@ type LinkType = typeof LinkType[keyof typeof LinkType];
 
 const urlReg = urlRegex({});
 
-export const urlProcessor: ProcessorProvider<void> = () => async (text) => {
-  const urls = urlReg.exec(text);
+export const urlProcessor: ProcessorProvider<void> = () => async (speechText) => {
+  const urls = urlReg.exec(speechText.text);
 
-  if (!urls) return text;
+  if (!urls) return speechText;
 
   processorLogger.debug("urlProcessor");
   processorLogger.debug(urls);
@@ -35,9 +36,12 @@ export const urlProcessor: ProcessorProvider<void> = () => async (text) => {
     })
   );
 
-  return replaceTuple.reduce((result: string, next: [string, string]) => {
-    return result.replace(next[0], next[1]);
-  }, text);
+  return {
+    ...speechText,
+    text: replaceTuple.reduce((result: string, next: [string, string]) => {
+      return result.replace(next[0], next[1]);
+    }, speechText.text),
+  };
 };
 
 const redirectStatus = [httpStatus.MOVED_PERMANENTLY, httpStatus.FOUND, httpStatus.SEE_OTHER];
