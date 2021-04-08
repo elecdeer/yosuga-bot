@@ -1,6 +1,6 @@
 import { Readable } from "stream";
 import axios from "axios";
-import { PauseParam, Speaker, SpeechText, SynthesisResult, VoiceParam } from "types";
+import { PauseParam, Speaker, SpeechText, SynthesisResult, VoiceParam } from "../types";
 
 export type VoiceroidQuery = Partial<{
   Text: string;

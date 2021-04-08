@@ -1,8 +1,8 @@
 import axios from "axios";
 import RGI_Emoji from "emoji-regex";
-import { processorLogger } from "processor";
-import { logger } from "commands/commands";
-import { ProcessorProvider } from "types";
+import { ProcessorProvider } from "../types";
+import { logger } from "../commands/commands";
+import { processorLogger } from "../processor";
 
 let emojiAnnotation: Record<string, string>;
 

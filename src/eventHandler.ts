@@ -1,9 +1,9 @@
 import { Client, VoiceState } from "discord.js";
 import log4js from "log4js";
-import { getGuildConfig } from "guildConfig";
-import { getSession, Session } from "session";
-import { createEmbedBase, handleCommand } from "commands/commands";
-import { handleText } from "textSpeech";
+import { getSession, Session } from "./session";
+import { handleText } from "./textSpeech";
+import { getGuildConfig } from "./guildConfig";
+import { createEmbedBase, handleCommand } from "./commands/commands";
 
 const logger = log4js.getLogger();
 export const setHandler = (client: Client): void => {

@@ -2,9 +2,9 @@
 import urlRegex from "url-regex-safe";
 import httpStatus from "http-status";
 import axios from "axios";
-import { processorLogger } from "processor";
 import ogs from "open-graph-scraper";
-import { ProcessorProvider } from "types";
+import { processorLogger } from "../processor";
+import { ProcessorProvider } from "../types";
 
 const LinkType = {
   Image: "画像",

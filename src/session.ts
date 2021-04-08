@@ -1,10 +1,10 @@
 import { Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 import async, { QueueObject } from "async";
-import { client } from "index";
-import { createEmbedBase, logger } from "commands/commands";
-import { getGuildConfig } from "guildConfig";
-import { VoiceroidSpeaker } from "speaker/voiceroidSpeaker";
-import { PauseParam, Speaker, SpeechTask, SpeechText } from "types";
+import { PauseParam, Speaker, SpeechTask, SpeechText } from "./types";
+import { getGuildConfig } from "./guildConfig";
+import { createEmbedBase, logger } from "./commands/commands";
+import { client } from "./index";
+import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
 
 const sessionStateMap: Record<string, Session> = {};
 

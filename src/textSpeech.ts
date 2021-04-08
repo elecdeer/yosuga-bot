@@ -1,14 +1,14 @@
 import { Message } from "discord.js";
-import { ProcessorChain } from "processor";
 import log4js from "log4js";
-import { Session } from "session";
-import { ServerConfig } from "guildConfig";
-import { urlProcessor } from "processor/urlProcessoor";
-import { emojiProcessor } from "processor/emojiProcessor";
-import { guildEmojiProcessor } from "processor/guildEmojiProcessor";
-import { codeBlockProcessor } from "processor/codeBlockProcessor";
-import { maxLengthProcessor } from "processor/maxLengthProcessor";
-import { SpeechText } from "types";
+import { maxLengthProcessor } from "./processor/maxLengthProcessor";
+import { urlProcessor } from "./processor/urlProcessor";
+import { ProcessorChain } from "./processor";
+import { emojiProcessor } from "./processor/emojiProcessor";
+import { codeBlockProcessor } from "./processor/codeBlockProcessor";
+import { guildEmojiProcessor } from "./processor/guildEmojiProcessor";
+import { Session } from "./session";
+import { ServerConfig } from "./guildConfig";
+import { SpeechText } from "./types";
 
 const logger = log4js.getLogger("text");
 

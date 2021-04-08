@@ -1,4 +1,4 @@
-import { ProcessorProvider } from "types";
+import { ProcessorProvider } from "../types";
 
 const codeBlockReg = /```(.*\n?)*```/g;
 

@@ -1,6 +1,6 @@
 import FileSync from "lowdb/adapters/FileSync";
 import low from "lowdb";
-import { VoiceParam } from "types";
+import { VoiceParam } from "./types";
 
 const adapter = new FileSync<Record<string, Partial<ServerConfig>>>("guildSettings.json");
 const serverConfDB = low(adapter);
