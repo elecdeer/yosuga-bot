@@ -119,7 +119,7 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
     session.pushSpeech({
       text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`,
       speed: 1,
-      volume: ,
+      volume: 1,
     });
   }
 };
@@ -129,7 +129,7 @@ const handleTurnOnVideo = (oldState: VoiceState, newState: VoiceState, session: 
   session.pushSpeech({
     text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`,
     speed: 1,
-    volume: 1
+    volume: ,
   });
 };
 

@@ -24,13 +24,13 @@ fetchEmojiPronunciationMap()
 
 const emojiReg = RGI_Emoji();
 
-export const emojiProcessor: ProcessorProvider<void> = () => async(speechText) => {
+export const emojiProcessor: ProcessorProvider<void> = () => async (speechText) => {
   // console.log("絵文字: " + speechText.match(reg));
   return {
     ...speechText,
     text: speechText.text.replace(emojiReg, (match) => {
       processorLogger.debug(`${match} => ${emojiAnnotation[match]}`);
       return emojiAnnotation[match] ?? "絵文字";
-    },
+    }),
   };
 };

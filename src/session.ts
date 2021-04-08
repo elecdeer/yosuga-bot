@@ -126,8 +126,8 @@ export class Session {
       speechText: param,
       voiceParam: {
         pitch: 1,
-        intonation: ,
-      ,
+        intonation: 1,
+      },
     });
 
     this.lastMessageTimestamp = timestamp ?? Date.now();
