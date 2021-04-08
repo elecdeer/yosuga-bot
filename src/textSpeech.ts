@@ -1,13 +1,14 @@
 import { Message } from "discord.js";
-import { ProcessorChain } from "./processor";
 import log4js from "log4js";
+import { maxLengthProcessor } from "./processor/maxLengthProcessor";
+import { urlProcessor } from "./processor/urlProcessor";
+import { ProcessorChain } from "./processor";
+import { emojiProcessor } from "./processor/emojiProcessor";
+import { codeBlockProcessor } from "./processor/codeBlockProcessor";
+import { guildEmojiProcessor } from "./processor/guildEmojiProcessor";
 import { Session } from "./session";
 import { ServerConfig } from "./guildConfig";
-import { urlProcessor } from "./processor/urlProcessoor";
-import { emojiProcessor } from "./processor/emojiProcessor";
-import { guildEmojiProcessor } from "./processor/guildEmojiProcessor";
-import { codeBlockProcessor } from "./processor/codeBlockProcessor";
-import { maxLengthProcessor } from "./processor/maxLengthProcessor";
+import { SpeechText } from "./types";
 
 const logger = log4js.getLogger("text");
 
@@ -54,21 +55,29 @@ export const handleText = async (
 
   logger.debug("baseText " + baseText);
 
-  let text = await processor.process(baseText);
-  logger.debug(`text: ${text}`);
+  const speechTexts: SpeechText[] = [
+    {
+      text: baseText,
+      speed: 1,
+      volume: 1,
+    },
+  ];
 
   //名前読み上げ
   const difMs = message.createdTimestamp - session.lastMessageTimestamp;
   logger.debug(`name omit? ${difMs} > ${nameOmitMs}`);
   if (session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs) {
-    text = `${session.getUsernamePronunciation(message.member)} ${text}`;
+    speechTexts.unshift({
+      text: session.getUsernamePronunciation(message.member),
+      speed: 1,
+      volume: 1,
+    });
   }
 
-  session.pushSpeech(
-    {
-      Text: text,
-    },
-    message.createdTimestamp,
-    message.author.id
-  );
+  const processedTexts = await processor.process(speechTexts, true);
+  logger.debug(`text: ${processedTexts}`);
+
+  processedTexts.forEach((item) => {
+    session.pushSpeech(item, message.createdTimestamp, message.author.id);
+  });
 };

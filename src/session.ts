@@ -1,9 +1,9 @@
 import { Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 import async, { QueueObject } from "async";
-import { client } from "./index";
-import { createEmbedBase, logger } from "./commands/commands";
-import { Speaker, SpeechParam } from "./speaker/speaker";
+import { PauseParam, Speaker, SpeechTask, SpeechText } from "./types";
 import { getGuildConfig } from "./guildConfig";
+import { createEmbedBase, logger } from "./commands/commands";
+import { client } from "./index";
 import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
 
 const sessionStateMap: Record<string, Session> = {};
@@ -16,15 +16,22 @@ export const getSession = (guildId: string): Session | null => {
   }
 };
 
+const defaultPauseParam: PauseParam = {
+  shortPause: 150,
+  longPause: 370,
+  sentencePause: 800,
+};
+
 export class Session {
   connection: VoiceConnection | null;
   voiceChannel: VoiceChannel;
   textChannel: TextChannel;
-  speechQueue: QueueObject<SpeechParam>;
+  speechQueue: QueueObject<SpeechTask>;
   guild: Guild;
 
   //仮
-  speaker: Speaker;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  speaker: Speaker<any, any>;
 
   lastMessageTimestamp: number;
   lastMessageAuthorId: string;
@@ -51,62 +58,57 @@ export class Session {
   }
 
   private createQueue() {
-    //tsだと変換されるからなのか、async functionだとうまく動かない
-
-    return async.queue((param: SpeechParam, cb) => {
-      // logger.debug("consume queue");
-      // logger.debug(param);
-
+    const worker = async (task: SpeechTask): Promise<void> => {
       const config = getGuildConfig(this.guild.id);
-      const connectedParam: SpeechParam = {
-        Text: param.Text,
-        Kana: param.Kana,
-        Speaker: { ...config.defaultSpeakerParam, ...param.Speaker },
-      };
 
-      this.broadcastSpeech(connectedParam)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const query = this.speaker.constructSynthesisQuery(
+        task.speechText,
+        task.voiceParam,
+        defaultPauseParam
+      );
+
+      const result = await this.speaker.synthesisSpeech(query);
+
+      const connection = this.connection;
+      if (!connection) {
+        logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
+        return Promise.reject();
+      }
+
+      await new Promise<void>((resolve) => {
+        const dispatcher = connection.play(result.stream, {
+          type: result.type ?? "unknown",
+        });
+
+        dispatcher.once("finish", () => {
+          logger.debug("resolve");
+          resolve();
+        });
+      });
+    };
+
+    return async.queue<SpeechTask, Error>((task, callback) => {
+      worker(task)
         .then(() => {
-          cb();
+          callback(null);
         })
         .catch((err) => {
-          cb(err);
+          callback(err);
         });
     });
-  }
-
-  broadcastSpeech(param: SpeechParam): Promise<void> {
-    const connection = this.connection;
-    if (!connection) {
-      logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
-      return Promise.reject();
-    }
-
-    return this.speaker
-      .getSpeech(param)
-      .then(
-        (data) =>
-          new Promise<void>((resolve) => {
-            connection.play(data).once("finish", () => {
-              logger.debug("resolve");
-              resolve();
-            });
-          })
-      )
-      .catch((reason) => {
-        logger.error(reason);
-      });
   }
 
   async connectVoiceChannel(): Promise<void> {
     this.connection = await this.voiceChannel.join();
 
-    await this.speaker.test().catch((err) => {
+    const isEnable = await this.speaker.checkIsEnableSynthesizer();
+    if (!isEnable) {
       logger.warn("音声合成システムが無効です");
-      logger.warn(err);
 
       const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
       void this.textChannel.send(embed);
-    });
+    }
   }
 
   disconnect(): void {
@@ -116,9 +118,17 @@ export class Session {
     delete sessionStateMap[this.guild.id];
   }
 
-  pushSpeech(param: SpeechParam, timestamp?: number, authorId?: string): void {
+  pushSpeech(param: SpeechText, timestamp?: number, authorId?: string): void {
     // logger.debug("push speeech queue", param.Text);
-    void this.speechQueue.push(param);
+
+    //仮
+    void this.speechQueue.push({
+      speechText: param,
+      voiceParam: {
+        pitch: 1,
+        intonation: 1,
+      },
+    });
 
     this.lastMessageTimestamp = timestamp ?? Date.now();
     this.lastMessageAuthorId = authorId ?? client.user?.id ?? "unknown";
