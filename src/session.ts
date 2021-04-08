@@ -32,7 +32,7 @@ export class Session {
 
   //仮
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  speaker: Speaker<any, any>;
+  speaker: Speaker<any>;
 
   lastMessageTimestamp: number;
   lastMessageAuthorId: string;
@@ -128,6 +128,12 @@ export class Session {
       voiceParam: {
         pitch: 1,
         intonation: 1,
+        additionalOption: {
+          cid: 5203,
+          emotionHappy: 0.5,
+          emotionAngry: 0,
+          emotionSad: 0,
+        },
       },
     });
 

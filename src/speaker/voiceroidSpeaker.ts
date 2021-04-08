@@ -21,7 +21,7 @@ export type VoiceroidSpeakerParam = Partial<{
 const speechTextUrl = `${process.env.VOICEROID_DEAMON_URL}/api/speechtext`;
 const checkUrl = `${process.env.VOICEROID_DEAMON_URL}/`;
 
-export class VoiceroidSpeaker implements Speaker<VoiceParam, VoiceroidQuery> {
+export class VoiceroidSpeaker implements Speaker<VoiceroidQuery> {
   constructSynthesisQuery(
     speechText: SpeechText,
     voiceParam: VoiceParam,

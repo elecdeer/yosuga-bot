@@ -26,13 +26,9 @@ export const handleText = async (
   session: Session,
   config: ServerConfig
 ): Promise<void> => {
-  // console.log(message);
-
   //読み上げ
-
   logger.debug("handleText");
 
-  // console.log(session);
   if (!session) return;
 
   // logger.debug(message);
@@ -44,22 +40,22 @@ export const handleText = async (
   logger.debug(`attachments: ${message.attachments}`);
   // logger.debug(`stickers] ${message.stickers}`);
 
-  let baseText = message.cleanContent;
+  const baseText = message.cleanContent;
 
   // console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
   // console.log("messageTime: " + message.createdTimestamp);
 
-  if (message.attachments.size > 0) {
-    baseText = baseText + " " + message.attachments.map((attachment) => attachment.url).join(" ");
-  }
-
   logger.debug("baseText " + baseText);
+
+  const speechTextBase = {
+    speed: 1,
+    volume: 1,
+  };
 
   const speechTexts: SpeechText[] = [
     {
+      ...speechTextBase,
       text: baseText,
-      speed: 1.2,
-      volume: 1,
     },
   ];
 
@@ -68,10 +64,20 @@ export const handleText = async (
   logger.debug(`name omit? ${difMs} > ${nameOmitMs}`);
   if (session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs) {
     speechTexts.unshift({
+      ...speechTextBase,
       text: session.getUsernamePronunciation(message.member),
-      speed: 1.2,
-      volume: 1,
     });
+  }
+
+  if (message.attachments.size > 0) {
+    message.attachments
+      .map((attachment) => ({
+        ...speechTextBase,
+        text: attachment.url,
+      }))
+      .forEach((item) => {
+        speechTexts.push(item);
+      });
   }
 
   const processedTexts = await processor.process(speechTexts, true);

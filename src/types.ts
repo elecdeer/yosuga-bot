@@ -1,22 +1,32 @@
 import { Readable } from "stream";
 import { StreamType } from "discord.js";
 
-export interface VoiceParam {
+export type VoiceParam = {
   pitch: number;
   intonation: number;
-}
+  additionalOption?: AdditionalVoiceParam;
+};
 
-export interface PauseParam {
+export type AdditionalVoiceParam = AIVoiceParam;
+
+export type AIVoiceParam = {
+  cid: number;
+  emotionHappy: number;
+  emotionAngry: number;
+  emotionSad: number;
+};
+
+export type PauseParam = {
   shortPause: number;
   longPause: number;
   sentencePause: number;
-}
+};
 
-export interface SpeechText {
+export type SpeechText = {
   text: string;
   speed: number;
   volume: number;
-}
+};
 
 export type SpeechTask = {
   voiceParam: VoiceParam;
@@ -31,10 +41,14 @@ export type SynthesisResult = {
   type?: StreamType;
 };
 
-export interface Speaker<T extends VoiceParam, U> {
-  synthesisSpeech: (query: U) => Promise<SynthesisResult>;
+export interface Speaker<T> {
+  synthesisSpeech: (query: T) => Promise<SynthesisResult>;
 
-  constructSynthesisQuery: (speechText: SpeechText, voiceParam: T, pauseParam: PauseParam) => U;
+  constructSynthesisQuery: (
+    speechText: SpeechText,
+    voiceParam: VoiceParam,
+    pauseParam: PauseParam
+  ) => T;
 
   checkIsEnableSynthesizer: () => Promise<boolean>;
 }

@@ -11,13 +11,8 @@ import { logger } from "../commands/commands";
 
 const wait = util.promisify(setTimeout);
 
-export interface AIVoiceParam extends VoiceParam {
-  emotionHappy: number;
-  emotionAngry: number;
-  emotionSad: number;
-}
-
 export type AIVoiceQuery = Partial<{
+  cid: number;
   talktext: string;
   effects: {
     volume: number;
@@ -43,10 +38,10 @@ const checkUrl = `${assistantSeikaUrl}/VERSION`;
 
 const socket = io("http://192.168.0.14:443");
 
-export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
+export class AIVoiceSpeaker implements Speaker<AIVoiceQuery> {
   constructSynthesisQuery(
     speechText: SpeechText,
-    voiceParam: AIVoiceParam,
+    voiceParam: VoiceParam,
     pauseParam: PauseParam
   ): AIVoiceQuery {
     return {
@@ -60,9 +55,9 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
         longpause: pauseParam.longPause,
       },
       emotions: {
-        喜び: voiceParam.emotionHappy,
-        怒り: voiceParam.emotionAngry,
-        悲しみ: voiceParam.emotionSad,
+        喜び: voiceParam.additionalOption?.emotionHappy ?? 0,
+        怒り: voiceParam.additionalOption?.emotionAngry ?? 0,
+        悲しみ: voiceParam.additionalOption?.emotionSad ?? 0,
       },
     };
   }
@@ -73,7 +68,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
     await wait(200);
 
     const res = axios
-      .post(`${assistantSeikaUrl}/PLAY2/5202`, query, {
+      .post(`${assistantSeikaUrl}/PLAY2/${query.cid ?? 5201}`, query, {
         auth: basicAuthParam,
       })
       .then((res) => {
