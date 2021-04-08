@@ -58,7 +58,7 @@ export const handleText = async (
   const speechTexts: SpeechText[] = [
     {
       text: baseText,
-      speed: 1,
+      speed: 1.2,
       volume: 1,
     },
   ];
@@ -69,7 +69,7 @@ export const handleText = async (
   if (session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs) {
     speechTexts.unshift({
       text: session.getUsernamePronunciation(message.member),
-      speed: 1,
+      speed: 1.2,
       volume: 1,
     });
   }
