@@ -1,7 +1,5 @@
 import { Readable } from "stream";
 import { StreamType } from "discord.js";
-import { AIVoiceSpeaker } from "./speaker/aivoiceSpeaker";
-import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
 
 export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -18,14 +16,6 @@ export type SpeakerParam = AIVoiceParam | VoiceroidParam;
 export type VoiceroidParam = {
   speaker: "voiceroid";
 };
-
-// const testValues = {
-//   processType: "num2str",
-//   value: 334
-// } | {
-//   processType: "str2num",
-//   value: "100"
-// };
 
 export type AIVoiceParam = {
   speaker: "aivoice";

@@ -1,4 +1,4 @@
-import { Command, createEmbedBase, logger } from "./commands";
+import { Command, commandLogger, createEmbedBase } from "./commands";
 import { TextChannel } from "discord.js";
 import { Session } from "../session";
 
@@ -8,7 +8,7 @@ export const startCommand: Command = {
   usage: "",
 
   execute: async (args, message, session, config) => {
-    logger.info(`try connect: ${message.guild?.id}`);
+    commandLogger.info(`try connect: ${message.guild?.id}`);
     if (!message.member) return;
     if (!message.guild) return;
 

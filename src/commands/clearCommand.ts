@@ -1,4 +1,4 @@
-import { Command, createEmbedBase, logger } from "./commands";
+import { Command, commandLogger, createEmbedBase } from "./commands";
 
 export const clearCommand: Command = {
   trigger: ["c", "clear"],
@@ -6,7 +6,7 @@ export const clearCommand: Command = {
   usage: "",
 
   execute: async (args, message, session, config) => {
-    logger.debug("handleClear");
+    commandLogger.debug("handleClear");
 
     if (!session?.connection) return;
 

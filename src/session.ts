@@ -5,7 +5,6 @@ import { getGuildConfig, getVoiceConfig } from "./configManager";
 import { createEmbedBase } from "./commands/commands";
 import { client } from "./index";
 import { createSpeakerMap, disposeSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
-import { config } from "dotenv";
 import { getLogger } from "log4js";
 
 const logger = getLogger("session");

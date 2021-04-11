@@ -1,4 +1,9 @@
 import log4js from "log4js";
+import Discord, { Client } from "discord.js";
+
+import { setHandler } from "./eventHandler";
+import { assignCommands } from "./commands/commands";
+import { yosugaEnv } from "./environment";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
@@ -14,13 +19,6 @@ log4js.configure({
     },
   },
 });
-
-import Discord, { Client } from "discord.js";
-import axios from "axios";
-
-import { setHandler } from "./eventHandler";
-import { assignCommands } from "./commands/commands";
-import { yosugaEnv } from "./environment";
 
 const logger = log4js.getLogger();
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 import RGI_Emoji from "emoji-regex";
 import { ProcessorProvider } from "../types";
-import { logger } from "../commands/commands";
+import { commandLogger } from "../commands/commands";
 import { processorLogger } from "../processor";
 
 let emojiAnnotation: Record<string, string>;
@@ -18,8 +18,8 @@ fetchEmojiPronunciationMap()
     emojiAnnotation = data;
   })
   .catch((err) => {
-    logger.info("絵文字発音リストの取得に失敗しました");
-    logger.info(err);
+    commandLogger.info("絵文字発音リストの取得に失敗しました");
+    commandLogger.info(err);
   });
 
 const emojiReg = RGI_Emoji();
