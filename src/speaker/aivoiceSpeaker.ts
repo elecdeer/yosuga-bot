@@ -1,4 +1,11 @@
-import { PauseParam, Speaker, SpeechText, SynthesisResult, VoiceParam } from "../types";
+import {
+  AIVoiceParam,
+  PauseParam,
+  Speaker,
+  SpeechText,
+  SynthesisResult,
+  VoiceParamBind,
+} from "../types";
 
 import * as util from "util";
 import { io } from "socket.io-client";
@@ -8,6 +15,7 @@ import ss from "socket.io-stream";
 import { Readable } from "stream";
 import axios from "axios";
 import { logger } from "../commands/commands";
+import { yosugaEnv } from "../environment";
 
 const wait = util.promisify(setTimeout);
 
@@ -29,19 +37,19 @@ export type AIVoiceQuery = Partial<{
   };
 }>;
 
-const assistantSeikaUrl = "http://192.168.0.14:7180/";
 const basicAuthParam = {
-  username: "SeikaServerUser",
-  password: "SeikaServerPassword",
+  username: yosugaEnv.assistantSeikaBasicUser ?? "",
+  password: yosugaEnv.assistantSeikaBasicPassword ?? "",
 };
-const checkUrl = `${assistantSeikaUrl}/VERSION`;
+const checkUrl = `${yosugaEnv.assistantSeikaUrl}/VERSION`;
+const fetchUrl = `${yosugaEnv.assistantSeikaUrl}/PLAY2`;
 
-const socket = io("http://192.168.0.14:443");
+const socket = io(yosugaEnv.socketIOAudioRecorderWSUrl);
 
-export class AIVoiceSpeaker implements Speaker<AIVoiceQuery> {
+export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
   constructSynthesisQuery(
     speechText: SpeechText,
-    voiceParam: VoiceParam,
+    voiceParam: VoiceParamBind<AIVoiceParam>,
     pauseParam: PauseParam
   ): AIVoiceQuery {
     return {
@@ -55,9 +63,9 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceQuery> {
         longpause: pauseParam.longPause,
       },
       emotions: {
-        喜び: voiceParam.additionalOption?.emotionHappy ?? 0,
-        怒り: voiceParam.additionalOption?.emotionAngry ?? 0,
-        悲しみ: voiceParam.additionalOption?.emotionSad ?? 0,
+        喜び: voiceParam.speakerOption?.emotionHappy ?? 0,
+        怒り: voiceParam.speakerOption?.emotionAngry ?? 0,
+        悲しみ: voiceParam.speakerOption?.emotionSad ?? 0,
       },
     };
   }
@@ -68,7 +76,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceQuery> {
     await wait(200);
 
     const res = axios
-      .post(`${assistantSeikaUrl}/PLAY2/${query.cid ?? 5201}`, query, {
+      .post(`${fetchUrl}/${query.cid ?? 5201}`, query, {
         auth: basicAuthParam,
       })
       .then((res) => {
@@ -82,7 +90,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceQuery> {
     };
   }
 
-  checkIsEnableSynthesizer(): Promise<boolean> {
+  checkIsActiveSynthesizer(): Promise<boolean> {
     return new Promise((resolve) => {
       axios({
         method: "GET",

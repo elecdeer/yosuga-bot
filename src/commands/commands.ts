@@ -2,11 +2,11 @@ import { Message, MessageEmbed, TextChannel } from "discord.js";
 
 import log4js from "log4js";
 import { Session } from "../session";
-import { ServerConfig } from "../guildConfig";
 import { startCommand } from "./startCommand";
 import { endCommand } from "./endCommand";
 import { clearCommand } from "./clearCommand";
 import { helpCommand } from "./helpCommand";
+import { GuildConfigWithoutVoice } from "../configManager";
 
 export const logger = log4js.getLogger("command");
 
@@ -16,7 +16,7 @@ export type CommandExecutor = (
   args: Array<string>,
   message: Message,
   session: Session | null,
-  config: ServerConfig
+  config: GuildConfigWithoutVoice
 ) => Promise<void>;
 export type Command = {
   trigger: string[];
@@ -57,7 +57,7 @@ export const assignCommands = (): void => {
 export const handleCommand = async (
   message: Message,
   session: Session | null,
-  config: ServerConfig
+  config: GuildConfigWithoutVoice
 ): Promise<void> => {
   logger.debug("handleCommand");
   if (!message.guild) return;

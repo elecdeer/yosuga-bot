@@ -1,6 +1,14 @@
 import { Readable } from "stream";
 import axios from "axios";
-import { PauseParam, Speaker, SpeechText, SynthesisResult, VoiceParam } from "../types";
+import {
+  PauseParam,
+  Speaker,
+  SpeechText,
+  SynthesisResult,
+  VoiceParamBind,
+  VoiceroidParam,
+} from "../types";
+import { yosugaEnv } from "../environment";
 
 export type VoiceroidQuery = Partial<{
   Text: string;
@@ -18,13 +26,13 @@ export type VoiceroidSpeakerParam = Partial<{
   PauseSentence: number;
 }>;
 
-const speechTextUrl = `${process.env.VOICEROID_DEAMON_URL}/api/speechtext`;
-const checkUrl = `${process.env.VOICEROID_DEAMON_URL}/`;
+const speechTextUrl = `${yosugaEnv.voiceroidDaemonUrl}/api/speechtext`;
+const checkUrl = `${yosugaEnv.voiceroidDaemonUrl}/`;
 
-export class VoiceroidSpeaker implements Speaker<VoiceroidQuery> {
+export class VoiceroidSpeaker implements Speaker<VoiceroidParam, VoiceroidQuery> {
   constructSynthesisQuery(
     speechText: SpeechText,
-    voiceParam: VoiceParam,
+    voiceParam: VoiceParamBind<VoiceroidParam>,
     pauseParam: PauseParam
   ): VoiceroidQuery {
     return {
@@ -54,7 +62,7 @@ export class VoiceroidSpeaker implements Speaker<VoiceroidQuery> {
     }
   }
 
-  checkIsEnableSynthesizer(): Promise<boolean> {
+  checkIsActiveSynthesizer(): Promise<boolean> {
     return new Promise((resolve) => {
       axios({
         method: "GET",

@@ -1,11 +1,14 @@
 import { Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 import async, { QueueObject } from "async";
-import { PauseParam, Speaker, SpeechTask, SpeechText } from "./types";
-import { getGuildConfig } from "./guildConfig";
-import { createEmbedBase, logger } from "./commands/commands";
+import { PartiallyPartial, SpeechTask, SpeechText, VoiceParamBind } from "./types";
+import { getGuildConfig, getVoiceConfig } from "./configManager";
+import { createEmbedBase } from "./commands/commands";
 import { client } from "./index";
-import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
-import { AIVoiceSpeaker } from "./speaker/aivoiceSpeaker";
+import { createSpeakerMap, disposeSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
+import { config } from "dotenv";
+import { getLogger } from "log4js";
+
+const logger = getLogger("session");
 
 const sessionStateMap: Record<string, Session> = {};
 
@@ -17,12 +20,6 @@ export const getSession = (guildId: string): Session | null => {
   }
 };
 
-const defaultPauseParam: PauseParam = {
-  shortPause: 150,
-  longPause: 370,
-  sentencePause: 800,
-};
-
 export class Session {
   connection: VoiceConnection | null;
   voiceChannel: VoiceChannel;
@@ -30,9 +27,7 @@ export class Session {
   speechQueue: QueueObject<SpeechTask>;
   guild: Guild;
 
-  //仮
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  speaker: Speaker<any>;
+  speakerMap: SpeakerMap;
 
   lastMessageTimestamp: number;
   lastMessageAuthorId: string;
@@ -48,7 +43,7 @@ export class Session {
     this.lastMessageTimestamp = 0;
     this.lastMessageAuthorId = "";
 
-    this.speaker = new AIVoiceSpeaker();
+    this.speakerMap = createSpeakerMap(guild.id);
 
     sessionStateMap[guild.id] = this;
   }
@@ -62,14 +57,24 @@ export class Session {
     const worker = async (task: SpeechTask): Promise<void> => {
       const config = getGuildConfig(this.guild.id);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const query = this.speaker.constructSynthesisQuery(
+      const speakerValue = this.speakerMap[task.voiceParam.speakerOption.speaker];
+      if (speakerValue.status !== "active") {
+        return;
+      }
+
+      //敗北のany
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const voiceParam: VoiceParamBind<any> = task.voiceParam;
+
+      const query = speakerValue.speaker.constructSynthesisQuery(
         task.speechText,
-        task.voiceParam,
-        defaultPauseParam
+        voiceParam,
+        config.pauseParam
       );
 
-      const result = await this.speaker.synthesisSpeech(query);
+      logger.debug("query", query);
+
+      const result = await speakerValue.speaker.synthesisSpeech(query);
 
       const connection = this.connection;
       if (!connection) {
@@ -102,43 +107,54 @@ export class Session {
 
   async connectVoiceChannel(): Promise<void> {
     this.connection = await this.voiceChannel.join();
-
-    const isEnable = await this.speaker.checkIsEnableSynthesizer();
-    if (!isEnable) {
-      logger.warn("音声合成システムが無効です");
-
-      const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
-      void this.textChannel.send(embed);
-    }
   }
 
   disconnect(): void {
     logger.info(`disconnect: ${this.voiceChannel.id}`);
     this.connection?.disconnect();
     this.speechQueue.kill();
+    disposeSpeakerMap(this.guild.id);
     delete sessionStateMap[this.guild.id];
   }
 
-  pushSpeech(param: SpeechText, timestamp?: number, authorId?: string): void {
+  pushSpeech(
+    param: PartiallyPartial<SpeechText, "speed" | "volume">,
+    userId?: string,
+    timestamp?: number
+  ): void {
     // logger.debug("push speeech queue", param.Text);
 
-    //仮
+    logger.debug(this.speakerMap);
+
+    //check状態のことを考えるべきかも
+    const voiceParam = getVoiceConfig(this.speakerMap, this.guild.id, userId);
+    logger.debug(voiceParam);
+
+    if (!voiceParam) {
+      logger.warn("音声合成システムが無効です");
+
+      const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
+      void this.textChannel.send(embed);
+      return;
+    }
+
+    const fullParam: SpeechText = {
+      speed: 1,
+      volume: 1,
+      ...param,
+    };
+    //ここでやらない方がいい気もする
+    const config = getGuildConfig(this.guild.id);
+    fullParam.speed *= config.masterSpeed;
+    fullParam.volume *= config.masterVolume;
+
     void this.speechQueue.push({
-      speechText: param,
-      voiceParam: {
-        pitch: 1,
-        intonation: 1,
-        additionalOption: {
-          cid: 5203,
-          emotionHappy: 0.5,
-          emotionAngry: 0,
-          emotionSad: 0,
-        },
-      },
+      speechText: fullParam,
+      voiceParam: voiceParam,
     });
 
     this.lastMessageTimestamp = timestamp ?? Date.now();
-    this.lastMessageAuthorId = authorId ?? client.user?.id ?? "unknown";
+    this.lastMessageAuthorId = userId ?? client.user?.id ?? "unknown";
 
     // logger.debug(this.speechQueue);
   }

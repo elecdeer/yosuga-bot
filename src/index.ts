@@ -1,14 +1,6 @@
-import { config } from "dotenv";
-
-config();
-
 import log4js from "log4js";
-import Discord, { Client } from "discord.js";
-import axios from "axios";
 
-import { setHandler } from "./eventHandler";
-import { assignCommands } from "./commands/commands";
-
+//最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
   appenders: {
     out: { type: "stdout" },
@@ -23,19 +15,24 @@ log4js.configure({
   },
 });
 
+import Discord, { Client } from "discord.js";
+import axios from "axios";
+
+import { setHandler } from "./eventHandler";
+import { assignCommands } from "./commands/commands";
+import { yosugaEnv } from "./environment";
+
 const logger = log4js.getLogger();
 
 logger.info("start process");
-logger.debug("environment", process.env);
 
 export const client: Client = new Discord.Client();
-axios.defaults.baseURL = process.env.VOICEROID_DEAMON_URL;
 
 setHandler(client);
 assignCommands();
 
 client
-  .login(process.env.DISCORD_TOKEN)
+  .login(yosugaEnv.discordToken)
   .then((res) => {
     logger.info("bot login");
     logger.info(`token: ${res}`);

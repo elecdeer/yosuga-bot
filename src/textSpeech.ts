@@ -7,8 +7,8 @@ import { emojiProcessor } from "./processor/emojiProcessor";
 import { codeBlockProcessor } from "./processor/codeBlockProcessor";
 import { guildEmojiProcessor } from "./processor/guildEmojiProcessor";
 import { Session } from "./session";
-import { ServerConfig } from "./guildConfig";
 import { SpeechText } from "./types";
+import { GuildConfigWithoutVoice } from "./configManager";
 
 const logger = log4js.getLogger("text");
 
@@ -19,12 +19,10 @@ const processor = new ProcessorChain()
   .use(guildEmojiProcessor())
   .use(codeBlockProcessor());
 
-const nameOmitMs = 30000;
-
 export const handleText = async (
   message: Message,
   session: Session,
-  config: ServerConfig
+  config: GuildConfigWithoutVoice
 ): Promise<void> => {
   //読み上げ
   logger.debug("handleText");
@@ -45,8 +43,6 @@ export const handleText = async (
   // console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
   // console.log("messageTime: " + message.createdTimestamp);
 
-  logger.debug("baseText " + baseText);
-
   const speechTextBase = {
     speed: 1,
     volume: 1,
@@ -61,8 +57,8 @@ export const handleText = async (
 
   //名前読み上げ
   const difMs = message.createdTimestamp - session.lastMessageTimestamp;
-  logger.debug(`name omit? ${difMs} > ${nameOmitMs}`);
-  if (session.lastMessageAuthorId !== message.author.id || difMs > nameOmitMs) {
+  logger.debug(`name omit? ${difMs} > ${config.timeToReadMemberNameSec * 1000}`);
+  if (session.lastMessageAuthorId !== message.author.id || difMs > config.timeToReadMemberNameSec) {
     speechTexts.unshift({
       ...speechTextBase,
       text: session.getUsernamePronunciation(message.member),
@@ -84,6 +80,6 @@ export const handleText = async (
   logger.debug(`text: ${processedTexts}`);
 
   processedTexts.forEach((item) => {
-    session.pushSpeech(item, message.createdTimestamp, message.author.id);
+    session.pushSpeech(item, message.author.id, message.createdTimestamp);
   });
 };

@@ -1,15 +1,34 @@
 import { Readable } from "stream";
 import { StreamType } from "discord.js";
+import { AIVoiceSpeaker } from "./speaker/aivoiceSpeaker";
+import { VoiceroidSpeaker } from "./speaker/voiceroidSpeaker";
+
+export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type VoiceParam = {
+  speakerOption: SpeakerParam;
   pitch: number;
   intonation: number;
-  additionalOption?: AdditionalVoiceParam;
 };
 
-export type AdditionalVoiceParam = AIVoiceParam;
+export type VoiceParamBind<T> = Exclude<VoiceParam, SpeakerParam> & { speakerOption: T };
+
+export type SpeakerParam = AIVoiceParam | VoiceroidParam;
+
+export type VoiceroidParam = {
+  speaker: "voiceroid";
+};
+
+// const testValues = {
+//   processType: "num2str",
+//   value: 334
+// } | {
+//   processType: "str2num",
+//   value: "100"
+// };
 
 export type AIVoiceParam = {
+  speaker: "aivoice";
   cid: number;
   emotionHappy: number;
   emotionAngry: number;
@@ -41,14 +60,38 @@ export type SynthesisResult = {
   type?: StreamType;
 };
 
-export interface Speaker<T> {
-  synthesisSpeech: (query: T) => Promise<SynthesisResult>;
+export interface Speaker<T extends SpeakerParam, U> {
+  synthesisSpeech: (query: U) => Promise<SynthesisResult>;
 
   constructSynthesisQuery: (
     speechText: SpeechText,
-    voiceParam: VoiceParam,
+    voiceParam: VoiceParamBind<T>,
     pauseParam: PauseParam
-  ) => T;
+  ) => U;
 
-  checkIsEnableSynthesizer: () => Promise<boolean>;
+  checkIsActiveSynthesizer: () => Promise<boolean>;
 }
+
+export type GuildConfig = {
+  commandPrefix: string;
+  voiceParam: VoiceParam;
+  pauseParam: PauseParam;
+  wordDictionary: WordDictionary;
+  masterVolume: number;
+  masterSpeed: number;
+  readStatusUpdate: boolean;
+  readTimeSignal: boolean;
+  timeToAutoLeaveSec: number;
+  timeToReadMemberNameSec: number;
+};
+
+export type WordDictionary = WordItem[];
+export type WordItem = {
+  type: "segment" | "all" | "regex";
+  word: string;
+  read: string;
+};
+
+export type UserConfig = {
+  voiceParam: VoiceParam;
+};
