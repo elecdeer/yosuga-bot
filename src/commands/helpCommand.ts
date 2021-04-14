@@ -1,4 +1,4 @@
-import { Command, commandList, createEmbedBase, logger } from "./commands";
+import { Command, commandList, commandLogger, createEmbedBase } from "./commands";
 
 export const helpCommand: Command = {
   trigger: ["help"],
@@ -8,8 +8,8 @@ export const helpCommand: Command = {
   execute: async (args, message, session, config) => {
     let commands = Array.from(commandList);
 
-    logger.debug("s" in ["s"]);
-    logger.debug(["s"].indexOf("s"));
+    commandLogger.debug("s" in ["s"]);
+    commandLogger.debug(["s"].indexOf("s"));
 
     const embed = createEmbedBase();
     embed.setDescription("Yosugaのコマンド一覧");

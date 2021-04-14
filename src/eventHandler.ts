@@ -2,8 +2,8 @@ import { Client, VoiceState } from "discord.js";
 import log4js from "log4js";
 import { getSession, Session } from "./session";
 import { handleText } from "./textSpeech";
-import { getGuildConfig } from "./guildConfig";
 import { createEmbedBase, handleCommand } from "./commands/commands";
+import { getGuildConfig } from "./configManager";
 
 const logger = log4js.getLogger();
 export const setHandler = (client: Client): void => {
@@ -17,12 +17,14 @@ export const setHandler = (client: Client): void => {
     if (!message.guild) return;
     if (message.author.bot) return;
 
-    logger.debug("process message");
-
     const guildId = message.guild.id;
+    logger.debug(`process message from ${message.author.id} at guild ${guildId}`);
+
     const sessionState = getSession(guildId);
 
     const config = getGuildConfig(guildId);
+    logger.debug("guildConfig");
+    logger.debug(config);
 
     if (message.content.startsWith(config.commandPrefix)) {
       handleCommand(message, sessionState, config).catch((err) => {
@@ -94,8 +96,6 @@ const handleEnterRoom = (oldState: VoiceState, newState: VoiceState, session: Se
 
   session.pushSpeech({
     text: `${session.getUsernamePronunciation(newState.member)}が入室しました。`,
-    speed: 1,
-    volume: 1,
   });
 };
 
@@ -118,8 +118,6 @@ const handleLeaveRoom = (oldState: VoiceState, newState: VoiceState, session: Se
   } else {
     session.pushSpeech({
       text: `${session.getUsernamePronunciation(newState.member)}が退室しました。`,
-      speed: 1,
-      volume: 1,
     });
   }
 };
@@ -128,8 +126,6 @@ const handleTurnOnVideo = (oldState: VoiceState, newState: VoiceState, session: 
   logger.debug("handleTurnOnVideo");
   session.pushSpeech({
     text: `${session.getUsernamePronunciation(newState.member)}がカメラをオンにしました。`,
-    speed: 1,
-    volume: 1,
   });
 };
 
@@ -141,8 +137,6 @@ const handleTurnOnLive = (oldState: VoiceState, newState: VoiceState, session: S
   logger.debug("handleTurnOnLive");
   session.pushSpeech({
     text: `${session.getUsernamePronunciation(newState.member)}がゴーライブを開始しました。`,
-    speed: 1,
-    volume: 1,
   });
 };
 

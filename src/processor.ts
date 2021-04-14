@@ -33,7 +33,7 @@ export class ProcessorChain {
       prevTexts = prevTexts.reduce((acc: SpeechText[], cur: SpeechText) => {
         const prevLast = acc[acc.length - 1];
         if (prevLast && prevLast.volume === cur.volume && prevLast.speed === cur.speed) {
-          prevLast.text = `${prevLast.text} ${cur.text}`;
+          prevLast.text = `${prevLast.text}、${cur.text}`;
         } else {
           acc.push(cur);
         }

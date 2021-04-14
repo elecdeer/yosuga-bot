@@ -1,4 +1,4 @@
-import { Command, createEmbedBase, logger } from "./commands";
+import { Command, createEmbedBase } from "./commands";
 
 export const endCommand: Command = {
   trigger: ["e", "end"],
