@@ -40,6 +40,8 @@ export const handleText = async (
 
   const baseText = message.cleanContent;
 
+  if (baseText.startsWith(config.ignorePrefix)) return;
+
   // console.log("lastTime: " + session.textChannel.lastMessage?.createdTimestamp);
   // console.log("messageTime: " + message.createdTimestamp);
 
