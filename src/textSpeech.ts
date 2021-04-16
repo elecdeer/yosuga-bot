@@ -56,9 +56,17 @@ export const handleText = async (
   ];
 
   //名前読み上げ
-  const difMs = message.createdTimestamp - session.lastMessageTimestamp;
+  session.lastPushedSpeech.timestamp;
+
+  const difMs = message.createdTimestamp - session.lastPushedSpeech.timestamp;
   logger.debug(`name omit? ${difMs} > ${config.timeToReadMemberNameSec * 1000}`);
-  if (session.lastMessageAuthorId !== message.author.id || difMs > config.timeToReadMemberNameSec) {
+
+  const isSpeechName =
+    session.lastPushedSpeech.author.type !== "member" ||
+    session.lastPushedSpeech.author.memberId !== message.author.id ||
+    difMs > config.timeToReadMemberNameSec;
+
+  if (isSpeechName) {
     speechTexts.unshift({
       ...speechTextBase,
       text: session.getUsernamePronunciation(message.member),

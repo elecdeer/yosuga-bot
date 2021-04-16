@@ -1,7 +1,16 @@
 import { Readable } from "stream";
-import { StreamType } from "discord.js";
+import { Client, StreamType } from "discord.js";
+import { Session } from "./session";
+
+// ====================
+// General
+// ====================
 
 export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// ====================
+// Voice
+// ====================
 
 export type VoiceParam = {
   speakerOption: SpeakerParam;
@@ -42,8 +51,16 @@ export type SpeechTask = {
   speechText: SpeechText;
 };
 
+// ====================
+// Processor
+// ====================
+
 export type TextProcessor = (text: Readonly<SpeechText>) => Promise<SpeechText[] | SpeechText>;
 export type ProcessorProvider<T> = (arg: T) => TextProcessor;
+
+// ====================
+// Speaker
+// ====================
 
 export type SynthesisResult = {
   stream: Readable;
@@ -61,6 +78,10 @@ export interface Speaker<T extends SpeakerParam, U> {
 
   checkIsActiveSynthesizer: () => Promise<boolean>;
 }
+
+// ====================
+// Config
+// ====================
 
 export type GuildConfig = {
   commandPrefix: string;
@@ -85,3 +106,10 @@ export type WordItem = {
 export type UserConfig = {
   voiceParam: VoiceParam;
 };
+
+// ====================
+// Event
+// ====================
+
+export type SessionEventHandlerRegister = (session: Session) => void;
+export type GlobalEventHandlerRegister = (client: Client) => void;

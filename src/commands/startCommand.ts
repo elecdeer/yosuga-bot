@@ -15,10 +15,11 @@ export const startCommand: Command = {
     const channel = message.channel;
     if (!(channel instanceof TextChannel)) return;
 
-    if (message.member.voice.channel) {
+    const voiceChannel = message.member.voice.channel;
+    if (voiceChannel) {
       if (session) {
         //既に接続済み
-        if (session.textChannel.id === channel.id) {
+        if (session.getTextChannel().id === channel.id) {
           //同じテキストルーム
           const embed = createEmbedBase().setDescription("接続済みです");
           await channel.send(embed);
@@ -26,18 +27,23 @@ export const startCommand: Command = {
           return;
         } else {
           //別テキストルーム
-          await session.textChannel.send(
-            createEmbedBase().setDescription(`読み上げチャンネルが${channel.name}に変更されました`)
-          );
+          await session
+            .getTextChannel()
+            .send(
+              createEmbedBase().setDescription(
+                `読み上げチャンネルが${channel.name}に変更されました`
+              )
+            );
 
-          session.textChannel = channel;
+          session.changeTextChannel(channel);
           await channel.send(createEmbedBase().setDescription(`接続しました!`));
 
           return;
         }
       } else {
-        const session = new Session(message.member.voice.channel, channel, message.guild);
-        await session.connectVoiceChannel();
+        const connection = await voiceChannel.join();
+        const session = new Session(voiceChannel, channel, message.guild);
+        // await session.connectVoiceChannel();
 
         const embed = createEmbedBase().setDescription("接続しました！");
 
