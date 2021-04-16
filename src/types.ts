@@ -73,6 +73,7 @@ export type GuildConfig = {
   readTimeSignal: boolean;
   timeToAutoLeaveSec: number;
   timeToReadMemberNameSec: number;
+  ignorePrefix: string;
 };
 
 export type WordDictionary = WordItem[];
