@@ -58,7 +58,10 @@ export const handleText = async (
   //名前読み上げ
   const difMs = message.createdTimestamp - session.lastMessageTimestamp;
   logger.debug(`name omit? ${difMs} > ${config.timeToReadMemberNameSec * 1000}`);
-  if (session.lastMessageAuthorId !== message.author.id || difMs > config.timeToReadMemberNameSec) {
+  if (
+    session.lastMessageAuthorId !== message.author.id ||
+    difMs > config.timeToReadMemberNameSec * 1000
+  ) {
     speechTexts.unshift({
       ...speechTextBase,
       text: session.getUsernamePronunciation(message.member),
