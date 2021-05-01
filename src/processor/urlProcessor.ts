@@ -17,31 +17,47 @@ const LinkType = {
 type LinkType = typeof LinkType[keyof typeof LinkType];
 
 const urlReg = urlRegex({});
+const urlRegGrouped = new RegExp(`(${urlReg.source})`, urlReg.flags);
 
-export const urlProcessor: ProcessorProvider<void> = () => async (speechText) => {
-  const urls = urlReg.exec(speechText.text);
+export const urlProcessor: ProcessorProvider<number> = (fastSpeedScale) => async (speechText) => {
+  const split = speechText.text.split(urlRegGrouped).filter((str) => str && str !== "");
 
-  if (!urls) return speechText;
+  // const urls = split.filter((str) => urlReg.test(str));
+  // const urlsRead = await Promise.all(
+  //   urls.map(async (url) => {
+  //     const urlType = await checkUrlType(url);
+  //     return urlType.read ?? urlType.type;
+  //   })
+  // );
 
-  processorLogger.debug("urlProcessor");
-  processorLogger.debug(urls);
+  const splitReplaced = await Promise.all(
+    split.map(async (item) => {
+      if (!urlReg.test(item))
+        return {
+          fast: false,
+          text: item,
+        };
 
-  //元のurlと置換後の文字列のtuple
-  const replaceTuple: Array<[string, string]> = await Promise.all(
-    urls.map(async (url) => {
-      const urlType = await checkUrlType(url);
-
-      const altText = urlType.read ?? urlType.type;
-      return [url, altText] as [string, string];
+      const urlType = await checkUrlType(item);
+      return {
+        fast: true,
+        text: urlType.read ?? urlType.type,
+      };
     })
   );
 
-  return {
-    ...speechText,
-    text: replaceTuple.reduce((result: string, next: [string, string]) => {
-      return result.replace(next[0], next[1]);
-    }, speechText.text),
-  };
+  processorLogger.debug("urlProcessor");
+  processorLogger.debug(split);
+  processorLogger.debug(splitReplaced);
+
+  return splitReplaced.map((item) => {
+    const speed = item.fast ? speechText.speed * fastSpeedScale : speechText.speed;
+    return {
+      ...speechText,
+      speed: speed,
+      text: item.text,
+    };
+  });
 };
 
 const redirectStatus = [httpStatus.MOVED_PERMANENTLY, httpStatus.FOUND, httpStatus.SEE_OTHER];
@@ -55,6 +71,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
     method: "GET",
     url: encodeURI(url),
     validateStatus: (status) => 200 <= status || status < 400,
+    timeout: 2000,
     headers: {
       "User-Agent": "bot",
     },

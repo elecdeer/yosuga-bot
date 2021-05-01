@@ -41,7 +41,9 @@ export const createSpeechQueue = (
 
       dispatcher.once("finish", () => {
         logger.debug("resolve");
-        resolve();
+        setTimeout(() => {
+          resolve();
+        }, config.pauseParam.longPause);
       });
     });
   };
