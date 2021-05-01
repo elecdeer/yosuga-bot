@@ -12,6 +12,7 @@ import { registerMessageHandler } from "./sessionHandler/message";
 import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
 import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
 import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
+import { registerAutoLeave } from "./sessionHandler/autoLeave";
 
 const logger = getLogger("session");
 
@@ -40,6 +41,7 @@ const handlerRegistrants: SessionEventHandlerRegistrant[] = [
   registerLeaveRoom,
   registerTurnOnVideo,
   registerTurnOnGoLive,
+  registerAutoLeave,
 ];
 
 export class Session extends SessionEmitter {
