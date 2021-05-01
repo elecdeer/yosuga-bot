@@ -1,6 +1,6 @@
-import { SessionEventHandlerRegister } from "../types";
+import { SessionEventHandlerRegistrant } from "../types";
 
-export const enterRoomRegister: SessionEventHandlerRegister = (session) => {
+export const registerEnterRoom: SessionEventHandlerRegistrant = (session) => {
   session.on("enterChannel", (member) => {
     session.pushSpeech({
       text: `${session.getUsernamePronunciation(member)}が入室しました。`,

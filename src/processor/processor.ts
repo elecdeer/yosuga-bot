@@ -1,5 +1,5 @@
 import { getLogger } from "log4js";
-import { SpeechText, TextProcessor } from "./types";
+import { SpeechText, TextProcessor } from "../types";
 
 export const processorLogger = getLogger("processor");
 
@@ -15,7 +15,10 @@ export class ProcessorChain {
     return this;
   }
 
-  async process(text: SpeechText | SpeechText[], collectSameParams = false): Promise<SpeechText[]> {
+  async process(
+    text: SpeechText | SpeechText[],
+    collectSameParams: boolean = false
+  ): Promise<SpeechText[]> {
     //reduceでもう少しうまく書ける気もする
 
     let prevTexts: SpeechText[] = ([] as SpeechText[]).concat(text);

@@ -1,127 +1,70 @@
-import {
-  Guild,
-  GuildMember,
-  Message,
-  TextChannel,
-  VoiceChannel,
-  VoiceConnection,
-} from "discord.js";
-import { PartiallyPartial, SpeechText } from "./types";
-import { getGuildConfig, getVoiceConfig } from "./configManager";
-import { createEmbedBase } from "./commands/commands";
-import { createSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
-import { getLogger } from "log4js";
-import StrictEventEmitter from "strict-event-emitter-types";
-import EventEmitter from "events";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { SessionEmitter } from "./sessionEmitter";
+import { GuildMember, TextChannel, VoiceConnection } from "discord.js";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
+import { createSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { getLogger } from "log4js";
+import { PartiallyPartial, SessionEventHandlerRegistrant, SpeechText } from "./types";
+import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
+import { createEmbedBase } from "./util";
+import { registerEnterRoom } from "./sessionHandler/enterRoom";
+import { registerMessageHandler } from "./sessionHandler/message";
 
 const logger = getLogger("session");
 
-interface Events {
-  message: (message: Message) => void;
-  enterChannel: (member: GuildMember) => void;
-  leaveChannel: (member: GuildMember) => void;
-  turnOnVideo: (member: GuildMember) => void;
-  turnOffVideo: (member: GuildMember) => void;
-  turnOnGoLive: (member: GuildMember) => void;
-  turnOffGoLive: (member: GuildMember) => void;
-  disconnect: () => void;
-}
-
-type SessionEmitter = StrictEventEmitter<EventEmitter, Events>;
-
-// const sessionStateMap: Record<string, Session> = {};
-//
-// const getSession = (guildId: string): Session | null => {
-//   if (guildId in sessionStateMap) {
-//     return sessionStateMap[guildId];
-//   } else {
-//     return null;
-//   }
-// };
-
+type SpeechRecordAuthorMember = {
+  type: "member";
+  memberId: string;
+};
+type SpeechRecordAuthorSystem = {
+  type: "yosuga";
+};
+type SpeechRecordAuthorOther = {
+  type: "unknown";
+};
+type SpeechRecordAuthor =
+  | SpeechRecordAuthorMember
+  | SpeechRecordAuthorSystem
+  | SpeechRecordAuthorOther;
 type PushSpeechRecord = {
   timestamp: number;
-  author:
-    | {
-        type: "member";
-        memberId: string;
-      }
-    | {
-        type: "yosuga";
-      }
-    | {
-        type: "unknown";
-      };
+  author: SpeechRecordAuthor;
 };
 
-export class Session extends (EventEmitter as { new (): SessionEmitter }) {
-  private readonly voiceChannel: VoiceChannel;
-  private textChannel: TextChannel;
-  private readonly guild: Guild;
+const handlerRegistrants: SessionEventHandlerRegistrant[] = [
+  registerEnterRoom,
+  registerMessageHandler,
+];
+
+export class Session extends SessionEmitter {
+  protected textChannel: TextChannel;
   readonly connection: VoiceConnection;
-  private speechQueue: SpeechQueue;
-  private readonly speakerMap: SpeakerMap;
+  protected readonly speakerMap: SpeakerMap;
+  protected speechQueue: SpeechQueue;
+
   lastPushedSpeech: PushSpeechRecord;
 
   constructor(
     yosugaEmitter: YosugaEventEmitter,
-    voiceChannel: VoiceChannel,
     connection: VoiceConnection,
     textChannel: TextChannel
   ) {
-    super();
-    this.voiceChannel = voiceChannel;
-    this.connection = connection;
+    super(yosugaEmitter, connection.channel);
     this.textChannel = textChannel;
-    this.guild = voiceChannel.guild;
+    this.connection = connection;
 
-    this.speakerMap = createSpeakerMap(voiceChannel.guild.id);
+    this.speakerMap = createSpeakerMap(this.guild.id);
     this.speechQueue = this.initializeQueue();
+
     this.lastPushedSpeech = {
       timestamp: 0,
-      autor: {
-        type: "unknown",
+      author: {
+        type: "unknon",
       },
     };
 
-    yosugaEmitter.on("message", (guildId, message) => {
-      if (guildId !== this.guild.id) return;
-      if (message.channel.id !== this.textChannel.id) return;
-      this.emit("message", message);
-    });
-
-    yosugaEmitter.on("moveChannel", (guildId, member, from, to) => {
-      if (guildId !== this.guild.id) return;
-      if (from && from.id === this.voiceChannel.id && to?.id !== this.voiceChannel.id) {
-        this.emit("leaveChannel", member);
-        return;
-      }
-      if (to && to.id === this.voiceChannel.id && from?.id !== this.voiceChannel.id) {
-        this.emit("enterChannel", member);
-        return;
-      }
-    });
-
-    yosugaEmitter.on("turnOnGoLive", (guildId, message) => {
-      if (guildId !== this.guild.id) return;
-      this.emit("turnOnGoLive", message);
-    });
-
-    yosugaEmitter.on("turnOffGoLive", (guildId, message) => {
-      if (guildId !== this.guild.id) return;
-      this.emit("turnOffGoLive", message);
-    });
-
-    yosugaEmitter.on("turnOnVideo", (guildId, message) => {
-      if (guildId !== this.guild.id) return;
-      this.emit("turnOnVideo", message);
-    });
-
-    yosugaEmitter.on("turnOffVideo", (guildId, message) => {
-      if (guildId !== this.guild.id) return;
-      this.emit("turnOffVideo", message);
+    handlerRegistrants.forEach((registrant) => {
+      registrant(this);
     });
   }
 
@@ -131,18 +74,12 @@ export class Session extends (EventEmitter as { new (): SessionEmitter }) {
     return this.speechQueue;
   }
 
-  // async connectVoiceChannel(): Promise<void> {
-  //   this.connection = await this.voiceChannel.join();
-  // }
-
   disconnect(): void {
     logger.info(`disconnect: ${this.voiceChannel.id}`);
-    this.connection?.disconnect();
+    this.connection.disconnect();
     this.speechQueue.kill();
-    // disposeSpeakerMap(this.guild.id);
     this.emit("disconnect");
-    // this.off()
-    // delete sessionStateMap[this.guild.id];
+    this.removeAllListeners();
   }
 
   pushSpeech(
@@ -178,7 +115,7 @@ export class Session extends (EventEmitter as { new (): SessionEmitter }) {
 
     void this.speechQueue.push({
       speechText: fullParam,
-      voicearam: voiceParam,
+      voiceParam: voiceParam,
     });
 
     this.lastPushedSpeech = {
@@ -186,10 +123,10 @@ export class Session extends (EventEmitter as { new (): SessionEmitter }) {
       author: userId
         ? {
             type: "member",
-           memberId: userId,
+            memberId: userId,
           }
         : {
-           ype: "yosuga",
+            type: "yosuga",
           },
     };
 
@@ -204,17 +141,11 @@ export class Session extends (EventEmitter as { new (): SessionEmitter }) {
     return this.textChannel;
   }
 
+  getConfig(): Readonly<GuildConfigWithoutVoice> {
+    return getGuildConfig(this.guild.id);
+  }
+
   getUsernamePronunciation(member: GuildMember | null): string {
     return member?.displayName ?? "不明なユーザ";
   }
 }
-
-// const sessionStateMap: Record<string, Session> = {};
-//
-// export const getSession = (guildId: string): Session | null => {
-//   if (guildId in sessionStateMap) {
-//     return sessionStateMap[guildId];
-//   } else {
-//     return null;
-//   }
-// };

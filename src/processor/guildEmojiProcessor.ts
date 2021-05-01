@@ -1,7 +1,7 @@
 //サーバのカスタム絵文字
 
 import { ProcessorProvider } from "../types";
-import { processorLogger } from "../processor";
+import { processorLogger } from "./processor";
 import { client } from "../index";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
@@ -10,6 +10,7 @@ export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechT
     ...speechText,
     text: speechText.text.replace(guildEmojiReg, (str) => {
       const emojiId = pickEmojiId(str);
+
       const emoji = client.emojis.resolve(emojiId);
 
       processorLogger.debug(emojiId, emoji?.name);

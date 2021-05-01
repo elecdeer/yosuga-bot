@@ -14,9 +14,10 @@ import { io } from "socket.io-client";
 import ss from "socket.io-stream";
 import { Readable } from "stream";
 import axios from "axios";
-import { commandLogger } from "../commands/commands";
 import { yosugaEnv } from "../environment";
+import { getLogger } from "log4js";
 
+const logger = getLogger("aivoiceSpeaker");
 const wait = util.promisify(setTimeout);
 
 export type AIVoiceQuery = Partial<{
@@ -80,7 +81,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
         auth: basicAuthParam,
       })
       .then((res) => {
-        commandLogger.debug("response received", res.status);
+        logger.debug("response received", res.status);
         socket.emit("end");
       });
 

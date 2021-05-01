@@ -1,5 +1,8 @@
 import { Readable } from "stream";
-import { Client, StreamType } from "discord.js";
+import { Guild, GuildMember, MessageEmbed, StreamType, TextChannel } from "discord.js";
+
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
 
 // ====================
@@ -111,5 +114,29 @@ export type UserConfig = {
 // Event
 // ====================
 
-export type SessionEventHandlerRegister = (session: Session) => void;
-export type GlobalEventHandlerRegister = (client: Client) => void;
+export type SessionEventHandlerRegistrant = (session: Session) => void;
+export type GlobalEventHandlerRegistrant = (emitter: YosugaEventEmitter) => void;
+
+// ====================
+// Command
+// ====================
+
+export type CommandExecutor = (
+  args: Array<string>,
+  context: CommandContext
+) => Promise<MessageEmbed>;
+
+export type Command = {
+  trigger: string[];
+  description: string;
+  usage: string;
+  execute: CommandExecutor;
+};
+
+export interface CommandContext {
+  session: Session | null;
+  config: GuildConfigWithoutVoice;
+  guild: Guild;
+  user: GuildMember;
+  textChannel: TextChannel;
+}

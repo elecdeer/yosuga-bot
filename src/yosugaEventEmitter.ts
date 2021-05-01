@@ -1,14 +1,16 @@
 import EventEmitter from "events";
-import { Client, GuildMember, Message, VoiceChannel } from "discord.js";
+import { Client, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
-import { Session } from "./session";
+
 import log4js from "log4js";
 import { getGuildConfig } from "./configManager";
+import { CommandContext } from "./types";
+import { getSession } from "./sessionManager";
 
 const logger = log4js.getLogger("yosugaEvent");
 
 interface Events {
-  command: (cmd: string, args: string[], message: Message, session: Session | null) => void;
+  command: (cmd: string, args: string[], context: CommandContext) => Promise<void>;
   message: (guildId: string, message: Message) => void;
   moveChannel: (
     guildId: string,
@@ -20,7 +22,12 @@ interface Events {
   turnOffVideo: (guildId: string, member: GuildMember) => void;
   turnOnGoLive: (guildId: string, member: GuildMember) => void;
   turnOffGoLive: (guildId: string, member: GuildMember) => void;
+  destroy: () => void;
 }
+
+// export const registerHandler = () => {
+//
+// }
 
 type YosugaEmitter = StrictEventEmitter<EventEmitter, Events>;
 
@@ -35,6 +42,8 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     client.on("message", (message) => {
       if (!message.guild) return;
       if (message.author.bot) return;
+      if (!message.member) return;
+      if (!message.channel.isText()) return;
 
       const guildId = message.guild.id;
       const config = getGuildConfig(guildId);
@@ -42,8 +51,18 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const messageSlice = message.content.slice(config.commandPrefix.length).trim().split(" ");
       const command = messageSlice.shift() ?? "";
 
+      const session = getSession(guildId);
+
       if (command === config.commandPrefix) {
-        this.emit("command", command, messageSlice, message, null);
+        const context: CommandContext = {
+          session: getSession(guildId),
+          config: config,
+          guild: message.guild,
+          user: message.member,
+          textChannel: message.channel as TxtChannel,
+        };
+
+        this.emit("command", command, messageSlice, context);
       } else {
         this.emit("message", guildId, message);
       }
@@ -79,6 +98,10 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         this.emit("turnOffGoLive", guildId, newState.member);
         return;
       }
+    });
+
+    process.on("exit", () => {
+      this.emit("destroy");
     });
   }
 }
