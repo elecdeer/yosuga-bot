@@ -11,13 +11,14 @@ export const clearCommand: Command = {
   execute: async (args, { session, config, guild, user, textChannel }) => {
     commandLogger.debug("handleClear");
 
+    commandLogger.debug(session);
+
     if (!session?.connection) return createEmbedBase().setDescription("未接続です.");
 
     if (session.connection.dispatcher) {
       session.connection.dispatcher.destroy();
     }
-
-    // session.initializeQueue();
+    session.initializeQueue();
 
     return createEmbedBase().setDescription("読み上げキューをクリアしました.");
   },
