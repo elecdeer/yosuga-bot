@@ -19,7 +19,7 @@ export const versionCommand: Command = {
   },
 };
 
-const execPromise = (cmd: string) =>
+const execPromise = (cmd: string): Promise<string> =>
   new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
