@@ -59,7 +59,7 @@ export class Session extends SessionEmitter {
     this.lastPushedSpeech = {
       timestamp: 0,
       author: {
-        type: "unknon",
+        type: "unknown",
       },
     };
 

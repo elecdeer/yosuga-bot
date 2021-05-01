@@ -59,7 +59,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
           config: config,
           guild: message.guild,
           user: message.member,
-          textChannel: message.channel as TxtChannel,
+          textChannel: message.channel as TextChannel,
         };
 
         this.emit("command", command, messageSlice, context);
