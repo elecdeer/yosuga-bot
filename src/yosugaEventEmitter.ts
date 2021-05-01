@@ -87,24 +87,26 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         return;
       }
 
-      if (!oldState.selfVideo && newState.selfVideo) {
-        this.emit("turnOnVideo", guildId, newState.member);
-        return;
-      }
+      if (oldState.channel?.id === newState.channel?.id && !!oldState.channel?.id) {
+        if (!oldState.selfVideo && newState.selfVideo) {
+          this.emit("turnOnVideo", guildId, newState.member);
+          return;
+        }
 
-      if (oldState.selfVideo && !newState.selfVideo) {
-        this.emit("turnOffVideo", guildId, newState.member);
-        return;
-      }
+        if (oldState.selfVideo && !newState.selfVideo) {
+          this.emit("turnOffVideo", guildId, newState.member);
+          return;
+        }
 
-      if (!oldState.streaming && newState.streaming) {
-        this.emit("turnOnGoLive", guildId, newState.member);
-        return;
-      }
+        if (!oldState.streaming && newState.streaming) {
+          this.emit("turnOnGoLive", guildId, newState.member);
+          return;
+        }
 
-      if (oldState.streaming && !newState.streaming) {
-        this.emit("turnOffGoLive", guildId, newState.member);
-        return;
+        if (oldState.streaming && !newState.streaming) {
+          this.emit("turnOffGoLive", guildId, newState.member);
+          return;
+        }
       }
     });
 
