@@ -17,7 +17,7 @@ export class ProcessorChain {
 
   async process(
     text: SpeechText | SpeechText[],
-    collectSameParams: boolean = false
+    collectSameParams?: boolean
   ): Promise<SpeechText[]> {
     //reduceでもう少しうまく書ける気もする
 
