@@ -6,6 +6,7 @@ import { urlProcessor } from "../processor/urlProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
+import { omitExclamationProcessor } from "../processor/omitExclamationProcessor";
 
 const logger = getLogger("text");
 
@@ -14,7 +15,8 @@ const processor = new ProcessorChain()
   .use(urlProcessor())
   .use(emojiProcessor())
   .use(guildEmojiProcessor())
-  .use(codeBlockProcessor());
+  .use(codeBlockProcessor())
+  .use(omitExclamationProcessor());
 
 export const registerMessageHandler: SessionEventHandlerRegistrant = (session) => {
   session.on("message", (message) => {
