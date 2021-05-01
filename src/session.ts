@@ -9,6 +9,9 @@ import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./confi
 import { createEmbedBase } from "./util";
 import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
 import { registerMessageHandler } from "./sessionHandler/message";
+import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
+import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
+import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
 
 const logger = getLogger("session");
 
@@ -32,8 +35,11 @@ type PushSpeechRecord = {
 };
 
 const handlerRegistrants: SessionEventHandlerRegistrant[] = [
-  registerEnterRoom,
   registerMessageHandler,
+  registerEnterRoom,
+  registerLeaveRoom,
+  registerTurnOnVideo,
+  registerTurnOnGoLive,
 ];
 
 export class Session extends SessionEmitter {
