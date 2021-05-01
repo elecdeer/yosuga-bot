@@ -1,9 +1,10 @@
 import log4js from "log4js";
 import Discord, { Client } from "discord.js";
 
-import { setHandler } from "./eventHandler";
-import { assignCommands } from "./commands/commands";
 import { yosugaEnv } from "./environment";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { assignCommands, registerCommandHandler } from "./globalHandler/command";
+import { registerSessionFactory } from "./sessionManager";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
@@ -24,28 +25,36 @@ const logger = log4js.getLogger();
 
 logger.info("start process");
 
-export const client: Client = new Discord.Client();
+//======================================================================
 
-setHandler(client);
-assignCommands();
+export const client: Client = new Discord.Client();
 
 client
   .login(yosugaEnv.discordToken)
   .then((res) => {
     logger.info("bot login");
     logger.info(`token: ${res}`);
+
+    initEmitter();
+    assignCommands();
   })
   .catch((err) => {
     logger.error("failed to login discord");
     logger.error(err);
   });
 
-process.on("exit", function () {
+const initEmitter = () => {
+  const globalEmitter = new YosugaEventEmitter(client);
+  registerSessionFactory(globalEmitter);
+  registerCommandHandler(globalEmitter);
+};
+
+process.on("exit", () => {
   logger.info("Exit...");
   log4js.shutdown();
   client.destroy();
   logger.info("Destroy");
 });
-process.on("SIGINT", function () {
+process.on("SIGINT", () => {
   process.exit(0);
 });

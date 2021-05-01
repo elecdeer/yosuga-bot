@@ -1,7 +1,19 @@
 import { Readable } from "stream";
-import { StreamType } from "discord.js";
+import { Guild, GuildMember, MessageEmbed, StreamType, TextChannel } from "discord.js";
+
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { GuildConfigWithoutVoice } from "./configManager";
+import { Session } from "./session";
+
+// ====================
+// General
+// ====================
 
 export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// ====================
+// Voice
+// ====================
 
 export type VoiceParam = {
   speakerOption: SpeakerParam;
@@ -42,8 +54,16 @@ export type SpeechTask = {
   speechText: SpeechText;
 };
 
+// ====================
+// Processor
+// ====================
+
 export type TextProcessor = (text: Readonly<SpeechText>) => Promise<SpeechText[] | SpeechText>;
 export type ProcessorProvider<T> = (arg: T) => TextProcessor;
+
+// ====================
+// Speaker
+// ====================
 
 export type SynthesisResult = {
   stream: Readable;
@@ -61,6 +81,10 @@ export interface Speaker<T extends SpeakerParam, U> {
 
   checkIsActiveSynthesizer: () => Promise<boolean>;
 }
+
+// ====================
+// Config
+// ====================
 
 export type GuildConfig = {
   commandPrefix: string;
@@ -86,3 +110,34 @@ export type WordItem = {
 export type UserConfig = {
   voiceParam: VoiceParam;
 };
+
+// ====================
+// Event
+// ====================
+
+export type SessionEventHandlerRegistrant = (session: Session) => void;
+export type GlobalEventHandlerRegistrant = (emitter: YosugaEventEmitter) => void;
+
+// ====================
+// Command
+// ====================
+
+export type CommandExecutor = (
+  args: Array<string>,
+  context: CommandContext
+) => Promise<MessageEmbed>;
+
+export type Command = {
+  trigger: string[];
+  description: string;
+  usage: string;
+  execute: CommandExecutor;
+};
+
+export interface CommandContext {
+  session: Session | null;
+  config: GuildConfigWithoutVoice;
+  guild: Guild;
+  user: GuildMember;
+  textChannel: TextChannel;
+}

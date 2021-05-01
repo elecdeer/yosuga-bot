@@ -3,7 +3,7 @@ import urlRegex from "url-regex-safe";
 import httpStatus from "http-status";
 import axios from "axios";
 import ogs from "open-graph-scraper";
-import { processorLogger } from "../processor";
+import { processorLogger } from "./processor";
 import { ProcessorProvider } from "../types";
 
 const LinkType = {

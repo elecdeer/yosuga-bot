@@ -1,11 +1,15 @@
-import { Command, commandList, commandLogger, createEmbedBase } from "./commands";
+import { commandList } from "../globalHandler/command";
+import { createEmbedBase } from "../util";
+import log4js from "log4js";
+import { Command } from "../types";
 
+const commandLogger = log4js.getLogger("command");
 export const helpCommand: Command = {
   trigger: ["help"],
   description: "Yosugaのコマンド一覧を表示する.",
   usage: "<trigger filter>...",
 
-  execute: async (args, message, session, config) => {
+  execute: async (args, { session, config, guild, user, textChannel }) => {
     let commands = Array.from(commandList);
 
     commandLogger.debug("s" in ["s"]);
@@ -35,6 +39,6 @@ export const helpCommand: Command = {
       })
     );
 
-    await message.channel.send(embed);
+    return embed;
   },
 };

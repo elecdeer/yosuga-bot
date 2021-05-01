@@ -1,119 +1,93 @@
-import { Guild, GuildMember, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
-import async, { QueueObject } from "async";
-import { PartiallyPartial, SpeechTask, SpeechText, VoiceParamBind } from "./types";
-import { getGuildConfig, getVoiceConfig } from "./configManager";
-import { createEmbedBase } from "./commands/commands";
-import { client } from "./index";
-import { createSpeakerMap, disposeSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
+import { SessionEmitter } from "./sessionEmitter";
+import { GuildMember, TextChannel, VoiceConnection } from "discord.js";
+import { createSpeechQueue, SpeechQueue } from "./speechQueue";
+import { createSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { getLogger } from "log4js";
+import { PartiallyPartial, SessionEventHandlerRegistrant, SpeechText } from "./types";
+import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
+import { createEmbedBase } from "./util";
+import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
+import { registerMessageHandler } from "./sessionHandler/message";
+import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
+import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
+import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
+import { registerAutoLeave } from "./sessionHandler/autoLeave";
 
 const logger = getLogger("session");
 
-const sessionStateMap: Record<string, Session> = {};
-
-export const getSession = (guildId: string): Session | null => {
-  if (guildId in sessionStateMap) {
-    return sessionStateMap[guildId];
-  } else {
-    return null;
-  }
+type SpeechRecordAuthorMember = {
+  type: "member";
+  memberId: string;
+};
+type SpeechRecordAuthorSystem = {
+  type: "yosuga";
+};
+type SpeechRecordAuthorOther = {
+  type: "unknown";
+};
+type SpeechRecordAuthor =
+  | SpeechRecordAuthorMember
+  | SpeechRecordAuthorSystem
+  | SpeechRecordAuthorOther;
+type PushSpeechRecord = {
+  timestamp: number;
+  author: SpeechRecordAuthor;
 };
 
-export class Session {
-  connection: VoiceConnection | null;
-  voiceChannel: VoiceChannel;
-  textChannel: TextChannel;
-  speechQueue: QueueObject<SpeechTask>;
-  guild: Guild;
+const handlerRegistrants: SessionEventHandlerRegistrant[] = [
+  registerMessageHandler,
+  registerEnterRoom,
+  registerLeaveRoom,
+  registerTurnOnVideo,
+  registerTurnOnGoLive,
+  registerAutoLeave,
+];
 
-  speakerMap: SpeakerMap;
+export class Session extends SessionEmitter {
+  protected textChannel: TextChannel;
+  readonly connection: VoiceConnection;
+  protected readonly speakerMap: SpeakerMap;
+  protected speechQueue: SpeechQueue;
 
-  lastMessageTimestamp: number;
-  lastMessageAuthorId: string;
+  lastPushedSpeech: PushSpeechRecord;
 
-  constructor(voiceChannel: VoiceChannel, textChannel: TextChannel, guild: Guild) {
-    this.connection = null;
-    this.voiceChannel = voiceChannel;
+  constructor(
+    yosugaEmitter: YosugaEventEmitter,
+    connection: VoiceConnection,
+    textChannel: TextChannel
+  ) {
+    super(yosugaEmitter, connection.channel);
     this.textChannel = textChannel;
-    this.guild = guild;
+    this.connection = connection;
 
-    this.speechQueue = this.createQueue();
+    this.speakerMap = createSpeakerMap(this.guild.id);
+    this.speechQueue = this.initializeQueue();
 
-    this.lastMessageTimestamp = 0;
-    this.lastMessageAuthorId = "";
-
-    this.speakerMap = createSpeakerMap(guild.id);
-
-    sessionStateMap[guild.id] = this;
-  }
-
-  initializeQueue(): void {
-    this.speechQueue.kill();
-    this.speechQueue = this.createQueue();
-  }
-
-  private createQueue() {
-    const worker = async (task: SpeechTask): Promise<void> => {
-      const config = getGuildConfig(this.guild.id);
-
-      const speakerValue = this.speakerMap[task.voiceParam.speakerOption.speaker];
-      if (speakerValue.status !== "active") {
-        return;
-      }
-
-      //敗北のany
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const voiceParam: VoiceParamBind<any> = task.voiceParam;
-
-      const query = speakerValue.speaker.constructSynthesisQuery(
-        task.speechText,
-        voiceParam,
-        config.pauseParam
-      );
-
-      logger.debug("query", query);
-
-      const result = await speakerValue.speaker.synthesisSpeech(query);
-
-      const connection = this.connection;
-      if (!connection) {
-        logger.error("broadcastSpeechを呼ぶ前にconnectVoiceChannelを呼ぶ必要がある");
-        return Promise.reject();
-      }
-
-      await new Promise<void>((resolve) => {
-        const dispatcher = connection.play(result.stream, {
-          type: result.type ?? "unknown",
-        });
-
-        dispatcher.once("finish", () => {
-          logger.debug("resolve");
-          resolve();
-        });
-      });
+    this.lastPushedSpeech = {
+      timestamp: 0,
+      author: {
+        type: "unknown",
+      },
     };
 
-    return async.queue<SpeechTask, Error>((task, callback) => {
-      worker(task)
-        .then(() => {
-          callback(null);
-        })
-        .catch((err) => {
-          callback(err);
-        });
+    handlerRegistrants.forEach((registrant) => {
+      registrant(this);
     });
   }
 
-  async connectVoiceChannel(): Promise<void> {
-    this.connection = await this.voiceChannel.join();
+  initializeQueue(): SpeechQueue {
+    this.speechQueue?.kill();
+    this.speechQueue = createSpeechQueue(this.guild.id, this.speakerMap, this.connection);
+    return this.speechQueue;
   }
 
   disconnect(): void {
     logger.info(`disconnect: ${this.voiceChannel.id}`);
-    this.connection?.disconnect();
+    this.connection.disconnect();
     this.speechQueue.kill();
-    disposeSpeakerMap(this.guild.id);
-    delete sessionStateMap[this.guild.id];
+    this.emit("disconnect");
+    this.removeAllListeners();
   }
 
   pushSpeech(
@@ -152,10 +126,31 @@ export class Session {
       voiceParam: voiceParam,
     });
 
-    this.lastMessageTimestamp = timestamp ?? Date.now();
-    this.lastMessageAuthorId = userId ?? client.user?.id ?? "unknown";
+    this.lastPushedSpeech = {
+      timestamp: timestamp ?? Date.now(),
+      author: userId
+        ? {
+            type: "member",
+            memberId: userId,
+          }
+        : {
+            type: "yosuga",
+          },
+    };
 
     // logger.debug(this.speechQueue);
+  }
+
+  changeTextChannel(textChannel: TextChannel): void {
+    this.textChannel = textChannel;
+  }
+
+  getTextChannel(): Readonly<TextChannel> {
+    return this.textChannel;
+  }
+
+  getConfig(): Readonly<GuildConfigWithoutVoice> {
+    return getGuildConfig(this.guild.id);
   }
 
   getUsernamePronunciation(member: GuildMember | null): string {
