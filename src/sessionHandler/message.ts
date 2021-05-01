@@ -26,6 +26,10 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
 
     const baseText = message.cleanContent;
     const config = session.getConfig();
+    if (baseText.startsWith(config.ignorePrefix)) {
+      logger.debug("ignored");
+      return;
+    }
 
     const speechTextBase = {
       speed: 1,
