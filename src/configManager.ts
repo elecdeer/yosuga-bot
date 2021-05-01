@@ -59,7 +59,7 @@ export const getGuildConfig = (guildId: string): Readonly<GuildConfigWithoutVoic
   return {
     ...guildConfigInitialDefault,
     ...guildConfigData.get("default").value(),
-    ...guildConfigData.get(guildId).value),
+    ...guildConfigData.get(guildId).value(),
   };
 };
 
