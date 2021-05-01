@@ -58,15 +58,16 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       logger.debug(`at guild: ${guildId}`);
       logger.debug(`input prefix: ${prefix}  configPrefix: ${config.commandPrefix}`);
 
+      const voiceChannel = message.member.voice.channel;
       if (prefix === config.commandPrefix) {
         const context: CommandContext = {
-          session: getSession(guildId),
+          session: voiceChannel ? getSession(voiceChannel.id) : null,
           config: config,
           guild: message.guild,
           user: message.member,
           textChannel: message.channel as TextChannel,
         };
-
+        logger.debug(context);
         logger.debug("emit command");
         this.emit("command", command, messageSlice, context);
       } else {
