@@ -73,7 +73,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
     validateStatus: (status) => 200 <= status || status < 400,
     timeout: 2000,
     headers: {
-      "User-Agent" "bot"
+      "User-Agent": "bot",
     },
   }).catch((err: Error) => err);
   if (res instanceof Error) {

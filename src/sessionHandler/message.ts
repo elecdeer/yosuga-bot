@@ -89,7 +89,7 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
       message.attachments
         .map((attachment) => ({
           ...speechTextBase,
-          text: attachment.rl,
+          text: attachment.url,
         }))
         .forEach((item) => {
           speechTexts.push(item);
