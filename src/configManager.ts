@@ -27,11 +27,13 @@ const guildConfigInitialDefault: GuildConfig = {
   wordDictionary: [],
   masterVolume: 1,
   masterSpeed: 1.1,
+  fastSpeedScale: 1.5,
   readStatusUpdate: true,
   readTimeSignal: false,
   timeToAutoLeaveSec: 10,
   timeToReadMemberNameSec: 30,
   ignorePrefix: "!!",
+  maxStringLength: 150,
 };
 
 const guildAdapter = new FileSync<GuildConfigRecord>(yosugaEnv.guildConfigPath);
@@ -55,8 +57,9 @@ export type GuildConfigWithoutVoice = Omit<GuildConfig, "voiceParam">;
  */
 export const getGuildConfig = (guildId: string): Readonly<GuildConfigWithoutVoice> => {
   return {
+    ...guildConfigInitialDefault,
     ...guildConfigData.get("default").value(),
-    ...guildConfigData.get(guildId).value(),
+    ...guildConfigData.get(guildId).value),
   };
 };
 

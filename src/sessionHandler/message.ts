@@ -7,16 +7,39 @@ import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { omitExclamationProcessor } from "../processor/omitExclamationProcessor";
+import { GuildConfigWithoutVoice } from "../configManager";
 
 const logger = getLogger("text");
 
-const processor = new ProcessorChain()
-  .use(maxLengthProcessor(150))
-  .use(urlProcessor())
-  .use(emojiProcessor())
-  .use(guildEmojiProcessor())
-  .use(codeBlockProcessor())
-  .use(omitExclamationProcessor());
+let processorCache: {
+  processor: ProcessorChain;
+  config: GuildConfigWithoutVoice;
+} | null;
+
+const createProcessor = (config: GuildConfigWithoutVoice) => {
+  //なんかもったいない気がするのでCacheしてるけどしなくてもいいかも
+  if (config === processorCache?.config) {
+    return processorCache.processor;
+  }
+
+  logger.debug("processor config");
+  logger.debug(config);
+
+  const processor = new ProcessorChain()
+    .use(maxLengthProcessor(config.maxStringLength))
+    .use(urlProcessor(config.fastSpeedScale))
+    .use(emojiProcessor())
+    .use(guildEmojiProcessor())
+    .use(codeBlockProcessor())
+    .use(omitExclamationProcessor());
+
+  processorCache = {
+    processor: processor,
+    config: config,
+  };
+
+  return processor;
+};
 
 export const registerMessageHandler: SessionEventHandlerRegistrant = (session) => {
   session.on("message", (message) => {
@@ -66,12 +89,14 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
       message.attachments
         .map((attachment) => ({
           ...speechTextBase,
-          text: attachment.url,
+          text: attachment.rl,
         }))
         .forEach((item) => {
           speechTexts.push(item);
         });
     }
+
+    const processor = createProcessor(config);
 
     void processor.process(speechTexts, true).then((processedTexts) => {
       logger.debug(`text: ${processedTexts}`);

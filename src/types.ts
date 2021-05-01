@@ -93,11 +93,13 @@ export type GuildConfig = {
   wordDictionary: WordDictionary;
   masterVolume: number;
   masterSpeed: number;
+  fastSpeedScale: number;
   readStatusUpdate: boolean;
   readTimeSignal: boolean;
   timeToAutoLeaveSec: number;
   timeToReadMemberNameSec: number;
   ignorePrefix: string;
+  maxStringLength: number;
 };
 
 export type WordDictionary = WordItem[];
