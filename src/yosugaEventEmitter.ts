@@ -40,6 +40,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     });
 
     client.on("message", (message) => {
+      logger.debug("handle message");
       if (!message.guild) return;
       if (message.author.bot) return;
       if (!message.member) return;
@@ -48,12 +49,16 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const guildId = message.guild.id;
       const config = getGuildConfig(guildId);
 
-      const messageSlice = message.content.slice(config.commandPrefix.length).trim().split(" ");
+      const messageSlice = message.content.trim().split(" ");
+      const prefix = messageSlice.shift() ?? "";
       const command = messageSlice.shift() ?? "";
 
-      const session = getSession(guildId);
+      // const session = getSession(guildId);
 
-      if (command === config.commandPrefix) {
+      logger.debug(`at guild: ${guildId}`);
+      logger.debug(`input prefix: ${prefix}  configPrefix: ${config.commandPrefix}`);
+
+      if (prefix === config.commandPrefix) {
         const context: CommandContext = {
           session: getSession(guildId),
           config: config,
@@ -62,8 +67,10 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
           textChannel: message.channel as TextChannel,
         };
 
+        logger.debug("emit command");
         this.emit("command", command, messageSlice, context);
       } else {
+        logger.debug("emit message");
         this.emit("message", guildId, message);
       }
     });

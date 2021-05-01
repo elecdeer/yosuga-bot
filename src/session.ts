@@ -7,7 +7,7 @@ import { getLogger } from "log4js";
 import { PartiallyPartial, SessionEventHandlerRegistrant, SpeechText } from "./types";
 import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
 import { createEmbedBase } from "./util";
-import { registerEnterRoom } from "./sessionHandler/enterRoom";
+import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
 import { registerMessageHandler } from "./sessionHandler/message";
 
 const logger = getLogger("session");

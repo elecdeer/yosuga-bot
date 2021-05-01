@@ -32,11 +32,15 @@ export const assignCommands = (): void => {
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {
+  commandLogger.debug("registerCommandHandler");
   emitter.on("command", (cmd, args, context) => {
-    commandLogger.debug("on command");
+    commandLogger.debug(`cmd: ${cmd} args: ${args}`);
+    commandLogger.debug(commandExeRecord);
 
     if (cmd in commandExeRecord) {
-      void commandExeRecord[cmd](args, context);
+      void commandExeRecord[cmd](args, context).then((resEmbed) => {
+        void context.textChannel.send(resEmbed);
+      });
     }
   });
 };
