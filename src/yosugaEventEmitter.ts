@@ -84,6 +84,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
       if (oldState.channel?.id !== newState.channel?.id) {
         this.emit("moveChannel", guildId, newState.member, oldState.channel, newState.channel);
+        return;
       }
 
       if (!oldState.selfVideo && newState.selfVideo) {
