@@ -45,7 +45,6 @@ const handlerRegistrants: SessionEventHandlerRegistrant[] = [
 ];
 
 export class Session extends SessionEmitter {
-  protected textChannel: TextChannel;
   readonly connection: VoiceConnection;
   protected readonly speakerMap: SpeakerMap;
   protected speechQueue: SpeechQueue;
@@ -57,8 +56,7 @@ export class Session extends SessionEmitter {
     connection: VoiceConnection,
     textChannel: TextChannel
   ) {
-    super(yosugaEmitter, connection.channel);
-    this.textChannel = textChannel;
+    super(yosugaEmitter, connection.channel, textChannel);
     this.connection = connection;
 
     this.speakerMap = createSpeakerMap(this.guild.id);
