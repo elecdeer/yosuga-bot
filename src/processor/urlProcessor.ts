@@ -13,7 +13,7 @@ const LinkType = {
   GifImage: "ジフ画像",
   ValidUrl: "URL省略",
   OGUrl: "URL",
-  InvalidUrl: "不明なURL"
+  InvalidUrl: "不明なURL",
 } as const;
 
 type LinkType = typeof LinkType[keyof typeof LinkType];
@@ -101,7 +101,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
     const ogRes = await ogs({
       url: "",
-      html: htl,
+      html: htm,
     });
 
     if (ogRes.error) {
