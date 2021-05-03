@@ -43,18 +43,23 @@ void guildConfigData
     default: guildConfigInitialDefault,
   })
   .write();
-guildConfigData.read();
 
 const userAdapter = new FileSync<UserConfigRecord>(yosugaEnv.userConfigPath);
 const userConfigData = low(userAdapter);
-userConfigData.read();
 
 export type GuildConfigWithoutVoice = Omit<GuildConfig, "voiceParam">;
 
-export const reloadConfigData = () => {
+export const reloadConfigData = async (): Promise<void> => {
   guildConfigData.read();
   userConfigData.read();
+  logger.debug(guildConfigData.toJSON());
+  logger.debug(userConfigData.toJSON());
 };
+
+void reloadConfigData().catch((err) => {
+  logger.error("設定ファイルの読み込みに失敗しました");
+  throw err;
+});
 
 /**
  * guildIdから各guildの設定を取得
