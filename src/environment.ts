@@ -23,7 +23,7 @@ const initEnv = (): YosugaEnv => {
     assistantSeikaUrl: process.env.ASSISTANT_SEIKA_URL,
     assistantSeikaBasicUser: process.env.ASSISTANT_SEIKA_BASIC_USER,
     assistantSeikaBasicPassword: process.env.ASSISTANT_SEIKA_BASIC_PASSWORD,
-    socketIOAudioRecorderWSUrl: process.env.SOCKERIO_AUDIO_RECORDER_WS_URL,
+    socketIOAudioRecorderWSUrl: process.env.SOCKETIO_AUDIO_RECORDER_WS_URL,
   };
 
   if (!env.guildConfigPath) env.guildConfigPath = "guildConfig.json";
