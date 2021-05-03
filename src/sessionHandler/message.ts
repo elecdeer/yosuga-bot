@@ -9,6 +9,7 @@ import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { omitExclamationProcessor } from "../processor/omitExclamationProcessor";
 import { GuildConfigWithoutVoice } from "../configManager";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
+import { tildeReplaceProcessor } from "../processor/tildeReplaceProcessor";
 
 const logger = getLogger("text");
 
@@ -33,6 +34,7 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
     .use(emojiProcessor())
     .use(guildEmojiProcessor())
     .use(omitExclamationProcessor())
+    .use(tildeReplaceProcessor())
     .use(maxLengthProcessor(config.maxStringLength));
 
   processorCache = {
