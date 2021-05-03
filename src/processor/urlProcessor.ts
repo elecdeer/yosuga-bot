@@ -6,12 +6,14 @@ import ogs from "open-graph-scraper";
 import { processorLogger } from "./processor";
 import { ProcessorProvider } from "../types";
 
+import { codeToString, convert } from "encoding-japanese";
+
 const LinkType = {
   Image: "画像",
   GifImage: "ジフ画像",
   ValidUrl: "URL省略",
   OGUrl: "URL",
-  InvalidUrl: "不明なURL",
+  InvalidUrl: "不明なURL"
 } as const;
 
 type LinkType = typeof LinkType[keyof typeof LinkType];
@@ -75,6 +77,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
     headers: {
       "User-Agent": "bot",
     },
+    responseType: "arraybuffer",
   }).catch((err: Error) => err);
   if (res instanceof Error) {
     return { type: LinkType.InvalidUrl };
@@ -94,9 +97,11 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
   }
 
   if (contentType.startsWith("text/html")) {
+    const html = codeToString(convert(res.data, "UNICODE"));
+
     const ogRes = await ogs({
       url: "",
-      html: res.data as string,
+      html: htl,
     });
 
     if (ogRes.error) {
