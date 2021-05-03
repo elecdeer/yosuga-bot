@@ -33,7 +33,7 @@ const guildConfigInitialDefault: GuildConfig = {
   timeToAutoLeaveSec: 10,
   timeToReadMemberNameSec: 30,
   ignorePrefix: "!!",
-  maxStringLength: 150,
+  maxStringLength: 80,
 };
 
 const guildAdapter = new FileSync<GuildConfigRecord>(yosugaEnv.guildConfigPath);

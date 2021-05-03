@@ -6,6 +6,8 @@ import ogs from "open-graph-scraper";
 import { processorLogger } from "./processor";
 import { ProcessorProvider } from "../types";
 
+import { codeToString, convert } from "encoding-japanese";
+
 const LinkType = {
   Image: "画像",
   GifImage: "ジフ画像",
@@ -16,29 +18,27 @@ const LinkType = {
 
 type LinkType = typeof LinkType[keyof typeof LinkType];
 
-const urlReg = urlRegex({});
-const urlRegGrouped = new RegExp(`(${urlReg.source})`, urlReg.flags);
+const urlRegStr = urlRegex({ returnString: true });
+const urlReg = new RegExp(urlRegStr, "iu");
+const urlRegGrouped = new RegExp(`(${urlRegStr})`, urlReg.flags);
 
 export const urlProcessor: ProcessorProvider<number> = (fastSpeedScale) => async (speechText) => {
   const split = speechText.text.split(urlRegGrouped).filter((str) => str && str !== "");
 
-  // const urls = split.filter((str) => urlReg.test(str));
-  // const urlsRead = await Promise.all(
-  //   urls.map(async (url) => {
-  //     const urlType = await checkUrlType(url);
-  //     return urlType.read ?? urlType.type;
-  //   })
-  // );
-
   const splitReplaced = await Promise.all(
     split.map(async (item) => {
-      if (!urlReg.test(item))
+      const testResult = urlReg.test(item);
+      processorLogger.debug(`urlRegTest: [${item}] result: ${testResult}`);
+      if (!testResult) {
+        processorLogger.debug(`not url`);
         return {
           fast: false,
           text: item,
         };
+      }
 
       const urlType = await checkUrlType(item);
+      processorLogger.debug(`url`);
       return {
         fast: true,
         text: urlType.read ?? urlType.type,
@@ -61,8 +61,10 @@ export const urlProcessor: ProcessorProvider<number> = (fastSpeedScale) => async
 };
 
 const redirectStatus = [httpStatus.MOVED_PERMANENTLY, httpStatus.FOUND, httpStatus.SEE_OTHER];
+const tenorOmitRegex = / -.*$/;
 
 const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> = async (url) => {
+  processorLogger.debug(`checkUrlType: ${url}`);
   if (!url) return { type: LinkType.InvalidUrl };
 
   processorLogger.debug(`check: ${url}`);
@@ -75,6 +77,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
     headers: {
       "User-Agent": "bot",
     },
+    responseType: "arraybuffer",
   }).catch((err: Error) => err);
   if (res instanceof Error) {
     return { type: LinkType.InvalidUrl };
@@ -94,17 +97,28 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
   }
 
   if (contentType.startsWith("text/html")) {
+    const html = codeToString(convert(res.data, "UNICODE"));
+
     const ogRes = await ogs({
       url: "",
-      html: res.data as string,
+      html: html,
     });
 
     if (ogRes.error) {
       return { type: LinkType.ValidUrl };
     } else {
+      const urlObj = new URL(url);
+      if (urlObj.hostname === "tenor.com") {
+        const read = ogRes.result.ogTitle?.replace(tenorOmitRegex, "");
+        return {
+          type: LinkType.GifImage,
+          read: read,
+        };
+      }
+
       return {
-        type: LinkType.ValidUrl,
-        read: `URL ${ogRes.result.ogTitle}`,
+        type: LinkType.OGUrl,
+        read: `${LinkType.OGUrl} ${ogRes.result.ogTitle}`,
       };
     }
     // processorLogger.debug(ogRes.result);
