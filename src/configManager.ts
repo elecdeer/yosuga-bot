@@ -51,6 +51,11 @@ userConfigData.read();
 
 export type GuildConfigWithoutVoice = Omit<GuildConfig, "voiceParam">;
 
+export const reloadConfigData = () => {
+  guildConfigData.read();
+  userConfigData.read();
+};
+
 /**
  * guildIdから各guildの設定を取得
  * @param guildId
