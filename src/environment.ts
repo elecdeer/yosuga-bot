@@ -6,6 +6,8 @@ export type YosugaEnv = {
   guildConfigPath: string;
   userConfigPath: string;
   discordToken: string;
+  discordAppId: string;
+  discordPublicKey: string;
   voiceroidDaemonUrl?: string;
   assistantSeikaUrl?: string;
   assistantSeikaBasicUser?: string;
@@ -19,6 +21,8 @@ const initEnv = (): YosugaEnv => {
     guildConfigPath: process.env.GUILD_CONFIG_PATH,
     userConfigPath: process.env.USER_CONFIG_PATH,
     discordToken: process.env.DISCORD_TOKEN,
+    discordAppId: process.env.DISCORD_APP_ID,
+    discordPublicKey: process.env.DISCORD_PUB_KEY,
     voiceroidDaemonUrl: process.env.VOICEROID_DAEMON_URL,
     assistantSeikaUrl: process.env.ASSISTANT_SEIKA_URL,
     assistantSeikaBasicUser: process.env.ASSISTANT_SEIKA_BASIC_USER,
