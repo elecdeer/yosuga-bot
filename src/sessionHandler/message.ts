@@ -26,12 +26,12 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
   logger.debug(config);
 
   const processor = new ProcessorChain()
-    .use(maxLengthProcessor(config.maxStringLength))
     .use(urlProcessor(config.fastSpeedScale))
     .use(emojiProcessor())
     .use(guildEmojiProcessor())
     .use(codeBlockProcessor())
-    .use(omitExclamationProcessor());
+    .use(omitExclamationProcessor())
+    .use(maxLengthProcessor(config.maxStringLength));
 
   processorCache = {
     processor: processor,
