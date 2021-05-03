@@ -5,6 +5,7 @@ import { endCommand } from "../commands/endCommand";
 import { clearCommand } from "../commands/clearCommand";
 import { helpCommand } from "../commands/helpCommand";
 import { versionCommand } from "../commands/versionCommand";
+import { reloadCommand } from "../commands/reloadCommand";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -31,6 +32,7 @@ export const assignCommands = (): void => {
   assign(clearCommand);
   assign(helpCommand);
   assign(versionCommand);
+  assign(reloadCommand);
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {
