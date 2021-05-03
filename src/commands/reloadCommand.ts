@@ -10,7 +10,12 @@ export const reloadCommand: Command = {
   usage: "",
 
   execute: async (args, { session, config, guild, user, textChannel }) => {
-    reloadConfigData();
-    return createEmbedBase().setDescription(`リロードしました.`);
+    commandLogger.debug("reload config");
+    const errEmbed = await reloadConfigData().catch((err) => {
+      commandLogger.warn(err);
+      return createEmbedBase().setDescription(`設定ファイルの読み込みに失敗しました.`);
+    });
+
+    return errEmbed || createEmbedBase().setDescription(`リロードしました.`);
   },
 };

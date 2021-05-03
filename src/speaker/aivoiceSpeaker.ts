@@ -54,6 +54,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
     pauseParam: PauseParam
   ): AIVoiceQuery {
     return {
+      cid: voiceParam.speakerOption.cid,
       talktext: speechText.text,
       effects: {
         volume: speechText.volume,
