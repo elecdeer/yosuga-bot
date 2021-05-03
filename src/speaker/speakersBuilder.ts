@@ -78,7 +78,7 @@ const createAIVoiceSpeaker = async (session: Session): Promise<Status<AIVoiceSpe
 export const createSpeakerMap = (session: Session): SpeakerMap => {
   const map: SpeakerMap = {
     voiceroid: { status: "checking" },
-    aivoice: { status: "cheking" },
+    aivoice: { status: "checking" },
   };
 
   void createVoiceroidSpeaker().then((value) => {
