@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Message, VoiceChannel } from "discord.js";
+import { Guild, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 import EventEmitter from "events";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
@@ -20,16 +20,23 @@ type SessionStrictEmitter = StrictEventEmitter<EventEmitter, Events>;
 
 export class SessionEmitter extends (EventEmitter as { new (): SessionStrictEmitter }) {
   protected readonly voiceChannel: VoiceChannel;
+  protected textChannel: TextChannel;
   protected readonly guild: Guild;
 
-  constructor(globalEmitter: YosugaEventEmitter, voiceChannel: VoiceChannel) {
+  constructor(
+    globalEmitter: YosugaEventEmitter,
+    voiceChannel: VoiceChannel,
+    textChannel: TextChannel
+  ) {
     super();
 
     this.voiceChannel = voiceChannel;
+    this.textChannel = textChannel;
     this.guild = voiceChannel.guild;
 
     globalEmitter.on("message", (guildId, message) => {
       if (guildId !== this.guild.id) return;
+      if (message.channel.id !== this.textChannel.id) return;
       this.emit("message", message);
     });
 
