@@ -106,7 +106,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
     if (ogRes.error) {
       return { type: LinkType.ValidUrl };
-    } else{
+    } else {
       const urlObj = new URL(url);
       if (urlObj.hostname === "tenor.com") {
         const read = ogRes.result.ogTitle?.replace(tenorOmitRegex, "");
@@ -117,8 +117,8 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
       }
 
       return {
-        type: LinkType.ValidUrl,
-        read: `${LinkType.ValidUrl} ${ogRes.result.ogTitle}`,
+        type: LinkType.OGUrl,
+        read: `${LinkType.OGUrl} ${ogRes.result.ogTitle}`,
       };
     }
     // processorLogger.debug(ogRes.result);
