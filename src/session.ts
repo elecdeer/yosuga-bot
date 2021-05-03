@@ -59,7 +59,7 @@ export class Session extends SessionEmitter {
     super(yosugaEmitter, connection.channel, textChannel);
     this.connection = connection;
 
-    this.speakerMap = createSpeakerMap(this.guild.id);
+    this.speakerMap = createSpeakerMap(this);
     this.speechQueue = this.initializeQueue();
 
     this.lastPushedSpeech = {

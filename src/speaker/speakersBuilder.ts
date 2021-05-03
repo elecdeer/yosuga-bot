@@ -1,5 +1,6 @@
 import { VoiceroidSpeaker } from "./voiceroidSpeaker";
 import { AIVoiceSpeaker } from "./aivoiceSpeaker";
+import { Session } from "../session";
 
 type Status<T> =
   | {
@@ -47,7 +48,7 @@ const releaseAIVoice = (guildId: string) => {
 const canUseAIVoice = (guildId?: string) =>
   (guildId && aivoiceLock.has(guildId)) || aivoiceLock.size === 0;
 
-const createAIVoiceSpeaker = async (guildId: string): Promise<Status<AIVoiceSpeaker>> => {
+const createAIVoiceSpeaker = async (session: Session): Promise<Status<AIVoiceSpeaker>> => {
   if (!canUseAIVoice()) {
     return {
       status: "inactive",
@@ -63,14 +64,18 @@ const createAIVoiceSpeaker = async (guildId: string): Promise<Status<AIVoiceSpea
     };
   }
 
+  const guildId = session.getTextChannel().guild.id;
   acquireAIVoice(guildId);
+  session.once("disconnect", () => {
+    releaseAIVoice(guildId);
+  });
   return {
     status: "active",
     speaker: aiVoiceSpeaker,
   };
 };
 
-export const createSpeakerMap = (guildId: string): SpeakerMap => {
+export const createSpeakerMap = (session: Session): SpeakerMap => {
   const map: SpeakerMap = {
     voiceroid: { status: "checking" },
     aivoice: { status: "checking" },
@@ -80,7 +85,7 @@ export const createSpeakerMap = (guildId: string): SpeakerMap => {
     map.voiceroid = value;
   });
 
-  void createAIVoiceSpeaker(guildId).then((value) => {
+  void createAIVoiceSpeaker(session).then((value) => {
     map.aivoice = value;
   });
 
