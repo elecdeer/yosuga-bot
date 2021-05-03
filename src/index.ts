@@ -1,6 +1,5 @@
 import log4js from "log4js";
 import Discord, { Client } from "discord.js";
-
 import { yosugaEnv } from "./environment";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { assignCommands, registerCommandHandler } from "./globalHandler/command";
@@ -22,7 +21,6 @@ log4js.configure({
 });
 
 const logger = log4js.getLogger();
-
 logger.info("start process");
 
 //======================================================================
