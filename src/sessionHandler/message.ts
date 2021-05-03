@@ -6,7 +6,7 @@ import { urlProcessor } from "../processor/urlProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
-import { omitExclamationProcessor } from "../processor/omitExclamationProcessor";
+import { omitSymbolProcessor } from "../processor/omitSymbolProcessor";
 import { GuildConfigWithoutVoice } from "../configManager";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
 import { tildeReplaceProcessor } from "../processor/tildeReplaceProcessor";
@@ -33,7 +33,10 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
     .use(urlProcessor(config.fastSpeedScale))
     .use(emojiProcessor())
     .use(guildEmojiProcessor())
-    .use(omitExclamationProcessor())
+    .use(omitSymbolProcessor("!"))
+    .use(omitSymbolProcessor("！"))
+    .use(omitSymbolProcessor("?"))
+    .use(omitSymbolProcessor("？"))
     .use(tildeReplaceProcessor())
     .use(maxLengthProcessor(config.maxStringLength));
 
