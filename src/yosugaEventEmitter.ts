@@ -55,7 +55,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
       // const session = getSession(guildId);
 
-      logger.debug(`at guild: ${guildId}`);
+      logger.debug(`at guild: ${guildId} from user: ${message.author.id}`);
       logger.debug(`input prefix: ${prefix}  configPrefix: ${config.commandPrefix}`);
 
       const voiceChannel = message.member.voice.channel;
