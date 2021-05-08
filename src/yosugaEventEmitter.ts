@@ -25,10 +25,6 @@ interface Events {
   destroy: () => void;
 }
 
-// export const registerHandler = () => {
-//
-// }
-
 type YosugaEmitter = StrictEventEmitter<EventEmitter, Events>;
 
 export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter }) {
@@ -74,6 +70,34 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         logger.debug("emit message");
         this.emit("message", guildId, message);
       }
+    });
+
+    client.on("interaction", (interaction) => {
+      if (!interaction.isCommand()) return;
+      logger.debug("receive interaction");
+
+      const guild = interaction.guild;
+      if (!guild) return; //これでmemberがGuildMemberに確定するはず
+      const config = getGuildConfig(guild.id);
+
+      const member: GuildMember = interaction.member as GuildMember;
+      const voiceChannel = member.voice.channel;
+
+      const context: CommandContext = {
+        session: voiceChannel ? getSession(voiceChannel.id) : null,
+        config: config,
+        guild: guild,
+        user: member,
+        textChannel: interaction.channel as TextChannel,
+      };
+
+      logger.debug(context);
+      logger.debug("emit command");
+      if (!interaction.command) return;
+      //微妙かも
+      const options = interaction.options.map((opt) => String(opt.value));
+
+      this.emit("command", interaction.command?.name, options, context);
     });
 
     client.on("voiceStateUpdate", (oldState, newState) => {
