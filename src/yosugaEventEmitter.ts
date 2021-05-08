@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Client, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
+import { Client, GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import log4js from "log4js";
@@ -15,8 +15,8 @@ interface Events {
   moveChannel: (
     guildId: string,
     member: GuildMember,
-    from: VoiceChannel | null,
-    to: VoiceChannel | null
+    from: VoiceChannel | StageChannel | null,
+    to: VoiceChannel | StageChannel | null
   ) => void;
   turnOnVideo: (guildId: string, member: GuildMember) => void;
   turnOffVideo: (guildId: string, member: GuildMember) => void;
