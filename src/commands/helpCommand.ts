@@ -12,6 +12,13 @@ export class HelpCommand extends CommandBase {
     super({
       name: "help",
       description: "Yosugaのコマンド一覧を表示する.",
+      options: [
+        {
+          name: "command",
+          type: "STRING",
+          description: "フィルタ",
+        },
+      ],
     });
   }
 
@@ -37,7 +44,7 @@ export class HelpCommand extends CommandBase {
 
         return {
           name: name,
-          value: `${command.data.description} \n usage: ${uage}`,
+          value: `${command.data.description} \n usage: ${command.getUsage(}`,
         };
       })
     );

@@ -46,7 +46,11 @@ export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) =>
 
     void command.execute(args, context).then((resEmbed) => {
       if (context.type === "interaction") {
-        void context.interaction.reply(resEmbed);
+        if (context.interaction.deferred) {
+          void context.interaction.editReply(resEmbed);
+        } else {
+          void context.interaction.reply(resEmbed);
+        }
       }
       if (context.type === "text") {
         void context.textChannel.send(resEmbed);

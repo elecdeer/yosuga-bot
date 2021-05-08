@@ -16,11 +16,16 @@ export class ReloadCommand extends CommandBase {
     });
   }
 
-  async execute(args: string[], { guild }: CommandContext): Promise<MessageEmbed> {
+  async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
     commandLogger.debug("reload config");
 
+    if (context.type === "interaction") {
+      commandLogger.debug("defer interaction");
+      void context.interaction.defer();
+    }
+
     await Promise.all(
-      Array.from(commandList).map((command) => guild.commands.create(command.data))
+      Array.from(commandList).map((command) => context.guild.commands.create(command.data))
     );
 
     const errEmbed = await reloadConfigData().catch((err) => {

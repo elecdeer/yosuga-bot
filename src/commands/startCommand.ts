@@ -16,11 +16,12 @@ export class StartCommand extends CommandBase {
     });
   }
 
-  async execute(
-    args: string[],
-    { session, textChannel, guild, user }: CommandContext
-  ): Promise<MessageEmbed> {
+  async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
+    const { session, textChannel, guild, user } = context;
     commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
+    if (context.type === "interaction") {
+      void context.interaction.defer();
+    }
 
     const voiceChannel = user.voice.channel;
     if (voiceChannel) {
