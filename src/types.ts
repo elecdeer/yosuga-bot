@@ -1,5 +1,13 @@
 import { Readable } from "stream";
-import { Guild, GuildMember, MessageEmbed, StreamType, TextChannel } from "discord.js";
+import {
+  ApplicationCommandData,
+  CommandInteraction,
+  Guild,
+  GuildMember,
+  MessageEmbed,
+  StreamType,
+  TextChannel,
+} from "discord.js";
 
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { GuildConfigWithoutVoice } from "./configManager";
@@ -129,17 +137,26 @@ export type CommandExecutor = (
   context: CommandContext
 ) => Promise<MessageEmbed>;
 
-export type Command = {
-  trigger: string[];
-  description: string;
-  usage: string;
-  execute: CommandExecutor;
-};
+export interface CommandData extends ApplicationCommandData {
+  alias?: string[];
+  // execute: CommandExecutor;
+}
 
-export interface CommandContext {
+export type CommandContextBase = {
   session: Session | null;
   config: GuildConfigWithoutVoice;
   guild: Guild;
   user: GuildMember;
   textChannel: TextChannel;
-}
+};
+
+export type TextCommandContext = CommandContextBase & {
+  type: "text";
+};
+
+export type InteractionCommandContext = CommandContextBase & {
+  type: "interaction";
+  interaction: CommandInteraction;
+};
+
+export type CommandContext = TextCommandContext | InteractionCommandContext;

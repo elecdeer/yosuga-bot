@@ -1,15 +1,25 @@
 import log4js from "log4js";
 import { createEmbedBase } from "../util";
-import { Command } from "../types";
+import { CommandContext } from "../types";
 import { startSession } from "../sessionManager";
+import { CommandBase } from "./commandBase";
+import { MessageEmbed } from "discord.js";
 
 const commandLogger = log4js.getLogger("command");
-export const startCommand: Command = {
-  trigger: ["s", "start"],
-  description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
-  usage: "",
 
-  execute: async (args, { session, config, guild, user, textChannel }) => {
+export class StartCommand extends CommandBase {
+  constructor() {
+    super({
+      name: "start",
+      alias: ["s"],
+      description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
+    });
+  }
+
+  async execute(
+    args: string[],
+    { session, textChannel, guild, user }: CommandContext
+  ): Promise<MessageEmbed> {
     commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
 
     const voiceChannel = user.voice.channel;
@@ -41,5 +51,5 @@ export const startCommand: Command = {
     } else {
       return createEmbedBase().setDescription("先にボイスチャンネルに入る必要があります.");
     }
-  },
-};
+  }
+}

@@ -57,6 +57,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const voiceChannel = message.member.voice.channel;
       if (prefix === config.commandPrefix) {
         const context: CommandContext = {
+          type: "text",
           session: voiceChannel ? getSession(voiceChannel.id) : null,
           config: config,
           guild: message.guild,
@@ -84,11 +85,13 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const voiceChannel = member.voice.channel;
 
       const context: CommandContext = {
+        type: "interaction",
+        interaction: interaction,
         session: voiceChannel ? getSession(voiceChannel.id) : null,
         config: config,
         guild: guild,
         user: member,
-        textChannel: interaction.channel as TextChannel,
+        textChannel: interaction.channel as TextChanne,
       };
 
       logger.debug(context);

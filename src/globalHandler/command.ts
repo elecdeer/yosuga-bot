@@ -1,50 +1,56 @@
-import { Command, CommandExecutor, GlobalEventHandlerRegistrant } from "../types";
+import { GlobalEventHandlerRegistrant } from "../types";
 import log4js from "log4js";
-import { startCommand } from "../commands/startCommand";
-import { endCommand } from "../commands/endCommand";
-import { clearCommand } from "../commands/clearCommand";
-import { helpCommand } from "../commands/helpCommand";
-import { versionCommand } from "../commands/versionCommand";
-import { reloadCommand } from "../commands/reloadCommand";
+import { StartCommand } from "../commands/startCommand";
+import { EndCommand } from "../commands/endCommand";
+import { ClearCommand } from "../commands/clearCommand";
+import { HelpCommand } from "../commands/helpCommand";
+import { VersionCommand } from "../commands/versionCommand";
+import { ReloadCommand } from "../commands/reloadCommand";
+import { CommandBase } from "../commands/commandBase";
 
 const commandLogger = log4js.getLogger("command");
 
-export const commandList = new Set<Command>();
-const commandExeRecord: Record<string, CommandExecutor> = {};
+export const commandList = new Set<CommandBase>();
+const commandRecord: Record<string, CommandBase> = {};
 
-const assign = (command: Command): void => {
-  // logger.debug(`assignCommand: ${commandText}`)
+const assign = (command: CommandBase): void => {
+  commandLogger.debug(`assignCommand: ${command.data.name} [${command.getTriggers()}]`);
   // commandMap[commandText] = action;
   commandList.add(command);
 
-  command.trigger.forEach((commandTrigger) => {
-    if (commandTrigger in commandExeRecord) {
-      throw new Error("コマンド名が重複しています");
+  command.getTriggers().forEach((commandTrigger) => {
+    if (commandTrigger in commandRecord) {
+      throw new Error(`コマンド名が重複しています: ${commandTrigger}`);
     }
-    commandExeRecord[commandTrigger] = command.execute;
+    commandRecord[commandTrigger] = command;
   });
 };
 
 export const assignCommands = (): void => {
   commandLogger.debug("assign commands");
-  assign(startCommand);
-  assign(endCommand);
-  assign(clearCommand);
-  assign(helpCommand);
-  assign(versionCommand);
-  assign(reloadCommand);
+  assign(new StartCommand());
+  assign(new EndCommand());
+  assign(new ClearCommand());
+  assign(new HelpCommand());
+  assign(new VersionCommand());
+  assign(new ReloadCommand());
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {
   commandLogger.debug("registerCommandHandler");
   emitter.on("command", (cmd, args, context) => {
     commandLogger.debug(`cmd: ${cmd} args: ${args}`);
-    commandLogger.debug(commandExeRecord);
 
-    if (cmd in commandExeRecord) {
-      void commandExeRecord[cmd](args, context).then((resEmbed) => {
+    const command = commandRecord[cmd];
+    if (!command) return;
+
+    void command.execute(args, context).then((resEmbed) => {
+      if (context.type === "interaction") {
+        void context.interaction.reply(resEmbed);
+      }
+      if (context.type === "text") {
         void context.textChannel.send(resEmbed);
-      });
-    }
+      }
+    });
   });
 };

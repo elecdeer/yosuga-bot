@@ -1,19 +1,22 @@
 import { commandList } from "../globalHandler/command";
 import { createEmbedBase } from "../util";
 import log4js from "log4js";
-import { Command } from "../types";
+import { CommandContext } from "../types";
+import { CommandBase } from "./commandBase";
+import { MessageEmbed } from "discord.js";
 
 const commandLogger = log4js.getLogger("command");
-export const helpCommand: Command = {
-  trigger: ["help"],
-  description: "Yosugaのコマンド一覧を表示する.",
-  usage: "<trigger filter>...",
 
-  execute: async (args, { session, config, guild, user, textChannel }) => {
+export class HelpCommand extends CommandBase {
+  constructor() {
+    super({
+      name: "help",
+      description: "Yosugaのコマンド一覧を表示する.",
+    });
+  }
+
+  async execute(args: string[], { config }: CommandContext): Promise<MessageEmbed> {
     let commands = Array.from(commandList);
-
-    commandLogger.debug("s" in ["s"]);
-    commandLogger.debug(["s"].indexOf("s"));
 
     const embed = createEmbedBase();
     embed.setDescription("Yosugaのコマンド一覧");
@@ -22,23 +25,23 @@ export const helpCommand: Command = {
       embed.setDescription(`Yosugaのコマンド一覧 (filter: ${args.join(", ")})`);
 
       //関係あるものだけ取り出す
-      commands = commands.filter((command) => {
-        return command.trigger.filter((trig) => args.indexOf(trig) !== -1).length > 0;
-      });
+      commands = commands.filter(
+        (command) => command.getTriggers().filter((trig) => args.indexOf(trig) !== -1).length > 0
+      );
     }
 
     embed.addFields(
       commands.map((command) => {
-        const name = command.trigger.join(" | ");
-        const usage = `${config.commandPrefix} ${command.trigger[0]} ${command.usage}`;
+        const name = command.getTriggers().join(" | ");
+        const usage = `${config.commandPrefix} ${command.data.name} ${command.getUsage()}`;
 
         return {
           name: name,
-          value: `${command.description} \n usage: ${usage}`,
+          value: `${command.data.description} \n usage: ${uage}`,
         };
       })
     );
 
     return embed;
-  },
-};
+  }
+}
