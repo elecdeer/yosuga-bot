@@ -108,6 +108,7 @@ export type GuildConfig = {
   timeToReadMemberNameSec: number;
   ignorePrefix: string;
   maxStringLength: number;
+  enableSlashCommand: boolean;
 };
 
 export type WordDictionary = WordItem[];

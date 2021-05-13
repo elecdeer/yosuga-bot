@@ -7,6 +7,7 @@ import { HelpCommand } from "../commands/helpCommand";
 import { VersionCommand } from "../commands/versionCommand";
 import { ReloadCommand } from "../commands/reloadCommand";
 import { CommandBase } from "../commands/commandBase";
+import { client } from "../index";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -34,6 +35,18 @@ export const assignCommands = (): void => {
   assign(new HelpCommand());
   assign(new VersionCommand());
   assign(new ReloadCommand());
+
+  void createSlashCommands(commandList).catch((err) => {
+    commandLogger.warn(err);
+  });
+};
+
+const createSlashCommands = async (commandList: Set<CommandBase>) => {
+  await Promise.all(
+    Array.from(commandList).map(async (command: CommandBase) =>
+      client.application?.commands.create(command.data)
+    )
+  );
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {

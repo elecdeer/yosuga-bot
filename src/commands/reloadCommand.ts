@@ -4,7 +4,6 @@ import { CommandContext } from "../types";
 import { reloadConfigData } from "../configManager";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
-import { commandList } from "../globalHandler/command";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -19,14 +18,18 @@ export class ReloadCommand extends CommandBase {
   async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
     commandLogger.debug("reload config");
 
-    if (context.type === "interaction") {
-      commandLogger.debug("defer interaction");
-      void context.interaction.defer();
-    }
-
-    await Promise.all(
-      Array.from(commandList).map((command) => context.guild.commands.create(command.data))
-    );
+    // const cmds = await context.guild.commands.fetch();
+    //
+    // commandLogger.debug(cmds.map((cmd) => `${cmd.id}: ${cmd.name}`));
+    //
+    // if (context.type === "interaction") {
+    //   commandLogger.debug("defer interaction");
+    //   void context.interaction.defer();
+    // }
+    //
+    // await Promise.all(
+    //   Array.from(commandList).map((command) => context.guild.commands.create(command.data))
+    // );
 
     const errEmbed = await reloadConfigData().catch((err) => {
       commandLogger.warn(err);

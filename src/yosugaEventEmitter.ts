@@ -75,7 +75,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
     client.on("interaction", (interaction) => {
       if (!interaction.isCommand()) return;
-      logger.debug("receive interaction");
+      logger.debug(`receive interaction ${interaction.command?.name}`);
 
       const guild = interaction.guild;
       if (!guild) return; //これでmemberがGuildMemberに確定するはず

@@ -40,11 +40,10 @@ export class HelpCommand extends CommandBase {
     embed.addFields(
       commands.map((command) => {
         const name = command.getTriggers().join(" | ");
-        const usage = `${config.commandPrefix} ${command.data.name} ${command.getUsage()}`;
 
         return {
           name: name,
-          value: `${command.data.description} \n usage: ${command.getUsage(}`,
+          value: `${command.data.description} \n usage: ${command.getUsage()}`,
         };
       })
     );
