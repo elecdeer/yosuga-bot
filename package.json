@@ -41,7 +41,7 @@
     "@discordjs/opus": "^0.3.3",
     "async": "^3.2.0",
     "axios": "^0.21.1",
-    "discord.js": "^12.5.1",
+    "discord.js": "github:discordjs/discord.js",
     "dotenv": "^8.2.0",
     "emoji-regex": "^9.2.2",
     "encoding-japanese": "^1.0.30",

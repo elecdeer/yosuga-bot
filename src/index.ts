@@ -1,5 +1,5 @@
 import log4js from "log4js";
-import Discord, { Client } from "discord.js";
+import Discord, { Client, Intents } from "discord.js";
 import { yosugaEnv } from "./environment";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { assignCommands, registerCommandHandler } from "./globalHandler/command";
@@ -25,7 +25,9 @@ logger.info("start process");
 
 //======================================================================
 
-export const client: Client = new Discord.Client();
+export const client: Client = new Discord.Client({
+  intents: Intents.NON_PRIVILEGED,
+});
 
 client
   .login(yosugaEnv.discordToken)

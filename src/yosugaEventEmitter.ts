@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Client, GuildMember, Message, TextChannel, VoiceChannel } from "discord.js";
+import { Client, GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import log4js from "log4js";
@@ -15,8 +15,8 @@ interface Events {
   moveChannel: (
     guildId: string,
     member: GuildMember,
-    from: VoiceChannel | null,
-    to: VoiceChannel | null
+    from: VoiceChannel | StageChannel | null,
+    to: VoiceChannel | StageChannel | null
   ) => void;
   turnOnVideo: (guildId: string, member: GuildMember) => void;
   turnOffVideo: (guildId: string, member: GuildMember) => void;
@@ -24,10 +24,6 @@ interface Events {
   turnOffGoLive: (guildId: string, member: GuildMember) => void;
   destroy: () => void;
 }
-
-// export const registerHandler = () => {
-//
-// }
 
 type YosugaEmitter = StrictEventEmitter<EventEmitter, Events>;
 
@@ -61,6 +57,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const voiceChannel = message.member.voice.channel;
       if (prefix === config.commandPrefix) {
         const context: CommandContext = {
+          type: "text",
           session: voiceChannel ? getSession(voiceChannel.id) : null,
           config: config,
           guild: message.guild,
@@ -74,6 +71,36 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         logger.debug("emit message");
         this.emit("message", guildId, message);
       }
+    });
+
+    client.on("interaction", (interaction) => {
+      if (!interaction.isCommand()) return;
+      logger.debug(`receive interaction ${interaction.command?.name}`);
+
+      const guild = interaction.guild;
+      if (!guild) return; //これでmemberがGuildMemberに確定するはず
+      const config = getGuildConfig(guild.id);
+
+      const member: GuildMember = interaction.member as GuildMember;
+      const voiceChannel = member.voice.channel;
+
+      const context: CommandContext = {
+        type: "interaction",
+        interaction: interaction,
+        session: voiceChannel ? getSession(voiceChannel.id) : null,
+        config: config,
+        guild: guild,
+        user: member,
+        textChannel: interaction.channel as TextChannel,
+      };
+
+      // logger.debug(context);
+      logger.debug("emit command");
+      if (!interaction.command) return;
+      //微妙かも
+      const options = interaction.options.map((opt) => String(opt.value));
+
+      this.emit("command", interaction.command?.name, options, context);
     });
 
     client.on("voiceStateUpdate", (oldState, newState) => {
