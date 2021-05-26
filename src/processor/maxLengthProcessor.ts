@@ -8,9 +8,7 @@ export const maxLengthProcessor: ProcessorProvider<number> = (max: number) => as
   //サロゲートペアを考慮した長さ
   const length = charArray.length;
 
-  if (length <= max) {
-    return speechText;
-  }
+  if (length <= max) return speechText;
 
   return {
     ...speechText,
