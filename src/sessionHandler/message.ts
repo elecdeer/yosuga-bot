@@ -10,6 +10,7 @@ import { omitSymbolProcessor } from "../processor/omitSymbolProcessor";
 import { GuildConfigWithoutVoice } from "../configManager";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
 import { tildeReplaceProcessor } from "../processor/tildeReplaceProcessor";
+import { spoilerProcessor } from "../processor/spoilerProcessor";
 
 const logger = getLogger("text");
 
@@ -29,6 +30,7 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
 
   const processor = new ProcessorChain()
     .use(codeBlockProcessor())
+    .use(spoilerProcessor())
     .use(nlSplitProcessor())
     .use(urlProcessor(config.fastSpeedScale))
     .use(emojiProcessor())
