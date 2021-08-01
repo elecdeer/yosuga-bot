@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
+    "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "async": "^3.2.0",
     "axios": "^0.21.1",
     "discord.js": "github:discordjs/discord.js",
