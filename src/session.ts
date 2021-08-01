@@ -105,7 +105,7 @@ export class Session extends SessionEmitter {
       logger.warn("音声合成システムが無効です");
 
       const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
-      void this.textChannel.send(embed);
+      void this.textChannel.send({ embeds: [embed] });
       return;
     }
 

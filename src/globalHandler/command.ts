@@ -60,13 +60,13 @@ export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) =>
     void command.execute(args, context).then((resEmbed) => {
       if (context.type === "interaction") {
         if (context.interaction.deferred) {
-          void context.interaction.editReply(resEmbed);
+          void context.interaction.editReply({ embeds: [resEmbed] });
         } else {
-          void context.interaction.reply(resEmbed);
+          void context.interaction.reply({ embeds: [resEmbed] });
         }
       }
       if (context.type === "text") {
-        void context.textChannel.send(resEmbed);
+        void context.textChannel.send({ embeds: [resEmbed] });
       }
     });
   });

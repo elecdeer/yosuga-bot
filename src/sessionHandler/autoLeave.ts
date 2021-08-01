@@ -37,7 +37,7 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
 
     void session
       .getTextChannel()
-      .send(embed)
+      .send({ embeds: [embed] })
       .then(() => {
         session.disconnect();
       });

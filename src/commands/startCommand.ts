@@ -33,13 +33,10 @@ export class StartCommand extends CommandBase {
         } else {
           //別テキストルーム
 
-          await session
-            .getTextChannel()
-            .send(
-              createEmbedBase().setDescription(
-                `読み上げチャンネルが${textChannel.name}に変更されました`
-              )
-            );
+          const embed = createEmbedBase().setDescription(
+            `読み上げチャンネルが${textChannel.name}に変更されました`
+          );
+          await session.getTextChannel().send({ embeds: [embed] });
 
           session.changeTextChannel(textChannel);
           return createEmbedBase().setDescription(`接続しました!`);
