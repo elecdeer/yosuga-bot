@@ -39,14 +39,17 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
+    "@discordjs/voice": "^0.5.5",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@sap_oss/node-socketio-stream": "^1.0.3",
     "async": "^3.2.0",
     "axios": "^0.21.1",
+    "bufferutil": "^4.0.3",
     "discord.js": "13.0.0-dev.t1627831263.774f5b7",
     "dotenv": "^8.2.0",
     "emoji-regex": "^9.2.2",
     "encoding-japanese": "^1.0.30",
+    "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^4.2.8",
     "http-status": "^1.5.0",
     "log4js": "^6.3.0",
@@ -54,6 +57,8 @@
     "open-graph-scraper": "^4.8.1",
     "socket.io-client": "^4.0.1",
     "strict-event-emitter-types": "^2.0.0",
-    "url-regex-safe": "^2.0.2"
+    "url-regex-safe": "^2.0.2",
+    "utf-8-validate": "^5.0.5",
+    "zlib-sync": "^0.1.7"
   }
 }
