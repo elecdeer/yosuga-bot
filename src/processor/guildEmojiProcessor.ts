@@ -13,9 +13,10 @@ export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechT
 
       if (!emojiData) return " ";
 
-      processorLogger.debug(emojiData.id, emojiData.name);
+      processorLogger.debug(`guildEmoji ${str} id: ${emojiData.id} name:${emojiData.name}`);
 
-      return (emojiData.name ?? "emoji") + " ";
+      const emojiRead = emojiData.name.replace("_", " ");
+      return emojiRead + " ";
     }),
   };
 };
