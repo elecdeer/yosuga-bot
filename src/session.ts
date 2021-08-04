@@ -78,16 +78,16 @@ export class Session extends SessionEmitter {
     this.player = createAudioPlayer({
       debug: true,
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Paus,
-      ,
+        noSubscriber: NoSubscriberBehavior.Pause,
+      },
     });
     connection.subscribe(this.player);
 
     this.lastPushedSpeech = {
       timestamp: 0,
       author: {
-        type: "unknown"
-      }
+        type: "unknow",
+      },
     };
 
     handlerRegistrants.forEach((registrant) => {
