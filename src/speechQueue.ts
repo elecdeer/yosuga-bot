@@ -34,7 +34,7 @@ export const createSpeechQueue = (session: Session, speakerMap: SpeakerMap): Spe
     const result = await speakerValue.speaker.synthesisSpeech(query);
 
     const resource = createAudioResource(result.stream, {
-      inputType: result.tpe,
+      inputType: result.type,
     });
 
     const player = session.player;

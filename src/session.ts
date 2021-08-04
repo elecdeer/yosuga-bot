@@ -22,7 +22,7 @@ import {
   AudioPlayer,
   createAudioPlayer,
   NoSubscriberBehavior,
-  VoiceConnectio,
+  VoiceConnection,
 } from "@discordjs/voice";
 
 const logger = getLogger("session");
@@ -86,8 +86,8 @@ export class Session extends SessionEmitter {
     this.lastPushedSpeech = {
       timestamp: 0,
       author: {
-        type: "unknown,
-      ,
+        type: "unknown"
+      }
     };
 
     handlerRegistrants.forEach((registrant) => {
@@ -162,19 +162,19 @@ export class Session extends SessionEmitter {
 
   changeTextChannel(textChannel: TextChannel): void {
     this.textChannel = textChannel;
-  };
+  }
 
   getTextChannel(): Readonly<TextChannel> {
     return this.textChannel;
-  };
+  }
 
   getVoiceChannel(): Readonly<VoiceOrStageChannel> {
     return this.voiceChannel;
-  };
+  }
 
   getConfig(): Readonly<GuildConfigWithoutVoice> {
     return getGuildConfig(this.guild.id);
-  };
+  }
 
   getUsernamePronunciation(member: GuildMember | null): string {
     return member?.displayName ?? "不明なユーザ";
