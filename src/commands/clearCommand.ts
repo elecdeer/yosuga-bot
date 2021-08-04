@@ -21,9 +21,8 @@ export class ClearCommand extends CommandBase {
 
     if (!session?.connection) return createEmbedBase().setDescription("未接続です.");
 
-    if (session.connection.dispatcher) {
-      session.connection.dispatcher.destroy();
-    }
+    session.player.stop();
+
     session.initializeQueue();
 
     return createEmbedBase().setDescription("読み上げキューをクリアしました.");

@@ -3,17 +3,15 @@ import { getLogger } from "log4js";
 import { getGuildConfig } from "./configManager";
 import async from "async";
 import { SpeakerMap } from "./speaker/speakersBuilder";
-import { VoiceConnection } from "discord.js";
+import { AudioPlayerStatus, createAudioResource, entersState } from "@discordjs/voice";
+import { Session } from "./session";
 
 const logger = getLogger("speechQueue");
 
 export type SpeechQueue = async.QueueObject<SpeechTask>;
-export const createSpeechQueue = (
-  guildId: string,
-  speakerMap: SpeakerMap,
-  connection: VoiceConnection
-): SpeechQueue => {
+export const createSpeechQueue = (session: Session, speakerMap: SpeakerMap): SpeechQueue => {
   const worker = async (task: SpeechTask): Promise<void> => {
+    const guildId = session.getVoiceChannel().guild.id;
     const config = getGuildConfig(guildId);
 
     const speakerValue = speakerMap[task.voiceParam.speakerOption.speaker];
@@ -34,18 +32,20 @@ export const createSpeechQueue = (
     logger.debug("query", query);
 
     const result = await speakerValue.speaker.synthesisSpeech(query);
-    await new Promise<void>((resolve) => {
-      const dispatcher = connection.play(result.stream, {
-        type: result.type ?? "unknown",
-      });
 
-      dispatcher.once("finish", () => {
-        logger.debug("resolve");
-        setTimeout(() => {
-          resolve();
-        }, config.pauseParam.longPause);
-      });
+    const resource = createAudioResource(result.stream, {
+      inputType: result.tpe,
     });
+
+    const player = session.player;
+    player.play(resource);
+    logger.debug("Play start");
+    await entersState(player, AudioPlayerStatus.Playing, 100);
+
+    logger.debug("Playing");
+    await entersState(player, AudioPlayerStatus.Idle, 2 ** 31 - 1);
+
+    logger.debug("Play finish");
   };
 
   return async.queue<SpeechTask, Error>((task, callback) => {

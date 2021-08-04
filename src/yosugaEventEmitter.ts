@@ -1,11 +1,13 @@
 import EventEmitter from "events";
-import { Client, GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { Client, GuildMember, Message, TextChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import log4js from "log4js";
 import { getGuildConfig } from "./configManager";
-import { CommandContext } from "./types";
+import { CommandContext, VoiceOrStageChannel } from "./types";
 import { getSession } from "./sessionManager";
+
+//TODO yosugaEventEmitterはeventEmitterBaseに改名して、indexでやってるassignCommandsとかをコンストラクタでやるように
 
 const logger = log4js.getLogger("yosugaEvent");
 
@@ -15,8 +17,8 @@ interface Events {
   moveChannel: (
     guildId: string,
     member: GuildMember,
-    from: VoiceChannel | StageChannel | null,
-    to: VoiceChannel | StageChannel | null
+    from: VoiceOrStageChannel | null,
+    to: VoiceOrStageChannel | null
   ) => void;
   turnOnVideo: (guildId: string, member: GuildMember) => void;
   turnOffVideo: (guildId: string, member: GuildMember) => void;
@@ -98,7 +100,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       logger.debug("emit command");
       if (!interaction.command) return;
       //微妙かも
-      const options = interaction.options.map((opt) => String(opt.value));
+      const options = interaction.options.data.map((opt) => String(opt.value));
 
       this.emit("command", interaction.command?.name, options, context);
     });

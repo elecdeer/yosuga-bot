@@ -16,6 +16,7 @@ import { Readable } from "stream";
 import axios from "axios";
 import { yosugaEnv } from "../environment";
 import { getLogger } from "log4js";
+import { StreamType } from "@discordjs/voice";
 
 const logger = getLogger("aivoiceSpeaker");
 const wait = util.promisify(setTimeout);
@@ -88,7 +89,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
 
     return {
       stream: stream,
-      type: "opus",
+      type: StreamType.Opus,
     };
   }
 

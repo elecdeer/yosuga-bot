@@ -45,4 +45,5 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
 };
 
 const getMemberNumExcludedBot = (session: Session): number =>
-  session.connection.channel.members.filter((member) => !member.user.bot).size;
+  session.getVoiceChannel().members.filter((member) => !member.user.bot).size;
+// session.connection.channel.members.filter((member) => !member.user.bot).size;

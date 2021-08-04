@@ -5,19 +5,23 @@ import {
   Guild,
   GuildMember,
   MessageEmbed,
-  StreamType,
+  StageChannel,
   TextChannel,
+  VoiceChannel,
 } from "discord.js";
 
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
+import { StreamType } from "@discordjs/voice";
 
 // ====================
 // General
 // ====================
 
 export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+export type VoiceOrStageChannel = VoiceChannel | StageChannel;
 
 // ====================
 // Voice

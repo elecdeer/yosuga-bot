@@ -4,6 +4,7 @@ import { yosugaEnv } from "./environment";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { assignCommands, registerCommandHandler } from "./globalHandler/command";
 import { registerSessionFactory } from "./sessionManager";
+import { generateDependencyReport } from "@discordjs/voice";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
@@ -22,6 +23,7 @@ log4js.configure({
 
 const logger = log4js.getLogger();
 logger.info("start process");
+logger.debug(generateDependencyReport());
 
 //======================================================================
 
