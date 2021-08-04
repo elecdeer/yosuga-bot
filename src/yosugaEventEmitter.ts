@@ -37,7 +37,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       logger.info("bot ready");
     });
 
-    client.on("message", (message) => {
+    client.on("messageCreate", (message) => {
       logger.debug("handle message");
       if (!message.guild) return;
       if (message.author.bot) return;
