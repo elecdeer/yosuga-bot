@@ -66,7 +66,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
           user: message.member,
           textChannel: message.channel as TextChannel,
         };
-        logger.debug(context);
+        // logger.debug(context);
         logger.debug("emit command");
         this.emit("command", command, messageSlice, context);
       } else {

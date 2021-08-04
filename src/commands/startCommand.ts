@@ -62,6 +62,7 @@ const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
     guildId: voiceChannel.guild.id,
     channelId: voiceChannel.id,
     adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    selfMute: false,
   });
 
   try {
