@@ -43,7 +43,7 @@ export class StartCommand extends CommandBase {
           return createEmbedBase().setDescription(`接続しました!`);
         }
       } else {
-        try{
+        try {
           const sessionManager = yosuga.sessionManager;
 
           const connection = await connectToChannel(voiceChannel);

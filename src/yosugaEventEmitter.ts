@@ -93,7 +93,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         config: config,
         guild: guild,
         user: member,
-        textChannel: interaction.channel as TextChanne,
+        textChannel: interaction.channel as TextChannel,
       };
 
       // logger.debug(context);
