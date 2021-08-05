@@ -37,7 +37,7 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
 
     void session
       .getTextChannel()
-      .send(embed)
+      .send({ embeds: [embed] })
       .then(() => {
         session.disconnect();
       });
@@ -45,4 +45,5 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
 };
 
 const getMemberNumExcludedBot = (session: Session): number =>
-  session.connection.channel.members.filter((member) => !member.user.bot).size;
+  session.getVoiceChannel().members.filter((member) => !member.user.bot).size;
+// session.connection.channel.members.filter((member) => !member.user.bot).size;

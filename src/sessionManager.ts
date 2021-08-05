@@ -1,8 +1,9 @@
-import { GlobalEventHandlerRegistrant } from "./types";
+import { GlobalEventHandlerRegistrant, VoiceOrStageChannel } from "./types";
 import log4js from "log4js";
 import { Session } from "./session";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { TextChannel, VoiceConnection } from "discord.js";
+import { TextChannel } from "discord.js";
+import { VoiceConnection } from "@discordjs/voice";
 
 const sessionStateMap: Record<string, Session> = {};
 
@@ -23,9 +24,13 @@ export const getSession = (voiceChannelId: string): Session | null => {
   }
 };
 
-export const startSession = (connection: VoiceConnection, textChannel: TextChannel): Session => {
-  const session = new Session(globalEmitter, connection, textChannel);
-  const channelId = connection.channel.id;
+export const startSession = (
+  connection: VoiceConnection,
+  textChannel: TextChannel,
+  voiceChannel: VoiceOrStageChannel
+): Session => {
+  const session = new Session(globalEmitter, connection, textChannel, voiceChannel);
+  const channelId = voiceChannel.id;
   sessionStateMap[channelId] = session;
 
   session.once("disconnect", () => {

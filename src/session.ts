@@ -1,10 +1,15 @@
 import { SessionEmitter } from "./sessionEmitter";
-import { GuildMember, TextChannel, VoiceConnection } from "discord.js";
+import { GuildMember, TextChannel } from "discord.js";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
 import { createSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { getLogger } from "log4js";
-import { PartiallyPartial, SessionEventHandlerRegistrant, SpeechText } from "./types";
+import {
+  PartiallyPartial,
+  SessionEventHandlerRegistrant,
+  SpeechText,
+  VoiceOrStageChannel,
+} from "./types";
 import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
 import { createEmbedBase } from "./util";
 import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
@@ -13,6 +18,12 @@ import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
 import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
 import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
+import {
+  AudioPlayer,
+  createAudioPlayer,
+  NoSubscriberBehavior,
+  VoiceConnection,
+} from "@discordjs/voice";
 
 const logger = getLogger("session");
 
@@ -48,19 +59,29 @@ export class Session extends SessionEmitter {
   readonly connection: VoiceConnection;
   protected readonly speakerMap: SpeakerMap;
   protected speechQueue: SpeechQueue;
+  readonly player: AudioPlayer;
 
   lastPushedSpeech: PushSpeechRecord;
 
   constructor(
     yosugaEmitter: YosugaEventEmitter,
     connection: VoiceConnection,
-    textChannel: TextChannel
+    textChannel: TextChannel,
+    voiceChannel: VoiceOrStageChannel
   ) {
-    super(yosugaEmitter, connection.channel, textChannel);
+    super(yosugaEmitter, voiceChannel, textChannel);
     this.connection = connection;
 
     this.speakerMap = createSpeakerMap(this);
     this.speechQueue = this.initializeQueue();
+
+    this.player = createAudioPlayer({
+      debug: true,
+      behaviors: {
+        noSubscriber: NoSubscriberBehavior.Pause,
+      },
+    });
+    connection.subscribe(this.player);
 
     this.lastPushedSpeech = {
       timestamp: 0,
@@ -76,7 +97,7 @@ export class Session extends SessionEmitter {
 
   initializeQueue(): SpeechQueue {
     this.speechQueue?.kill();
-    this.speechQueue = createSpeechQueue(this.guild.id, this.speakerMap, this.connection);
+    this.speechQueue = createSpeechQueue(this, this.speakerMap);
     return this.speechQueue;
   }
 
@@ -105,7 +126,7 @@ export class Session extends SessionEmitter {
       logger.warn("音声合成システムが無効です");
 
       const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
-      void this.textChannel.send(embed);
+      void this.textChannel.send({ embeds: [embed] });
       return;
     }
 
@@ -145,6 +166,10 @@ export class Session extends SessionEmitter {
 
   getTextChannel(): Readonly<TextChannel> {
     return this.textChannel;
+  }
+
+  getVoiceChannel(): Readonly<VoiceOrStageChannel> {
+    return this.voiceChannel;
   }
 
   getConfig(): Readonly<GuildConfigWithoutVoice> {

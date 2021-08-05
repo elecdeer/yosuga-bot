@@ -1,9 +1,10 @@
 import log4js from "log4js";
 import { createEmbedBase } from "../util";
-import { CommandContext } from "../types";
+import { CommandContext, VoiceOrStageChannel } from "../types";
 import { startSession } from "../sessionManager";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
+import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -33,24 +34,42 @@ export class StartCommand extends CommandBase {
         } else {
           //別テキストルーム
 
-          await session
-            .getTextChannel()
-            .send(
-              createEmbedBase().setDescription(
-                `読み上げチャンネルが${textChannel.name}に変更されました`
-              )
-            );
+          const embed = createEmbedBase().setDescription(
+            `読み上げチャンネルが${textChannel.name}に変更されました`
+          );
+          await session.getTextChannel().send({ embeds: [embed] });
 
           session.changeTextChannel(textChannel);
           return createEmbedBase().setDescription(`接続しました!`);
         }
       } else {
-        const connection = await voiceChannel.join();
-        startSession(connection, textChannel);
-        return createEmbedBase().setDescription("接続しました！");
+        try {
+          const connection = await connectToChannel(voiceChannel);
+          startSession(connection, textChannel, voiceChannel);
+          return createEmbedBase().setDescription("接続しました！");
+        } catch (error) {
+          return createEmbedBase().setDescription("接続エラーが発生しました.");
+        }
       }
     } else {
       return createEmbedBase().setDescription("先にボイスチャンネルに入る必要があります.");
     }
   }
 }
+
+const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
+  const connection = joinVoiceChannel({
+    guildId: voiceChannel.guild.id,
+    channelId: voiceChannel.id,
+    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    selfMute: false,
+  });
+
+  try {
+    await entersState(connection, VoiceConnectionStatus.Ready, 30 * 1000);
+    return connection;
+  } catch (error) {
+    connection.destroy();
+    throw error;
+  }
+};

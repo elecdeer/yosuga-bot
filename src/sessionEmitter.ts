@@ -1,7 +1,8 @@
-import { Guild, GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 import EventEmitter from "events";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { VoiceOrStageChannel } from "./types";
 
 // const logger = getLogger("session");
 
@@ -19,13 +20,13 @@ interface Events {
 type SessionStrictEmitter = StrictEventEmitter<EventEmitter, Events>;
 
 export class SessionEmitter extends (EventEmitter as { new (): SessionStrictEmitter }) {
-  protected readonly voiceChannel: VoiceChannel | StageChannel;
+  protected readonly voiceChannel: VoiceOrStageChannel;
   protected textChannel: TextChannel;
   protected readonly guild: Guild;
 
   constructor(
     globalEmitter: YosugaEventEmitter,
-    voiceChannel: VoiceChannel | StageChannel,
+    voiceChannel: VoiceOrStageChannel,
     textChannel: TextChannel
   ) {
     super();

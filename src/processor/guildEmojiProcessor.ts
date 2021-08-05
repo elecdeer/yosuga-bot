@@ -2,20 +2,21 @@
 
 import { ProcessorProvider } from "../types";
 import { processorLogger } from "./processor";
-import { client } from "../index";
+import { Util } from "discord.js";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
 export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechText) => {
   return {
     ...speechText,
     text: speechText.text.replace(guildEmojiReg, (str) => {
-      const emojiId = pickEmojiId(str);
+      const emojiData = Util.parseEmoji(str);
 
-      const emoji = client.emojis.resolve(emojiId);
+      if (!emojiData) return " ";
 
-      processorLogger.debug(emojiId, emoji?.name);
+      processorLogger.debug(`guildEmoji ${str} id: ${emojiData.id} name:${emojiData.name}`);
 
-      return (emoji?.name ?? "emoji") + " ";
+      const emojiRead = emojiData.name.replace("_", " ");
+      return emojiRead + " ";
     }),
   };
 };

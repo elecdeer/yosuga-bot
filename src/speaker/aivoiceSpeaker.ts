@@ -9,13 +9,15 @@ import {
 
 import * as util from "util";
 import { io } from "socket.io-client";
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import ss from "socket.io-stream";
+import ss from "@sap_oss/node-socketio-stream";
 import { Readable } from "stream";
 import axios from "axios";
 import { yosugaEnv } from "../environment";
 import { getLogger } from "log4js";
+import { StreamType } from "@discordjs/voice";
 
 const logger = getLogger("aivoiceSpeaker");
 const wait = util.promisify(setTimeout);
@@ -88,7 +90,7 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
 
     return {
       stream: stream,
-      type: "opus",
+      type: StreamType.Opus,
     };
   }
 

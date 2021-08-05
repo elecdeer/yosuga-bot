@@ -42,11 +42,8 @@ export const assignCommands = (): void => {
 };
 
 const createSlashCommands = async (commandList: Set<CommandBase>) => {
-  await Promise.all(
-    Array.from(commandList).map(async (command: CommandBase) =>
-      client.application?.commands.create(command.data)
-    )
-  );
+  const applicationCommands = Array.from(commandList).map((command) => command.data);
+  await client.application?.commands.set(applicationCommands);
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {
@@ -60,13 +57,13 @@ export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) =>
     void command.execute(args, context).then((resEmbed) => {
       if (context.type === "interaction") {
         if (context.interaction.deferred) {
-          void context.interaction.editReply(resEmbed);
+          void context.interaction.editReply({ embeds: [resEmbed] });
         } else {
-          void context.interaction.reply(resEmbed);
+          void context.interaction.reply({ embeds: [resEmbed] });
         }
       }
       if (context.type === "text") {
-        void context.textChannel.send(resEmbed);
+        void context.textChannel.send({ embeds: [resEmbed] });
       }
     });
   });

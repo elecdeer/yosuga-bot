@@ -4,6 +4,7 @@ import { yosugaEnv } from "./environment";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { assignCommands, registerCommandHandler } from "./globalHandler/command";
 import { registerSessionFactory } from "./sessionManager";
+import { generateDependencyReport } from "@discordjs/voice";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
@@ -22,18 +23,24 @@ log4js.configure({
 
 const logger = log4js.getLogger();
 logger.info("start process");
+logger.debug(generateDependencyReport());
 
 //======================================================================
 
 export const client: Client = new Discord.Client({
-  intents: Intents.NON_PRIVILEGED,
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
 });
 
 client
   .login(yosugaEnv.discordToken)
+  .then(async (res) => {
+    if (!client.application?.owner) await client.application?.fetch();
+    return res;
+  })
   .then((res) => {
     logger.info("bot login");
     logger.info(`token: ${res}`);
+    logger.info(`applicationOwner: ${client.application?.owner}`);
 
     initEmitter();
     assignCommands();

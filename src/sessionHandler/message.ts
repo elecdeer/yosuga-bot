@@ -31,8 +31,8 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
     .use(codeBlockProcessor())
     .use(nlSplitProcessor())
     .use(urlProcessor(config.fastSpeedScale))
-    .use(emojiProcessor())
     .use(guildEmojiProcessor())
+    .use(emojiProcessor())
     .use(omitSymbolProcessor("!"))
     .use(omitSymbolProcessor("！"))
     .use(omitSymbolProcessor("?"))
@@ -55,6 +55,7 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
 
     logger.debug(`embeds: ${message.embeds}`);
     logger.debug(`attachments: ${message.attachments}`);
+    logger.debug(`stickers: ${message.stickers}`);
 
     const baseText = message.cleanContent;
     const config = session.getConfig();
@@ -92,11 +93,24 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
       });
     }
 
+    //attachments
     if (message.attachments.size > 0) {
       message.attachments
         .map((attachment) => ({
           ...speechTextBase,
           text: attachment.url,
+        }))
+        .forEach((item) => {
+          speechTexts.push(item);
+        });
+    }
+
+    //stickers
+    if (message.stickers.size > 0) {
+      message.stickers
+        .map((sticker) => ({
+          ...speechTextBase,
+          text: sticker.name ?? "スンプ",
         }))
         .forEach((item) => {
           speechTexts.push(item);
