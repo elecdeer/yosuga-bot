@@ -1,9 +1,9 @@
-import { commandList } from "../globalHandler/command";
 import { createEmbedBase } from "../util";
 import log4js from "log4js";
 import { CommandContext } from "../types";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
+import { yosuga } from "../index";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -23,18 +23,13 @@ export class HelpCommand extends CommandBase {
   }
 
   async execute(args: string[], { config }: CommandContext): Promise<MessageEmbed> {
-    let commands = Array.from(commandList);
+    const commands = yosuga.commandManager.getCommandList(args);
 
     const embed = createEmbedBase();
     embed.setDescription("Yosugaのコマンド一覧");
 
     if (args.length > 0) {
       embed.setDescription(`Yosugaのコマンド一覧 (filter: ${args.join(", ")})`);
-
-      //関係あるものだけ取り出す
-      commands = commands.filter(
-        (command) => command.getTriggers().filter((trig) => args.indexOf(trig) !== -1).length > 0
-      );
     }
 
     embed.addFields(

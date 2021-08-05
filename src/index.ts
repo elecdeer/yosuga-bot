@@ -1,10 +1,7 @@
 import log4js from "log4js";
 import Discord, { Client, Intents } from "discord.js";
-import { yosugaEnv } from "./environment";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { assignCommands, registerCommandHandler } from "./globalHandler/command";
-import { registerSessionFactory } from "./sessionManager";
 import { generateDependencyReport } from "@discordjs/voice";
+import { YosugaClient } from "./yosugaClient";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({
@@ -31,30 +28,8 @@ export const client: Client = new Discord.Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
 });
 
-client
-  .login(yosugaEnv.discordToken)
-  .then(async (res) => {
-    if (!client.application?.owner) await client.application?.fetch();
-    return res;
-  })
-  .then((res) => {
-    logger.info("bot login");
-    logger.info(`token: ${res}`);
-    logger.info(`applicationOwner: ${client.application?.owner}`);
-
-    initEmitter();
-    assignCommands();
-  })
-  .catch((err) => {
-    logger.error("failed to login discord");
-    logger.error(err);
-  });
-
-const initEmitter = () => {
-  const globalEmitter = new YosugaEventEmitter(client);
-  registerSessionFactory(globalEmitter);
-  registerCommandHandler(globalEmitter);
-};
+export const yosuga = new YosugaClient(client);
+yosuga.initClient();
 
 process.on("exit", () => {
   logger.info("Exit...");
