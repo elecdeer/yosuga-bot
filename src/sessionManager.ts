@@ -1,40 +1,39 @@
-import { GlobalEventHandlerRegistrant, VoiceOrStageChannel } from "./types";
+import { VoiceOrStageChannel } from "./types";
 import log4js from "log4js";
 import { Session } from "./session";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { TextChannel } from "discord.js";
+import { Collection, TextChannel } from "discord.js";
 import { VoiceConnection } from "@discordjs/voice";
-
-const sessionStateMap: Record<string, Session> = {};
-
-let globalEmitter: YosugaEventEmitter;
+import { YosugaClient } from "./yosugaClient";
+import { yosuga } from "./index";
 
 const logger = log4js.getLogger("sessionManager");
 
-export const registerSessionFactory: GlobalEventHandlerRegistrant = (emitter) => {
-  logger.debug("session factory register");
-  globalEmitter = emitter;
-};
+export class SessionManager {
+  protected yosuga: YosugaClient;
+  protected sessionCollection: Collection<string, Session>;
 
-export const getSession = (voiceChannelId: string): Session | null => {
-  if (voiceChannelId in sessionStateMap) {
-    return sessionStateMap[voiceChannelId];
-  } else {
-    return null;
+  constructor(yosuga: YosugaClient) {
+    this.yosuga = yosuga;
+
+    this.sessionCollection = new Collection<string, Session>();
   }
-};
 
-export const startSession = (
-  connection: VoiceConnection,
-  textChannel: TextChannel,
-  voiceChannel: VoiceOrStageChannel
-): Session => {
-  const session = new Session(globalEmitter, connection, textChannel, voiceChannel);
-  const channelId = voiceChannel.id;
-  sessionStateMap[channelId] = session;
+  getSession(voiceChannelId: string): Session | null {
+    return this.sessionCollection.get(voiceChannelId) ?? null;
+  }
 
-  session.once("disconnect", () => {
-    delete sessionStateMap[channelId];
-  });
-  return session;
-};
+  startSession(
+    connection: VoiceConnection,
+    textChannel: TextChannel,
+    voiceChannel: VoiceOrStageChannel
+  ): Session {
+    const session = new Session(yosuga, connection, textChannel, voiceChannel);
+    const channelId = voiceChannel.id;
+
+    this.sessionCollection.set(channelId, session);
+    session.once("disconnect", () => {
+      this.sessionCollection.delete(channelId);
+    });
+    return session;
+  }
+}

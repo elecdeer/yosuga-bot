@@ -1,10 +1,10 @@
 import log4js from "log4js";
 import { createEmbedBase } from "../util";
 import { CommandContext, VoiceOrStageChannel } from "../types";
-import { startSession } from "../sessionManager";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
+import { yosuga } from "../index";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -43,9 +43,11 @@ export class StartCommand extends CommandBase {
           return createEmbedBase().setDescription(`接続しました!`);
         }
       } else {
-        try {
+        try{
+          const sessionManager = yosuga.sessionManager;
+
           const connection = await connectToChannel(voiceChannel);
-          startSession(connection, textChannel, voiceChannel);
+          sessionManager.startSession(connection, textChannel, voiceChannel);
           return createEmbedBase().setDescription("接続しました！");
         } catch (error) {
           return createEmbedBase().setDescription("接続エラーが発生しました.");

@@ -1,10 +1,9 @@
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { Client } from "discord.js";
 import { yosugaEnv } from "./environment";
-import { registerCommandHandler } from "./globalHandler/command";
 import { client } from "./index";
 import { getLogger } from "log4js";
-import { registerSessionFactory } from "./sessionManager";
+import { SessionManager } from "./sessionManager";
 import { CommandManager } from "./commandManager";
 import { StartCommand } from "./commands/startCommand";
 import { EndCommand } from "./commands/endCommand";
@@ -19,6 +18,7 @@ export class YosugaClient extends YosugaEventEmitter {
   readonly client: Client;
 
   readonly commandManager: CommandManager;
+  readonly sessionManager: SessionManager;
 
   constructor(discordClient: Client) {
     super(discordClient);
@@ -27,6 +27,8 @@ export class YosugaClient extends YosugaEventEmitter {
 
     this.commandManager = new CommandManager(this);
     this.assignCommands();
+
+    this.sessionManager = new SessionManager(this);
   }
 
   initClient(): void {
@@ -41,9 +43,6 @@ export class YosugaClient extends YosugaEventEmitter {
         logger.info(`token: ${res}`);
         logger.info(`applicationOwner: ${client.application?.owner}`);
 
-        this.initEmitter();
-        // assignCommands();
-
         void this.commandManager.registerSlashCommand().catch((err) => {
           logger.warn(err);
         });
@@ -52,11 +51,6 @@ export class YosugaClient extends YosugaEventEmitter {
         logger.error("failed to login discord");
         logger.error(err);
       });
-  }
-
-  protected initEmitter(): void {
-    registerSessionFactory(this);
-    registerCommandHandler(this);
   }
 
   protected assignCommands(): void {

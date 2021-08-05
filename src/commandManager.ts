@@ -12,6 +12,29 @@ export class CommandManager {
 
   constructor(yosuga: YosugaClient) {
     this.yosuga = yosuga;
+    this.attachHandler();
+  }
+
+  private attachHandler() {
+    this.yosuga.on("command", (cmd, args, context) => {
+      commandLogger.debug(`cmd: ${cmd} args: ${args}`);
+
+      const command = this.yosuga.commandManager.getCommand(cmd);
+      if (!command) return;
+
+      void command.execute(args, context).then((resEmbed) => {
+        if (context.type === "interaction") {
+          if (context.interaction.deferred) {
+            void context.interaction.editReply({ embeds: [resEmbed] });
+          } else {
+            void context.interaction.reply({ embeds: [resEmbed] });
+          }
+        }
+        if (context.type === "text") {
+          void context.textChannel.send({ embeds: [resEmbed] });
+        }
+      });
+    });
   }
 
   assign(command: CommandBase): void {

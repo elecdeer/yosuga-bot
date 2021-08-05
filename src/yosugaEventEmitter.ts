@@ -5,7 +5,7 @@ import StrictEventEmitter from "strict-event-emitter-types";
 import log4js from "log4js";
 import { getGuildConfig } from "./configManager";
 import { CommandContext, VoiceOrStageChannel } from "./types";
-import { getSession } from "./sessionManager";
+import { yosuga } from "./index";
 
 //TODO yosugaEventEmitterはeventEmitterBaseに改名して、indexでやってるassignCommandsとかをコンストラクタでやるように
 
@@ -60,7 +60,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       if (prefix === config.commandPrefix) {
         const context: CommandContext = {
           type: "text",
-          session: voiceChannel ? getSession(voiceChannel.id) : null,
+          session: voiceChannel ? yosuga.sessionManager.getSession(voiceChannel.id) : null,
           config: config,
           guild: message.guild,
           user: message.member,
@@ -89,11 +89,11 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       const context: CommandContext = {
         type: "interaction",
         interaction: interaction,
-        session: voiceChannel ? getSession(voiceChannel.id) : null,
+        session: voiceChannel ? yosuga.sessionManager.getSession(voiceChannel.id) : null,
         config: config,
         guild: guild,
         user: member,
-        textChannel: interaction.channel as TextChannel,
+        textChannel: interaction.channel as TextChanne,
       };
 
       // logger.debug(context);
