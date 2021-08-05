@@ -42,11 +42,8 @@ export const assignCommands = (): void => {
 };
 
 const createSlashCommands = async (commandList: Set<CommandBase>) => {
-  await Promise.all(
-    Array.from(commandList).map(async (command: CommandBase) =>
-      client.application?.commands.create(command.data)
-    )
-  );
+  const applicationCommands = Array.from(commandList).map((command) => command.data);
+  await client.application?.commands.set(applicationCommands);
 };
 
 export const registerCommandHandler: GlobalEventHandlerRegistrant = (emitter) => {
