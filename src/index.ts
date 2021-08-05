@@ -33,9 +33,14 @@ export const client: Client = new Discord.Client({
 
 client
   .login(yosugaEnv.discordToken)
+  .then(async (res) => {
+    if (!client.application?.owner) await client.application?.fetch();
+    return res;
+  })
   .then((res) => {
     logger.info("bot login");
     logger.info(`token: ${res}`);
+    logger.info(`applicationOwner: ${client.application?.owner}`);
 
     initEmitter();
     assignCommands();
