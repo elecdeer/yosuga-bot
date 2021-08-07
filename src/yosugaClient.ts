@@ -13,6 +13,7 @@ import { VersionCommand } from "./commands/versionCommand";
 import { ReloadCommand } from "./commands/reloadCommand";
 import { Speaker } from "./speaker/speaker";
 import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
+import { Session } from "./session";
 
 const logger = getLogger("yosugaClient");
 
@@ -65,12 +66,12 @@ export class YosugaClient extends YosugaEventEmitter {
     this.commandManager.assign(new ReloadCommand());
   }
 
-  speakersFactory(): Collection<string, Speaker> {
+  speakersFactory(session: Session): Collection<string, Speaker> {
     const collection = new Collection<string, Speaker>();
 
     //うまいことして環境変数からいじれるようにする
     if (yosugaEnv.voiceroidDaemonUrl) {
-      collection.set("yukari", new VoiceroidDaemonSpeaker(yosugaEnv.voiceroidDaemonUrl));
+      collection.set("yukari", new VoiceroidDaemonSpeaker(session, yosugaEnv.voiceroidDaemonUrl));
     }
 
     return collection;

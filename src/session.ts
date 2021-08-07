@@ -76,7 +76,7 @@ export class Session extends SessionEmitter {
     super(yosugaEmitter, voiceChannel, textChannel);
     this.connection = connection;
 
-    this.voiceProvider = new VoiceProvider(this, yosuga.speakersFactory());
+    this.voiceProvider = new VoiceProvider(this, yosuga.speakersFactory(this));
 
     this.speechQueue = this.initializeQueue();
 

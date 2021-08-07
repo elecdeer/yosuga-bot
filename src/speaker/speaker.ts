@@ -1,10 +1,16 @@
 import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource } from "@discordjs/voice";
+import { Session } from "../session";
 
 type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 
 export abstract class Speaker<T = unknown> {
+  protected session: Session;
   status: SpeakerState = "checking";
+
+  constructor(session: Session) {
+    this.session = session;
+  }
 
   abstract synthesis(
     speechText: SpeechText,
@@ -13,8 +19,4 @@ export abstract class Speaker<T = unknown> {
   ): Promise<AudioResource>;
 
   abstract checkInitialActiveness(): Promise<void>;
-
-  dispose(): void {
-    //  何かあれば
-  }
 }

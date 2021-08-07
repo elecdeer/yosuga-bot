@@ -4,6 +4,7 @@ import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice
 import axios from "axios";
 import { Readable } from "stream";
 import { getLogger } from "log4js";
+import { Session } from "../session";
 
 export type VoiceroidDaemonQuery = Partial<{
   Text: string;
@@ -27,8 +28,8 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
   private checkUrl: string;
   private speechTextUrl: string;
 
-  constructor(urlBase: string) {
-    super();
+  constructor(session: Session, urlBase: string) {
+    super(session);
     this.urlBase = urlBase;
     this.checkUrl = `${urlBase}/`;
     this.speechTextUrl = `${urlBase}/api/speechtext`;
