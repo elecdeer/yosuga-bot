@@ -83,7 +83,7 @@ export class Session extends SessionEmitter {
     this.player = createAudioPlayer({
       debug: true,
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Paue,
+        noSubscriber: NoSubscriberBehavior.Pause,
       },
     });
     connection.subscribe(this.player);
