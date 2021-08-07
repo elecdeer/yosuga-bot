@@ -1,5 +1,5 @@
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { Client } from "discord.js";
+import { Client, Collection } from "discord.js";
 import { yosugaEnv } from "./environment";
 import { client } from "./index";
 import { getLogger } from "log4js";
@@ -11,6 +11,8 @@ import { ClearCommand } from "./commands/clearCommand";
 import { HelpCommand } from "./commands/helpCommand";
 import { VersionCommand } from "./commands/versionCommand";
 import { ReloadCommand } from "./commands/reloadCommand";
+import { Speaker } from "./speaker/speaker";
+import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 
 const logger = getLogger("yosugaClient");
 
@@ -61,5 +63,16 @@ export class YosugaClient extends YosugaEventEmitter {
     this.commandManager.assign(new HelpCommand());
     this.commandManager.assign(new VersionCommand());
     this.commandManager.assign(new ReloadCommand());
+  }
+
+  speakersFactory(): Collection<string, Speaker> {
+    const collection = new Collection<string, Speaker>();
+
+    //うまいことして環境変数からいじれるようにする
+    if (yosugaEnv.voiceroidDaemonUrl) {
+      collection.set("yukari", new VoiceroidDaemonSpeaker(yosugaEnv.voiceroidDaemonUrl));
+    }
+
+    return collection;
   }
 }

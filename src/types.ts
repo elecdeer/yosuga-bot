@@ -1,4 +1,3 @@
-import { Readable } from "stream";
 import {
   ApplicationCommandData,
   CommandInteraction,
@@ -13,7 +12,6 @@ import {
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
-import { StreamType } from "@discordjs/voice";
 
 // ====================
 // General
@@ -27,27 +25,35 @@ export type VoiceOrStageChannel = VoiceChannel | StageChannel;
 // Voice
 // ====================
 
-export type VoiceParam = {
-  speakerOption: SpeakerParam;
+// export type synthesisEngine = "voiceroidDaemon" | "assistantSeika";
+
+export type VoiceParam<T> = {
   pitch: number;
   intonation: number;
+  additionalOption?: T;
 };
 
-export type VoiceParamBind<T> = Exclude<VoiceParam, SpeakerParam> & { speakerOption: T };
-
-export type SpeakerParam = AIVoiceParam | VoiceroidParam;
-
-export type VoiceroidParam = {
-  speaker: "voiceroid";
+export type VoiceOption = {
+  speakerName: string;
+  voiceParam: VoiceParam<unknown>;
 };
 
-export type AIVoiceParam = {
-  speaker: "aivoice";
-  cid: number;
-  emotionHappy: number;
-  emotionAngry: number;
-  emotionSad: number;
-};
+//
+// export type VoiceParamBind<T> = Exclude<VoiceParam, SpeakerParam> & { speakerOption: T };
+//
+// export type SpeakerParam = AIVoiceParam | VoiceroidParam;
+//
+// export type VoiceroidParam = {
+//   speaker: "voiceroid";
+// };
+//
+// export type AIVoiceParam = {
+//   speaker: "aivoice";
+//   cid: number;
+//   emotionHappy: number;
+//   emotionAngry: number;
+//   emotionSad: number;
+// };
 
 export type PauseParam = {
   shortPause: number;
@@ -62,7 +68,7 @@ export type SpeechText = {
 };
 
 export type SpeechTask = {
-  voiceParam: VoiceParam;
+  voiceOption: VoiceOption;
   speechText: SpeechText;
 };
 
@@ -77,22 +83,22 @@ export type ProcessorProvider<T> = (arg: T) => TextProcessor;
 // Speaker
 // ====================
 
-export type SynthesisResult = {
-  stream: Readable;
-  type?: StreamType;
-};
-
-export interface Speaker<T extends SpeakerParam, U> {
-  synthesisSpeech: (query: U) => Promise<SynthesisResult>;
-
-  constructSynthesisQuery: (
-    speechText: SpeechText,
-    voiceParam: VoiceParamBind<T>,
-    pauseParam: PauseParam
-  ) => U;
-
-  checkIsActiveSynthesizer: () => Promise<boolean>;
-}
+// export type SynthesisResult = {
+//   stream: Readable;
+//   type?: StreamType;
+// };
+//
+// export interface Speaker<T extends SpeakerParam, U> {
+//   synthesisSpeech: (query: U) => Promise<SynthesisResult>;
+//
+//   constructSynthesisQuery: (
+//     speechText: SpeechText,
+//     voiceParam: VoiceParamBind<T>,
+//     pauseParam: PauseParam
+//   ) => U;
+//
+//   checkIsActiveSynthesizer: () => Promise<boolean>;
+// }
 
 // ====================
 // Config
@@ -100,7 +106,7 @@ export interface Speaker<T extends SpeakerParam, U> {
 
 export type GuildConfig = {
   commandPrefix: string;
-  voiceParam: VoiceParam;
+  voiceOption: VoiceOption;
   pauseParam: PauseParam;
   wordDictionary: WordDictionary;
   masterVolume: number;
@@ -123,7 +129,7 @@ export type WordItem = {
 };
 
 export type UserConfig = {
-  voiceParam: VoiceParam;
+  voiceOption: VoiceOption;
 };
 
 // ====================

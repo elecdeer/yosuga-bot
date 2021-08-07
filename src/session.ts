@@ -1,7 +1,6 @@
 import { SessionEmitter } from "./sessionEmitter";
 import { GuildMember, TextChannel } from "discord.js";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import { createSpeakerMap, SpeakerMap } from "./speaker/speakersBuilder";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { getLogger } from "log4js";
 import {
@@ -24,6 +23,8 @@ import {
   NoSubscriberBehavior,
   VoiceConnection,
 } from "@discordjs/voice";
+import { VoiceProvider } from "./speaker/voiceProvider";
+import { yosuga } from "./index";
 
 const logger = getLogger("session");
 
@@ -57,7 +58,10 @@ const handlerRegistrants: SessionEventHandlerRegistrant[] = [
 
 export class Session extends SessionEmitter {
   readonly connection: VoiceConnection;
-  protected readonly speakerMap: SpeakerMap;
+  // protected readonly speakerMap: SpeakerMap;
+
+  //TODO これまとめたさがある
+  protected voiceProvider: VoiceProvider;
   protected speechQueue: SpeechQueue;
   readonly player: AudioPlayer;
 
@@ -72,13 +76,14 @@ export class Session extends SessionEmitter {
     super(yosugaEmitter, voiceChannel, textChannel);
     this.connection = connection;
 
-    this.speakerMap = createSpeakerMap(this);
+    this.voiceProvider = new VoiceProvider(this, yosuga.speakersFactory());
+
     this.speechQueue = this.initializeQueue();
 
     this.player = createAudioPlayer({
       debug: true,
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause,
+        noSubscriber: NoSubscriberBehavior.Paue,
       },
     });
     connection.subscribe(this.player);
@@ -97,7 +102,7 @@ export class Session extends SessionEmitter {
 
   initializeQueue(): SpeechQueue {
     this.speechQueue?.kill();
-    this.speechQueue = createSpeechQueue(this, this.speakerMap);
+    this.speechQueue = createSpeechQueue(this);
     return this.speechQueue;
   }
 
@@ -116,13 +121,13 @@ export class Session extends SessionEmitter {
   ): void {
     // logger.debug("push speeech queue", param.Text);
 
-    logger.debug(this.speakerMap);
+    // logger.debug(this.speakerMap);
 
     //check状態のことを考えるべきかも
-    const voiceParam = getVoiceConfig(this.speakerMap, this.guild.id, userId);
-    logger.debug(voiceParam);
+    const voiceOption = getVoiceConfig(this.voiceProvider, this.guild.id, userId);
+    logger.debug(voiceOption);
 
-    if (!voiceParam) {
+    if (!voiceOption) {
       logger.warn("音声合成システムが無効です");
 
       const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
@@ -142,7 +147,7 @@ export class Session extends SessionEmitter {
 
     void this.speechQueue.push({
       speechText: fullParam,
-      voiceParam: voiceParam,
+      voiceOption: voiceOption,
     });
 
     this.lastPushedSpeech = {
@@ -174,6 +179,14 @@ export class Session extends SessionEmitter {
 
   getConfig(): Readonly<GuildConfigWithoutVoice> {
     return getGuildConfig(this.guild.id);
+  }
+
+  getGuildId(): `${bigint}` {
+    return this.guild.id;
+  }
+
+  getVoiceProvider(): Readonly<VoiceProvider> {
+    return this.voiceProvider;
   }
 
   getUsernamePronunciation(member: GuildMember | null): string {

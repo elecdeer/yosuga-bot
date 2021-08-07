@@ -1,9 +1,9 @@
 import FileSync from "lowdb/adapters/FileSync";
 import low from "lowdb";
-import { GuildConfig, UserConfig, VoiceParam } from "./types";
+import { GuildConfig, UserConfig, VoiceOption } from "./types";
 import { yosugaEnv } from "./environment";
-import { SpeakerMap } from "./speaker/speakersBuilder";
 import { getLogger } from "log4js";
+import { VoiceProvider } from "./speaker/voiceProvider";
 
 type GuildConfigRecord = Record<string, Partial<GuildConfig>> & { default: GuildConfig };
 type UserConfigRecord = Record<string, Partial<UserConfig>>;
@@ -12,11 +12,11 @@ const logger = getLogger("configManager");
 
 const guildConfigInitialDefault: GuildConfig = {
   commandPrefix: "yosuga",
-  voiceParam: {
-    intonation: 1,
-    pitch: 1,
-    speakerOption: {
-      speaker: "voiceroid",
+  voiceOption: {
+    speakerName: "yukari",
+    voiceParam: {
+      intonation: 1,
+      pitch: 1,
     },
   },
   pauseParam: {
@@ -77,34 +77,40 @@ export const getGuildConfig = (guildId: string): Readonly<GuildConfigWithoutVoic
 /**
  * guildIdとuserId、speakerMapから利用可能な読み上げ設定を取得
  * mergeは行わない
- * @param speakerMap
+ * @param voiceProvider
  * @param guildId
  * @param userId
  */
 export const getVoiceConfig = (
-  speakerMap: SpeakerMap,
+  voiceProvider: VoiceProvider,
   guildId: string,
   userId?: string
-): Readonly<VoiceParam> | null => {
+): Readonly<VoiceOption> | null => {
+  logger.debug(voiceProvider.speakerCollection);
+  const activeSpeakerCollection = voiceProvider.speakerCollection.filter(
+    (speaker) => speaker.status == "active"
+  );
+
   if (userId) {
-    const userConfig = userConfigData.get(userId).value()?.voiceParam;
+    const userConfig = userConfigData.get(userId).value()?.voiceOption;
     logger.debug("user", userConfigData.get(userId).value());
-    if (userConfig && speakerMap[userConfig.speakerOption.speaker].status === "active") {
+
+    if (userConfig && activeSpeakerCollection.has(userConfig.speakerName)) {
       return userConfig;
     }
   }
 
-  const guildConfig = guildConfigData.get(guildId).value()?.voiceParam;
+  const guildConfig = guildConfigData.get(guildId).value()?.voiceOption;
   logger.debug("guild", guildConfigData.get(guildId).value());
 
-  if (guildConfig && speakerMap[guildConfig.speakerOption.speaker].status === "active") {
+  if (guildConfig && activeSpeakerCollection.has(guildConfig.speakerName)) {
     return guildConfig;
   }
 
-  const defaultConfig = guildConfigData.get("default").value()?.voiceParam;
-  logger.debug("defalut", guildConfigData.get("default").value());
+  const defaultConfig = guildConfigData.get("default").value()?.voiceOption;
+  logger.debug("default", guildConfigData.get("default").value());
 
-  if (defaultConfig && speakerMap[defaultConfig.speakerOption.speaker].status === "active") {
+  if (defaultConfig && activeSpeakerCollection.has(defaultConfig.speakerName)) {
     return defaultConfig;
   }
 
