@@ -10,8 +10,6 @@ import {
 import * as util from "util";
 import { io } from "socket.io-client";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import ss from "@sap_oss/node-socketio-stream";
 import { Readable } from "stream";
 import axios from "axios";
@@ -113,7 +111,6 @@ export class AIVoiceSpeaker implements Speaker<AIVoiceParam, AIVoiceQuery> {
 
 const getAudioStreamFromSocket = () =>
   new Promise<Readable>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     ss(socket).once("sendStream", (stream: Readable) => {
       console.log("on sendStream");
       stream.on("data", (chunk) => {
