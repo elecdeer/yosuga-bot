@@ -1,5 +1,5 @@
 import { SessionEmitter } from "./sessionEmitter";
-import { GuildMember, TextChannel } from "discord.js";
+import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { getLogger } from "log4js";
@@ -181,7 +181,7 @@ export class Session extends SessionEmitter {
     return getGuildConfig(this.guild.id);
   }
 
-  getGuildId(): `${bigint}` {
+  getGuildId(): Snowflake {
     return this.guild.id;
   }
 
