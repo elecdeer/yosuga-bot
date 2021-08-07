@@ -1,7 +1,7 @@
 import { VoiceOrStageChannel } from "./types";
 import log4js from "log4js";
 import { Session } from "./session";
-import { Collection, TextChannel } from "discord.js";
+import { Collection, Snowflake, TextChannel } from "discord.js";
 import { VoiceConnection } from "@discordjs/voice";
 import { YosugaClient } from "./yosugaClient";
 import { yosuga } from "./index";
@@ -10,15 +10,15 @@ const logger = log4js.getLogger("sessionManager");
 
 export class SessionManager {
   protected yosuga: YosugaClient;
-  protected sessionCollection: Collection<string, Session>;
+  protected sessionCollection: Collection<Snowflake, Session>;
 
   constructor(yosuga: YosugaClient) {
     this.yosuga = yosuga;
 
-    this.sessionCollection = new Collection<string, Session>();
+    this.sessionCollection = new Collection<Snowflake, Session>();
   }
 
-  getSession(voiceChannelId: string): Session | null {
+  getSession(voiceChannelId: Snowflake): Session | null {
     return this.sessionCollection.get(voiceChannelId) ?? null;
   }
 

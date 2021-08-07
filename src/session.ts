@@ -30,7 +30,7 @@ const logger = getLogger("session");
 
 type SpeechRecordAuthorMember = {
   type: "member";
-  memberId: string;
+  memberId: Snowflake;
 };
 type SpeechRecordAuthorSystem = {
   type: "yosuga";
@@ -116,7 +116,7 @@ export class Session extends SessionEmitter {
 
   pushSpeech(
     param: PartiallyPartial<SpeechText, "speed" | "volume">,
-    userId?: string,
+    userId?: Snowflake,
     timestamp?: number
   ): void {
     // logger.debug("push speeech queue", param.Text);

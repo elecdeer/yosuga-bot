@@ -4,6 +4,7 @@ import { GuildConfig, UserConfig, VoiceOption } from "./types";
 import { yosugaEnv } from "./environment";
 import { getLogger } from "log4js";
 import { VoiceProvider } from "./speaker/voiceProvider";
+import { Snowflake } from "discord.js";
 
 type GuildConfigRecord = Record<string, Partial<GuildConfig>> & { default: GuildConfig };
 type UserConfigRecord = Record<string, Partial<UserConfig>>;
@@ -66,11 +67,11 @@ void reloadConfigData().catch((err) => {
  * guildIdから各guildの設定を取得
  * @param guildId
  */
-export const getGuildConfig = (guildId: string): Readonly<GuildConfigWithoutVoice> => {
+export const getGuildConfig = (guildId: Snowflake): Readonly<GuildConfigWithoutVoice> => {
   return {
     ...guildConfigInitialDefault,
     ...guildConfigData.get("default").value(),
-    ...guildConfigData.get(guildId).value(),
+    ...guildConfigData.get(guildId).value()
   };
 };
 
@@ -83,8 +84,8 @@ export const getGuildConfig = (guildId: string): Readonly<GuildConfigWithoutVoic
  */
 export const getVoiceConfig = (
   voiceProvider: VoiceProvider,
-  guildId: string,
-  userId?: string
+  guildId: Snowflake,
+  userId?: Snowflake
 ): Readonly<VoiceOption> | null => {
   logger.debug(voiceProvider.speakerCollection);
   const activeSpeakerCollection = voiceProvider.speakerCollection.filter(

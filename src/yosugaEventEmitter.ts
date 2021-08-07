@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { Client, GuildMember, Message, TextChannel } from "discord.js";
+import { Client, GuildMember, Message, Snowflake, TextChannel } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import log4js from "log4js";
@@ -11,17 +11,17 @@ const logger = log4js.getLogger("yosugaEvent");
 
 interface Events {
   command: (cmd: string, args: string[], context: CommandContext) => Promise<void>;
-  message: (guildId: string, message: Message) => void;
+  message: (guildId: Snowflake, message: Message) => void;
   moveChannel: (
-    guildId: string,
+    guildId: Snowflake,
     member: GuildMember,
     from: VoiceOrStageChannel | null,
     to: VoiceOrStageChannel | null
   ) => void;
-  turnOnVideo: (guildId: string, member: GuildMember) => void;
-  turnOffVideo: (guildId: string, member: GuildMember) => void;
-  turnOnGoLive: (guildId: string, member: GuildMember) => void;
-  turnOffGoLive: (guildId: string, member: GuildMember) => void;
+  turnOnVideo: (guildId: Snowflake, member: GuildMember) => void;
+  turnOffVideo: (guildId: Snowflake, member: GuildMember) => void;
+  turnOnGoLive: (guildId: Snowflake, member: GuildMember) => void;
+  turnOffGoLive: (guildId: Snowflake, member: GuildMember) => void;
   destroy: () => void;
 }
 
