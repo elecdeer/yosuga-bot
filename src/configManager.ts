@@ -71,7 +71,7 @@ export const getGuildConfig = (guildId: Snowflake): Readonly<GuildConfigWithoutV
   return {
     ...guildConfigInitialDefault,
     ...guildConfigData.get("default").value(),
-    ...guildConfigData.get(guildId).value()
+    ...guildConfigData.get(guildId).value(),
   };
 };
 
