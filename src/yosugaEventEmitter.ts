@@ -7,8 +7,6 @@ import { getGuildConfig } from "./configManager";
 import { CommandContext, VoiceOrStageChannel } from "./types";
 import { yosuga } from "./index";
 
-//TODO yosugaEventEmitterはeventEmitterBaseに改名して、indexでやってるassignCommandsとかをコンストラクタでやるように
-
 const logger = log4js.getLogger("yosugaEvent");
 
 interface Events {

@@ -8,7 +8,7 @@ export abstract class Speaker<T = unknown> {
   protected session: Session;
   status: SpeakerState = "checking";
 
-  constructor(session: Session) {
+  protected constructor(session: Session) {
     this.session = session;
   }
 
