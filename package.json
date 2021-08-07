@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "devDependencies": {
     "@types/async": "^3.2.7",
