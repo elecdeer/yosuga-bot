@@ -5,6 +5,8 @@ declare module "@sap_oss/node-socketio-stream" {
   import { Duplex, DuplexOptions, Readable, ReadableOptions } from "stream";
   import { EventEmitter } from "events";
 
+  export default lookup;
+
   declare function lookup(sio: SIOSocket, options?: StreamSocketOption): Socket;
 
   export declare function createStream(options?: IOStreamConstructor): IOStream;
@@ -13,8 +15,6 @@ declare module "@sap_oss/node-socketio-stream" {
     blob: Blob,
     option?: BlobReadStreamOption
   ): BlobReadStream;
-
-  export = lookup;
 
   interface StreamSocketOption {
     forceBase64: boolean;
