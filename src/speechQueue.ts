@@ -1,41 +1,27 @@
-import { SpeechTask, VoiceParamBind } from "./types";
+import { SpeechTask } from "./types";
 import { getLogger } from "log4js";
-import { getGuildConfig } from "./configManager";
 import async from "async";
-import { SpeakerMap } from "./speaker/speakersBuilder";
-import { AudioPlayerStatus, createAudioResource, entersState } from "@discordjs/voice";
+import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import { Session } from "./session";
 
 const logger = getLogger("speechQueue");
 
 export type SpeechQueue = async.QueueObject<SpeechTask>;
-export const createSpeechQueue = (session: Session, speakerMap: SpeakerMap): SpeechQueue => {
+export const createSpeechQueue = (session: Session): SpeechQueue => {
   const worker = async (task: SpeechTask): Promise<void> => {
-    const guildId = session.getVoiceChannel().guild.id;
-    const config = getGuildConfig(guildId);
+    const config = session.getConfig();
 
-    const speakerValue = speakerMap[task.voiceParam.speakerOption.speaker];
-    if (speakerValue.status !== "active") {
+    const voiceProvider = session.getVoiceProvider();
+
+    const resource = await voiceProvider
+      .synthesis(task.speechText, task.voiceOption, config.pauseParam)
+      .catch((err) => {
+        logger.error(err);
+      });
+    if (!resource) {
+      logger.debug("synthesis failed");
       return;
     }
-
-    //敗北のany
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const voiceParam: VoiceParamBind<any> = task.voiceParam;
-
-    const query = speakerValue.speaker.constructSynthesisQuery(
-      task.speechText,
-      voiceParam,
-      config.pauseParam
-    );
-
-    logger.debug("query", query);
-
-    const result = await speakerValue.speaker.synthesisSpeech(query);
-
-    const resource = createAudioResource(result.stream, {
-      inputType: result.type,
-    });
 
     const player = session.player;
     player.play(resource);
