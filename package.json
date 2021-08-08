@@ -52,7 +52,6 @@
     "dotenv": "^10.0.0",
     "emoji-regex": "^9.2.2",
     "encoding-japanese": "^1.0.30",
-    "erlpack": "github:discord/erlpack",
     "ffmpeg-static": "^4.4.0",
     "http-status": "^1.5.0",
     "libsodium-wrappers": "^0.7.9",
