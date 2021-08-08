@@ -3,12 +3,7 @@ import { createEmbedBase } from "../util";
 import { CommandContext, VoiceOrStageChannel } from "../types";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
-import {
-  DiscordGatewayAdapterCreator,
-  entersState,
-  joinVoiceChannel,
-  VoiceConnectionStatus,
-} from "@discordjs/voice";
+import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 import { yosuga } from "../index";
 
 const commandLogger = log4js.getLogger("command");
@@ -66,14 +61,10 @@ export class StartCommand extends CommandBase {
 }
 
 const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
-  //一時的なやつ
-  //https://github.com/discordjs/voice/issues/166
-  const adapter = voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
-
   const connection = joinVoiceChannel({
     guildId: voiceChannel.guild.id,
     channelId: voiceChannel.id,
-    adapterCreator: adapter,
+    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
     selfMute: false,
   });
 
