@@ -16,7 +16,7 @@ jobs:
 
       - name: write version file
         shell: bash
-        run: echo $GITHUB_SHA > .commitHash
+        run: echo "$GITHUB_SHA" > .commitHash
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
