@@ -14,17 +14,9 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: ls1
+      - name: write imageenv file
         shell: bash
-        run: ls -R
-
-      - name: write version file
-        shell: bash
-        run: echo "${{ github.sha }}" > commithash
-
-      - name: ls2
-        shell: bash
-        run: ls -R
+        run: echo -e "COMMIT_ID=${{ github.sha }}\n" > .imageenv
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
