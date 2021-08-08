@@ -8,7 +8,6 @@ COPY tsconfig.json ./
 RUN apk add --no-cache --virtual .gyp python3 make g++ \
     && npm ci \
     && apk del .gyp
-#RUN npm ci
 
 COPY src src
 COPY .commithash ./
