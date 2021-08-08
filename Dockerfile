@@ -5,7 +5,10 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-RUN npm ci
+RUN apk add --no-cache --virtual .gyp python make g++ \
+    && npm ci \
+    && apk del .gyp
+#RUN npm ci
 
 COPY src src
 
