@@ -20,7 +20,7 @@ jobs:
 
       - name: write version file
         shell: bash
-        run: echo "${{ github.sha }}" > .commithash
+        run: echo "${{ github.sha }}" > commithash
 
       - name: ls2
         shell: bash
