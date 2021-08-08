@@ -21,7 +21,8 @@ export class StartCommand extends CommandBase {
     const { session, textChannel, guild, user } = context;
     commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
     if (context.type === "interaction") {
-      void context.interaction.defer();
+      await context.interaction.deferReply();
+      // await context.interaction.defer();
     }
 
     const voiceChannel = user.voice.channel;
