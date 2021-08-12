@@ -1,9 +1,7 @@
 name: Build and Publish Docker
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   build_and_push:
@@ -22,7 +20,7 @@ jobs:
             "commitId": "${{github.sha}}",
             "ref": "${{github.ref}}",
             "imageName": "${{ env.IMAGE_NAME }}",
-            "trigger": "master"
+            "trigger": "manual"
           }
       #          echo -e "COMMIT_ID=${{ github.sha }}\n" > .imageenv
       - name: Set up Docker Buildx
@@ -41,5 +39,4 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha　}}
