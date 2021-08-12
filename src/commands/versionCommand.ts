@@ -16,7 +16,7 @@ export class VersionCommand extends CommandBase {
     });
   }
 
-  async execute(args: string[], context: CommandContext): Promise<MessageEmbed>{
+  async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
     commandLogger.debug("handleVersion");
 
     const revision = imageEnv.commitId;
