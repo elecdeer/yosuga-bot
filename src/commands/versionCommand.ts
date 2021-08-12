@@ -1,9 +1,9 @@
 import log4js from "log4js";
 import { createEmbedBase } from "../util";
 import { CommandContext } from "../types";
-import { exec } from "child_process";
 import { CommandBase } from "./commandBase";
 import { MessageEmbed } from "discord.js";
+import { imageEnv } from "../environment";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -19,19 +19,9 @@ export class VersionCommand extends CommandBase {
   async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
     commandLogger.debug("handleVersion");
 
-    const result = await execPromise("cat /etc/hostname").catch((err) => "");
-    commandLogger.debug(`result: ${result}`);
+    const revision = imageEnv.commitId;
+    commandLogger.debug(`version: ${revision}`);
 
-    return createEmbedBase().setDescription(`version: ${result}`);
+    return createEmbedBase().setDescription(`rev: ${revision}`);
   }
 }
-
-const execPromise = (cmd: string): Promise<string> =>
-  new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        reject(stdout + stderr);
-      }
-      resolve(stdout);
-    });
-  });

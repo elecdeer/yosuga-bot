@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import * as fs from "fs";
 
 config();
 
@@ -13,6 +14,13 @@ export type YosugaEnv = {
   assistantSeikaBasicUser?: string;
   assistantSeikaBasicPassword?: string;
   socketIOAudioRecorderWSUrl: string;
+};
+
+export type ImageEnv = {
+  commitId: string;
+  ref: string;
+  imageName: string;
+  trigger: string;
 };
 
 const initEnv = (): YosugaEnv => {
@@ -66,3 +74,28 @@ const initEnv = (): YosugaEnv => {
 };
 
 export const yosugaEnv: Readonly<YosugaEnv> = initEnv();
+
+const initImageEnv = (): ImageEnv => {
+  try {
+    const readResult = fs.readFileSync("./imageenv.json");
+    const env = JSON.parse(readResult.toString()) as ImageEnv;
+    const empty = {
+      imageName: "",
+      ref: "",
+      trigger: "",
+      commitId: "",
+    };
+    return {
+      ...empty,
+      ...env,
+    };
+  } catch (e) {
+    return {
+      commitId: "",
+      ref: "",
+      imageName: "",
+      trigger: "",
+    };
+  }
+};
+export const imageEnv: Readonly<ImageEnv> = initImageEnv();
