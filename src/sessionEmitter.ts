@@ -53,21 +53,25 @@ export class SessionEmitter extends (EventEmitter as { new (): SessionStrictEmit
 
     globalEmitter.on("turnOnVideo", (guildId, member) => {
       if (guildId !== this.guild.id) return;
+      if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOnVideo", member);
     });
 
     globalEmitter.on("turnOffVideo", (guildId, member) => {
       if (guildId !== this.guild.id) return;
+      if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOffVideo", member);
     });
 
     globalEmitter.on("turnOnGoLive", (guildId, member) => {
       if (guildId !== this.guild.id) return;
+      if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOnGoLive", member);
     });
 
     globalEmitter.on("turnOffGoLive", (guildId, member) => {
       if (guildId !== this.guild.id) return;
+      if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOffGoLive", member);
     });
   }
