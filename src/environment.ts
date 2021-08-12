@@ -78,7 +78,17 @@ export const yosugaEnv: Readonly<YosugaEnv> = initEnv();
 const initImageEnv = (): ImageEnv => {
   try {
     const readResult = fs.readFileSync("./imageenv.json");
-    return JSON.parse(readResult.toString()) as ImageEnv;
+    const env = JSON.parse(readResult.toString()) as ImageEnv;
+    const empty = {
+      imageName: "",
+      ref: "",
+      trigger: "",
+      commitId: "",
+    };
+    return {
+      ...empty,
+      ...env,
+    };
   } catch (e) {
     return {
       commitId: "",
