@@ -16,8 +16,14 @@ jobs:
 
       - name: write imageenv file
         shell: bash
-        run: echo -e "COMMIT_ID=${{ github.sha }}\n" > .imageenv
-
+        run: |
+          cat << EOS > imageenv.json
+          {
+            "commitId": "${{github.sha}}",
+            "ref": "${{github.ref}}",
+            "imageName": "${{ env.IMAGE_NAME }}"
+          }
+      #          echo -e "COMMIT_ID=${{ github.sha }}\n" > .imageenv
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
