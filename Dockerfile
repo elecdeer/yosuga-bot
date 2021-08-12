@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual .gyp python3 make g++ \
     && apk del .gyp
 
 COPY src src
-COPY .imageenv ./
+COPY imageenv.json ./
 
 RUN npm run build
 
