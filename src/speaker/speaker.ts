@@ -2,14 +2,22 @@ import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource } from "@discordjs/voice";
 import { Session } from "../session";
 
-type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
+export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 
 export abstract class Speaker<T = unknown> {
-  protected session: Session;
+  protected readonly session: Session;
+
+  readonly engineType: string;
   status: SpeakerState = "checking";
 
-  protected constructor(session: Session) {
+  protected constructor(session: Session, engineType: string) {
     this.session = session;
+    this.engineType = engineType;
+  }
+
+  async initialize(): Promise<Speaker<T>> {
+    this.status = await this.checkInitialActiveness();
+    return this;
   }
 
   abstract synthesis(
@@ -18,5 +26,5 @@ export abstract class Speaker<T = unknown> {
     pauseParam: PauseParam
   ): Promise<AudioResource>;
 
-  abstract checkInitialActiveness(): Promise<void>;
+  protected abstract checkInitialActiveness(): Promise<SpeakerState>;
 }

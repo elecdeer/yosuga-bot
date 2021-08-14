@@ -1,5 +1,3 @@
-// import {IOStream} from "@sap_oss/node-socketio-stream/lib"
-
 declare module "@sap_oss/node-socketio-stream" {
   import { Socket as SIOSocket } from "socket.io-client";
   import { Duplex, DuplexOptions, Readable, ReadableOptions } from "stream";
@@ -20,7 +18,7 @@ declare module "@sap_oss/node-socketio-stream" {
     forceBase64: boolean;
   }
 
-  declare class Socket extends EventEmitter {
+  export declare class Socket extends EventEmitter {
     constructor(sio: SIOSocket, options?: StreamSocketOption);
   }
 
@@ -28,7 +26,7 @@ declare module "@sap_oss/node-socketio-stream" {
     allowHalfOpen: boolean;
   }
 
-  declare class IOStream extends Duplex {
+  export declare class IOStream extends Duplex {
     constructor(option?: IOStreamOption);
   }
 
@@ -36,7 +34,7 @@ declare module "@sap_oss/node-socketio-stream" {
     synchronous: boolean;
   }
 
-  declare class BlobReadStreamOption extends Readable {
+  export declare class BlobReadStreamOption extends Readable {
     constructor(option?: BlobReadStreamOption);
   }
 }
