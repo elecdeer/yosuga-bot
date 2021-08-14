@@ -72,7 +72,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
     try {
       await axios({
         method: "GET",
-        url: this.checkrl,
+        url: this.checkUrl,
       });
 
       logger.debug(`${this.urlBase} active`);
