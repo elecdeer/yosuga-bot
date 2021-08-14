@@ -5,9 +5,6 @@ import { Session } from "../session";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import axios from "axios";
 import { getLogger } from "log4js";
-
-// import { opus } from "prism-media";
-// import Encoder = opus.Encoder;
 import { opus } from "prism-media";
 import { Readable } from "stream";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
@@ -34,15 +31,12 @@ export class TtsControllerSpeaker extends Speaker {
   }
 
   override async checkInitialActiveness(): Promise<SpeakerState> {
-    //TODO これだと複数のTtsControllerSpeakerが存在した場合、同時にチェックしようとしてコンフリクトする
-
     if (!ttsControllerOccupier.canUse(this.session)) {
       return "inactive";
     }
 
     logger.debug("checkInitialActiveness");
 
-    // return "active";
     const stream = await this.synthesisStream(
       {
         text: "テスト",
@@ -80,20 +74,11 @@ export class TtsControllerSpeaker extends Speaker {
   ): Promise<AudioResource> {
     const stream = await this.synthesisStream(speechText, voiceParam, pauseParam);
 
-    const resource = createAudioResource(stream, {
+    return createAudioResource(stream, {
       inputType: StreamType.Opus,
       silencePaddingFrames: 0,
       inlineVolume: false,
     });
-
-    // stream.on("data", (chunk) => {
-    //   logger.debug(chunk);
-    // });
-    // stream.on("finish", () => {
-    //   logger.debug("stream finish");
-    // });
-
-    return resource;
   }
 
   protected async synthesisStream(
