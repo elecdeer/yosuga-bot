@@ -25,7 +25,7 @@ export class CommandManager {
       void command.execute(args, context).then((resEmbed) => {
         if (context.type === "interaction") {
           if (context.interaction.deferred) {
-            void context.interaction.editReply({ embeds: [resEmbed] });
+            void context.interaction.followUp({ embeds: [resEmbed] });
           } else {
             void context.interaction.reply({ embeds: [resEmbed] });
           }
