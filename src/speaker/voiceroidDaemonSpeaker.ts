@@ -1,4 +1,4 @@
-import { Speaker } from "./speaker";
+import { Speaker, SpeakerState } from "./speaker";
 import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
@@ -29,15 +29,13 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
   private speechTextUrl: string;
 
   constructor(session: Session, urlBase: string) {
-    super(session);
+    super(session, "voiceroidDaemon");
     this.urlBase = urlBase;
     this.checkUrl = `${urlBase}/`;
     this.speechTextUrl = `${urlBase}/api/speechtext`;
-
-    void this.checkInitialActiveness();
   }
 
-  async synthesis(
+  override async synthesis(
     speechText: SpeechText,
     voiceParam: VoiceParam<void>,
     pauseParam: PauseParam
@@ -68,24 +66,21 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
     throw Error("Failed to Synthesis");
   }
 
-  checkInitialActiveness(): Promise<void> {
+  override async checkInitialActiveness(): Promise<SpeakerState> {
     logger.debug("checkInitialActiveness");
-    return new Promise<void>((resolve) => {
-      axios({
+
+    try {
+      await axios({
         method: "GET",
         url: this.checkUrl,
-      })
-        .then(() => {
-          logger.debug(`${this.urlBase} active`);
-          this.status = "active";
-          resolve();
-        })
-        .catch((err) => {
-          logger.debug(`${this.urlBase} inactive`);
-          logger.debug(err);
-          this.status = "inactive";
-          resolve();
-        });
-    });
+      });
+
+      logger.debug(`${this.urlBase} active`);
+      return "active";
+    } catch (error) {
+      logger.debug(`${this.urlBase} inactive`);
+      logger.debug(error);
+      return "inactive";
+    }
   }
 }

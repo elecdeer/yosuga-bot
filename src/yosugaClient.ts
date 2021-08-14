@@ -14,6 +14,8 @@ import { ReloadCommand } from "./commands/reloadCommand";
 import { Speaker } from "./speaker/speaker";
 import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 import { Session } from "./session";
+import { TtsControllerSpeaker } from "./speaker/ttsControllerSpeaker";
+import { allSerial } from "./util";
 
 const logger = getLogger("yosugaClient");
 
@@ -73,6 +75,23 @@ export class YosugaClient extends YosugaEventEmitter {
     if (yosugaEnv.voiceroidDaemonUrl) {
       collection.set("yukari", new VoiceroidDaemonSpeaker(session, yosugaEnv.voiceroidDaemonUrl));
     }
+
+    //test
+    collection.set(
+      "akane",
+      new TtsControllerSpeaker(session, {
+        urlBase: "http://192.168.0.14:1000",
+        outputDevice: "CABLE Input",
+        voiceName: "琴葉 茜",
+        wsUrl: "http://192.168.0.14443",
+      })
+    );
+
+    const daemonSpeakers = collection.filter((speaker) => speaker.engineType === "voiceroidDaemon");
+    void Promise.all(daemonSpeakers.map((speaker) => speaker.initialize()));
+
+    const ttsSpeakers = collection.filter((speaker) => speaker.engineType === "ttsController");
+    void allSerial(ttsSpeakers.map((speaker) => () => speaker.initialize()));
 
     return collection;
   }
