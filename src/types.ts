@@ -1,5 +1,5 @@
 import {
-  ApplicationCommandData,
+  ChatInputApplicationCommandData,
   CommandInteraction,
   Guild,
   GuildMember,
@@ -148,10 +148,10 @@ export type CommandExecutor = (
   context: CommandContext
 ) => Promise<MessageEmbed>;
 
-export interface CommandData extends ApplicationCommandData {
+export type CommandData = ChatInputApplicationCommandData & {
   alias?: string[];
   // execute: CommandExecutor;
-}
+};
 
 export type CommandContextBase = {
   session: Session | null;
