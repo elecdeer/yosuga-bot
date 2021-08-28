@@ -55,7 +55,7 @@ export class HelpCommand extends CommandBase {
 
         return {
           name: name,
-          value: command.data.descriptio,
+          value: command.data.description,
         };
       })
     );
