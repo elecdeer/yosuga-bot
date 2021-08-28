@@ -1,10 +1,11 @@
 import log4js from "log4js";
-import { createEmbedBase } from "../util";
-import { CommandContext, VoiceOrStageChannel } from "../types";
+import { VoiceOrStageChannel } from "../types";
 import { CommandBase } from "./commandBase";
-import { MessageEmbed } from "discord.js";
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 import { yosuga } from "../index";
+import { CommandContext } from "../commandContext";
+import { CommandPermission } from "../PermissionUtil";
+import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -12,36 +13,58 @@ export class StartCommand extends CommandBase {
   constructor() {
     super({
       name: "start",
-      alias: ["s"],
       description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
+      permission: CommandPermission.Everyone,
+      messageCommand: {
+        alias: ["s"],
+      },
+      interactionCommand: {},
     });
   }
 
-  async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
-    const { session, textChannel, guild, user } = context;
-    commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
-    if (context.type === "interaction") {
-      await context.interaction.deferReply();
-      // await context.interaction.defer();
-    }
+  async execute(context: CommandContext): Promise<void> {
+    const { session, textChannel, guild, member } = context;
 
-    const voiceChannel = user.voice.channel;
+    commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
+
+    const voiceChannel = member.voice.channel;
+
     if (voiceChannel) {
+      if (!hasBotPermission(textChannel, voiceChannel)) {
+        await context.reply("error", "チャンネルに参加する権限がBotにありません.");
+        return;
+      }
+
       if (session) {
         //既に接続済み
-        if (session.getTextChannel().id === textChannel.id) {
+        if (
+          session.getTextChannel().id === textChannel.id &&
+          session.getVoiceChannel().id === voiceChannel.id
+        ) {
           //同じテキストルーム
-          return createEmbedBase().setDescription("接続済みです");
+          await context.reply("warn", "接続済みです.");
         } else {
           //別テキストルーム
 
-          const embed = createEmbedBase().setDescription(
-            `読み上げチャンネルが${textChannel.name}に変更されました`
-          );
-          await session.getTextChannel().send({ embeds: [embed] });
+          //TODO 確認処理
 
-          session.changeTextChannel(textChannel);
-          return createEmbedBase().setDescription(`接続しました!`);
+          const oldTextChannel = session.getTextChannel();
+
+          const contents: string[] = [];
+          if (session.getTextChannel().id !== textChannel.id) {
+            contents.push(`読み上げチャンネルが${textChannel.name}に変更されました.`);
+
+            session.changeTextChannel(textChannel);
+          }
+          if (session.getVoiceChannel().id !== voiceChannel.id) {
+            contents.push(`接続チャンネルが${voiceChannel.name}に変更されました.`);
+
+            const connection = await connectToChannel(voiceChannel);
+            session.changeVoiceChannel(voiceChannel, connection);
+          }
+
+          await context.reply("plain", contents.join("\n"), oldTextChannel);
+          await context.reply("plain", `接続しました!`);
         }
       } else {
         try {
@@ -49,13 +72,13 @@ export class StartCommand extends CommandBase {
 
           const connection = await connectToChannel(voiceChannel);
           sessionManager.startSession(connection, textChannel, voiceChannel);
-          return createEmbedBase().setDescription("接続しました！");
+          await context.reply("plain", `接続しました!`);
         } catch (error) {
-          return createEmbedBase().setDescription("接続エラーが発生しました.");
+          await context.reply("error", "接続エラーが発生しました.");
         }
       }
     } else {
-      return createEmbedBase().setDescription("先にボイスチャンネルに入る必要があります.");
+      await context.reply("warn", "先にボイスチャンネルに入る必要があります.");
     }
   }
 }
@@ -73,6 +96,20 @@ const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
     return connection;
   } catch (error) {
     connection.destroy();
+    commandLogger.error(error);
     throw error;
   }
+};
+
+const hasBotPermission = (textChannel: TextChannel, voiceChannel: VoiceChannel | StageChannel) => {
+  const me = textChannel.guild.me!;
+  const tcPermission = me.permissionsIn(textChannel);
+  const vcPermission = me.permissionsIn(voiceChannel);
+
+  return (
+    tcPermission.has("VIEW_CHANNEL") &&
+    tcPermission.has("SEND_MESSAGES") &&
+    vcPermission.has("CONNECT") &&
+    vcPermission.has("SPEAK")
+  );
 };

@@ -13,7 +13,7 @@ export class VoiceProvider {
     this.speakerCollection = speakerCollection;
   }
 
-  synthesis(
+  async synthesis(
     speechText: SpeechText,
     voiceOption: VoiceOption,
     pauseParam: PauseParam
@@ -24,6 +24,10 @@ export class VoiceProvider {
 
     const speaker = activeSpeakerCollection.get(voiceOption.speakerName);
     if (!speaker) throw new Error("使用できない話者名が指定されています");
-    return speaker.synthesis(speechText, voiceOption.voiceParam, pauseParam);
+    const result = await speaker.synthesis(speechText, voiceOption.voiceParam, pauseParam);
+    if (!result) {
+      throw new Error("合成に失敗");
+    }
+    return result;
   }
 }

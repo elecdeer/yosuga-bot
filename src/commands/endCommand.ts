@@ -1,8 +1,7 @@
 import log4js from "log4js";
-import { createEmbedBase } from "../util";
-import { CommandContext } from "../types";
 import { CommandBase } from "./commandBase";
-import { MessageEmbed } from "discord.js";
+import { CommandContext } from "../commandContext";
+import { CommandPermission } from "../PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -10,16 +9,23 @@ export class EndCommand extends CommandBase {
   constructor() {
     super({
       name: "end",
-      alias: ["e"],
       description: "ボイスチャンネルから退出し,読み上げを終了する.",
+      permission: CommandPermission.Everyone,
+      messageCommand: {
+        alias: ["e"],
+      },
+      interactionCommand: {},
     });
   }
 
-  async execute(args: string[], { session }: CommandContext): Promise<MessageEmbed> {
-    if (!session?.connection) return createEmbedBase().setDescription("未接続です.");
+  async execute(context: CommandContext): Promise<void> {
+    if (!context.session?.connection) {
+      await context.reply("warn", "未接続です.");
+      return;
+    }
 
-    session.disconnect();
+    context.session.disconnect();
 
-    return createEmbedBase().setDescription("退出しました.");
+    await context.reply("plain", "退出しました.");
   }
 }

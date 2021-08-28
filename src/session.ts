@@ -10,7 +10,7 @@ import {
   VoiceOrStageChannel,
 } from "./types";
 import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
-import { createEmbedBase } from "./util";
+import { createYosugaEmbed } from "./util";
 import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
 import { registerMessageHandler } from "./sessionHandler/message";
 import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
@@ -57,7 +57,7 @@ const handlerRegistrants: SessionEventHandlerRegistrant[] = [
 ];
 
 export class Session extends SessionEmitter {
-  readonly connection: VoiceConnection;
+  connection: VoiceConnection;
   // protected readonly speakerMap: SpeakerMap;
 
   //TODO これまとめたさがある
@@ -130,7 +130,7 @@ export class Session extends SessionEmitter {
     if (!voiceOption) {
       logger.warn("音声合成システムが無効です");
 
-      const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
+      const embed = createYosugaEmbed().setDescription("⚠ 音声合成システムが無効となっています");
       void this.textChannel.send({ embeds: [embed] });
       return;
     }
@@ -169,6 +169,11 @@ export class Session extends SessionEmitter {
     this.textChannel = textChannel;
   }
 
+  changeVoiceChannel(voiceChannel: VoiceOrStageChannel, connection: VoiceConnection): void {
+    this.voiceChannel = voiceChannel;
+    this.connection = connection;
+  }
+
   getTextChannel(): Readonly<TextChannel> {
     return this.textChannel;
   }
@@ -187,6 +192,10 @@ export class Session extends SessionEmitter {
 
   getVoiceProvider(): Readonly<VoiceProvider> {
     return this.voiceProvider;
+  }
+
+  getYosugaUserId(): Snowflake {
+    return this.guild.me!.id;
   }
 
   getUsernamePronunciation(member: GuildMember | null): string {

@@ -50,7 +50,13 @@ export class TtsControllerSpeaker extends Speaker {
       this.session.getConfig().pauseParam
     );
 
-    const timeout: Promise<SpeakerState> = wait(3000).then(() => "inactive");
+    if (!stream) {
+      return "inactive";
+    }
+
+    const timeout: Promise<SpeakerState> = wait(3000).then(() => {
+      return "inactive";
+    });
 
     const active: Promise<SpeakerState> = new Promise((resolve) => {
       stream.once("data", (chunk) => {
@@ -71,8 +77,10 @@ export class TtsControllerSpeaker extends Speaker {
     speechText: SpeechText,
     voiceParam: VoiceParam<unknown>,
     pauseParam: PauseParam
-  ): Promise<AudioResource> {
+  ): Promise<AudioResource | null> {
     const stream = await this.synthesisStream(speechText, voiceParam, pauseParam);
+
+    if (!stream) return null;
 
     return createAudioResource(stream, {
       inputType: StreamType.Opus,
@@ -85,7 +93,7 @@ export class TtsControllerSpeaker extends Speaker {
     speechText: SpeechText,
     voiceParam: VoiceParam<unknown>,
     pauseParam: PauseParam
-  ): Promise<Readable> {
+  ): Promise<Readable | null> {
     logger.debug(this.config);
 
     const urlParams = new URLSearchParams();
@@ -102,13 +110,17 @@ export class TtsControllerSpeaker extends Speaker {
 
     const start = () => axios.get(url);
 
-    const stream = await this.recorder.recordAudioStream(start);
-    return stream.pipe(
-      new opus.Encoder({
-        channels: 1,
-        rate: 48000,
-        frameSize: 960,
-      })
-    );
+    try {
+      const stream = await this.recorder.recordAudioStream(start);
+      return stream.pipe(
+        new opus.Encoder({
+          channels: 1,
+          rate: 48000,
+          frameSize: 960,
+        })
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

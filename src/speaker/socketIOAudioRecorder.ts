@@ -30,7 +30,7 @@ export class SIOAudioRecorder {
     //streamが来始めたらResolveされる
     return new Promise<Readable>((resolve, reject) => {
       const timeoutTimer = setTimeout(() => {
-        reject("timeout");
+        reject(new Error("receiveStream timeout"));
       }, 3000);
 
       this.socketStream.once("sendStream", (stream: Readable) => {

@@ -31,8 +31,8 @@ export const client: Client = new Discord.Client({
 export const yosuga = new YosugaClient(client);
 yosuga.initClient();
 
-process.on("exit", () => {
-  logger.info("Exit...");
+process.on("exit", (code) => {
+  logger.info(`Exit... ${code}`);
   log4js.shutdown();
   client.destroy();
   logger.info("Destroy");
