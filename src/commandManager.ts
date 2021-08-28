@@ -22,14 +22,14 @@ export class CommandManager {
       commandLogger.debug(`cmd: ${cmd}`);
 
       //うーん
-      void (async() => {
+      void (async () => {
         const command = this.getCommand(cmd);
-        if(!command){
+        if (!command) {
           await context.reply("warn", "不明なコマンドです");
           return;
         }
 
-        if((await fetchPermission(context.member)) < command.data.permission){
+        if ((await fetchPermission(context.member)) < command.data.permission) {
           await context.reply("prohibit", "このコマンドを実行する権限がありません.");
           return;
         }
@@ -63,9 +63,9 @@ export class CommandManager {
     commandLogger.debug(`assignCommand: ${command.data.name} [${command.getTriggers()}]`);
     this.commandCollection.set(command.data.name, command);
 
-    if(command.isMessageCommand()){
+    if (command.isMessageCommand()) {
       command.getTriggers().forEach((trigger) => {
-        if(this.commandTriggerCollection.has(trigger)){
+        if (this.commandTriggerCollection.has(trigger)) {
           throw new Error(`コマンド名が重複しています: ${trigger}`);
         }
         this.commandTriggerCollection.set(trigger, command);
@@ -73,11 +73,11 @@ export class CommandManager {
     }
   }
 
-  async registerSlashCommands(guild?: Guild): Promise<void>{
+  async registerSlashCommands(guild?: Guild): Promise<void> {
     commandLogger.debug("registerSlashCommands");
 
     const application = this.yosuga.client.application;
-    if(!application){
+    if (!application) {
       commandLogger.warn("application undefined");
       return;
     }
@@ -93,11 +93,11 @@ export class CommandManager {
       commandLogger.debug(cmd);
     });
 
-    if(guild){
+    if (guild) {
       const appCommands = await application.commands.set(registerCommands, guild.id);
 
       await this.registerGuildPermission(guild, appCommands);
-    }else{
+    } else {
       const appCommands = await application.commands.set(registerCommands);
 
       const guildManager = this.yosuga.client.guilds;
@@ -112,7 +112,7 @@ export class CommandManager {
   async registerGuildPermission(
     guild: Guild,
     appCommands: Collection<string, ApplicationCommand>
-  ): Promise<unknown>{
+  ): Promise<unknown> {
     commandLogger.debug("registerGuildPermission");
     const commandManager = guild.client.application!.commands;
 
@@ -121,7 +121,7 @@ export class CommandManager {
     return Promise.all(
       appCommands
         .filter((command) => !command.defaultPermission)
-        .map(async(command) => {
+        .map(async (command) => {
           const commandData = this.commandCollection.get(command.name)!;
 
           commandLogger.debug(`command: ${commandData.data.name}`);
@@ -132,7 +132,7 @@ export class CommandManager {
           return await commandManager.permissions.set({
             command: command.id,
             guild: guild.id,
-            permissions: permission.allowList
+            permissions: permission.allowList,
           });
         })
     );
@@ -146,28 +146,28 @@ export class CommandManager {
     }
 
     await application.commands.set([]);
-    if(guildId){
+    if (guildId) {
       await application.commands.set([], guildId);
     }
   }
 
-  getCommand(trigger: string): CommandBase | undefined{
+  getCommand(trigger: string): CommandBase | undefined {
     return this.commandTriggerCollection.get(trigger);
   }
 
   getCommandList(
     permission: CommandPermission,
     triggerFilter?: string | string[]
-  ): Collection<string, CommandBase>{
+  ): Collection<string, CommandBase> {
     commandLogger.debug(`trigger: ${triggerFilter}`);
 
-    if(triggerFilter){
+    if (triggerFilter) {
       commandLogger.debug(`filter`);
       const list = [...triggerFilter];
       return this.commandTriggerCollection
         .filter((_, key) => list.includes(key))
         .filter((cmd) => cmd.data.permission <= permission);
-    }else{
+    } else {
       commandLogger.debug(`all`);
       return this.commandCollection.filter((cmd) => cmd.data.permission <= permission);
     }
