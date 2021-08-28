@@ -57,7 +57,7 @@ const handlerRegistrants: SessionEventHandlerRegistrant[] = [
 ];
 
 export class Session extends SessionEmitter {
-  readonly connection: VoiceConnection;
+  connection: VoiceConnection;
   // protected readonly speakerMap: SpeakerMap;
 
   //TODO これまとめたさがある
@@ -158,7 +158,7 @@ export class Session extends SessionEmitter {
             memberId: userId,
           }
         : {
-            type: "yosuga",
+            type: "yosug",
           },
     };
 
@@ -167,6 +167,11 @@ export class Session extends SessionEmitter {
 
   changeTextChannel(textChannel: TextChannel): void {
     this.textChannel = textChannel;
+  }
+
+  changeVoiceChannel(voiceChannel: VoiceOrStageChannel, connection: VoiceConnection): void {
+    this.voiceChannel = voiceChannel;
+    this.connection = connection;
   }
 
   getTextChannel(): Readonly<TextChannel> {

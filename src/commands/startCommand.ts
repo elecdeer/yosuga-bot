@@ -5,6 +5,7 @@ import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs
 import { yosuga } from "../index";
 import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../PermissionUtil";
+import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -27,24 +28,42 @@ export class StartCommand extends CommandBase {
     commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
 
     const voiceChannel = member.voice.channel;
+
     if (voiceChannel) {
+      if (!hasBotPermission(textChannel, voiceChannel)) {
+        await context.reply("error", "チャンネルに参加する権限がBotにありません.");
+        return;
+      }
+
       if (session) {
         //既に接続済み
-        if (session.getTextChannel().id === textChannel.id) {
+        if (
+          session.getTextChannel().id === textChannel.id &&
+          session.getVoiceChannel().id === voiceChannel.id
+        ) {
           //同じテキストルーム
-          await context.reply("warn", "接続済みです");
+          await context.reply("warn", "接続済みです.");
         } else {
           //別テキストルーム
 
           //TODO 確認処理
-          await context.reply(
-            "plain",
-            `読み上げチャンネルが${textChannel.name}に変更されました`,
-            session.getTextChannel()
-          );
 
-          session.changeTextChannel(textChannel);
+          const oldTextChannel = session.getTextChannel();
 
+          const contents: string[] = [];
+          if (session.getTextChannel().id !== textChannel.id) {
+            contents.push(`読み上げチャンネルが${textChannel.name}に変更されました.`);
+
+            session.changeTextChannel(textChannel);
+          }
+          if (session.getVoiceChannel().id !== voiceChannel.id) {
+            contents.push(`接続チャンネルが${voiceChannel.name}に変更されました.`);
+
+            const connection = await connectToChannel(voiceChannel);
+            session.changeVoiceChannel(voiceChannel, connection);
+          }
+
+          await context.reply("plain", contents.join("\n"), oldTextChannel);
           await context.reply("plain", `接続しました!`);
         }
       } else {
@@ -80,4 +99,17 @@ const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
     commandLogger.error(error);
     throw error;
   }
+};
+
+const hasBotPermission = (textChannel: TextChannel, voiceChannel: VoiceChannel | StageChannel) => {
+  const me = textChannel.guild.me!;
+  const tcPermission = me.permissionsIn(textChannel);
+  const vcPermission = me.permissionsIn(voiceChannel);
+
+  return (
+    tcPermission.has("VIEW_CHANNEL") &&
+    tcPermission.has("SEND_MESSAGES") &&
+    vcPermission.has("CONNECT") &&
+    vcPermission.has("SPEAK")
+  );
 };

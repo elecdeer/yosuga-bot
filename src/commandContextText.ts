@@ -30,7 +30,7 @@ export class CommandContextText extends CommandContext {
 
     this.config = getGuildConfig(this.guild.id);
     const voiceChannel = this.member.voice.channel;
-    this.session = voiceChannel ? yosuga.sessionManager.getSession(voiceChannel.id) : null;
+    this.session = voiceChannel ? yosuga.sessionManager.getSession(this.guild.id) : null;
 
     this.message = message;
   }

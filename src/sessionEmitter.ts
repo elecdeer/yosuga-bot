@@ -20,7 +20,7 @@ interface Events {
 type SessionStrictEmitter = StrictEventEmitter<EventEmitter, Events>;
 
 export class SessionEmitter extends (EventEmitter as { new (): SessionStrictEmitter }) {
-  protected readonly voiceChannel: VoiceOrStageChannel;
+  protected voiceChannel: VoiceOrStageChannel;
   protected textChannel: TextChannel;
   protected readonly guild: Guild;
 

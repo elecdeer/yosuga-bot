@@ -18,8 +18,8 @@ export class SessionManager {
     this.sessionCollection = new Collection<Snowflake, Session>();
   }
 
-  getSession(voiceChannelId: Snowflake): Session | null {
-    return this.sessionCollection.get(voiceChannelId) ?? null;
+  getSession(guildId: Snowflake): Session | null {
+    return this.sessionCollection.get(guildId) ?? null;
   }
 
   startSession(
@@ -28,11 +28,11 @@ export class SessionManager {
     voiceChannel: VoiceOrStageChannel
   ): Session {
     const session = new Session(yosuga, connection, textChannel, voiceChannel);
-    const channelId = voiceChannel.id;
+    const guildId = textChannel.guild.id;
 
-    this.sessionCollection.set(channelId, session);
+    this.sessionCollection.set(guildId, session);
     session.once("disconnect", () => {
-      this.sessionCollection.delete(channelId);
+      this.sessionCollection.delete(guildId);
     });
     return session;
   }
