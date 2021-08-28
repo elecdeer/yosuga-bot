@@ -20,6 +20,7 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
   },
   settings: {
     settings: {

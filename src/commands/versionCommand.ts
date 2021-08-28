@@ -1,7 +1,8 @@
 import log4js from "log4js";
-import { CommandBase, CommandPermission } from "./commandBase";
+import { CommandBase } from "./commandBase";
 import { imageEnv } from "../environment";
 import { CommandContext } from "../commandContext";
+import { CommandPermission } from "../PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -10,7 +11,7 @@ export class VersionCommand extends CommandBase {
     super({
       name: "version",
       description: "Yosugaのバージョン情報を表示する.",
-      permission: CommandPermission.Everyone,
+      permission: CommandPermission.GuildAdmin,
       messageCommand: {},
       interactionCommand: {},
     });

@@ -14,15 +14,15 @@ import log4js from "log4js";
 import { getGuildConfig } from "./configManager";
 import { VoiceOrStageChannel } from "./types";
 import { yosuga } from "./index";
-import { hasAdminPermission } from "./util";
 import { CommandContext } from "./commandContext";
 import { CommandContextText, isValidMessage } from "./commandContextText";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
+import { hasAdminPermission } from "./PermissionUtil";
 
 const logger = log4js.getLogger("yosugaEvent");
 
 interface Events {
-  command: (cmd: string, context: CommandContext) => Promise<void>;
+  command: (cmd: string, context: CommandContext) => void;
   message: (guildId: Snowflake, message: Message) => void;
   moveChannel: (
     guildId: Snowflake,

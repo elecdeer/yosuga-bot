@@ -35,15 +35,16 @@ export class CommandContextSlash extends CommandContext {
   override readonly member: GuildMember;
   override readonly config: GuildConfigWithoutVoice;
   override readonly session: Session | null;
+
   readonly interaction: CommandInteraction;
 
-  private differTimer: NodeJS.Timeout;
+  private readonly differTimer: NodeJS.Timeout;
 
   constructor(interaction: ValidCommandInteraction, yosuga: YosugaClient) {
     super();
 
     this.guild = interaction.guild;
-    this.textChannel = interaction.channel as TextChannel;
+    this.textChannel = interaction.channel;
     this.member = interaction.member;
 
     this.config = getGuildConfig(this.guild.id);

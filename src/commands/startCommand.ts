@@ -1,9 +1,10 @@
 import log4js from "log4js";
 import { VoiceOrStageChannel } from "../types";
-import { CommandBase, CommandPermission } from "./commandBase";
+import { CommandBase } from "./commandBase";
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 import { yosuga } from "../index";
 import { CommandContext } from "../commandContext";
+import { CommandPermission } from "../PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 

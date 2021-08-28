@@ -1,8 +1,8 @@
 import { CommandBase } from "./commands/commandBase";
 import log4js from "log4js";
-import { Collection, Role, Snowflake } from "discord.js";
+import { ApplicationCommand, Collection, Guild, Snowflake } from "discord.js";
 import { YosugaClient } from "./yosugaClient";
-import { hasAdminPermission } from "./util";
+import { CommandPermission, constructPermissionData, fetchPermission } from "./PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -21,22 +21,41 @@ export class CommandManager {
     this.yosuga.on("command", (cmd, context) => {
       commandLogger.debug(`cmd: ${cmd}`);
 
-      const command = this.getCommand(cmd);
-      if (!command) return;
+      //うーん
+      void (async() => {
+        const command = this.getCommand(cmd);
+        if(!command){
+          await context.reply("warn", "不明なコマンドです");
+          return;
+        }
 
-      void command.execute(context).catch((err) => {
+        if((await fetchPermission(context.member)) < command.data.permission){
+          await context.reply("prohibit", "このコマンドを実行する権限がありません.");
+          return;
+        }
+
+        await command.execute(context);
+      })().catch((err) => {
         commandLogger.error(err);
       });
     });
 
     this.yosuga.on("addAdminRole", (role) => {
-      // this.yosuga.client.application?.commands.permissions.add({
-      //   command: this.commandList.
-      // })
+      void role.client
+        .application!.commands.fetch()
+        .then((commands) => this.registerGuildPermission(role.guild, commands));
     });
 
     this.yosuga.on("removeAdminRole", (role) => {
-      //
+      void role.client
+        .application!.commands.fetch()
+        .then((commands) => this.registerGuildPermission(role.guild, commands));
+    });
+
+    this.yosuga.client.on("guildCreate", (guild: Guild) => {
+      void guild.client
+        .application!.commands.fetch()
+        .then((commands) => this.registerGuildPermission(guild, commands));
     });
   }
 
@@ -44,9 +63,9 @@ export class CommandManager {
     commandLogger.debug(`assignCommand: ${command.data.name} [${command.getTriggers()}]`);
     this.commandCollection.set(command.data.name, command);
 
-    if (command.isMessageCommand()) {
+    if(command.isMessageCommand()){
       command.getTriggers().forEach((trigger) => {
-        if (this.commandTriggerCollection.has(trigger)) {
+        if(this.commandTriggerCollection.has(trigger)){
           throw new Error(`コマンド名が重複しています: ${trigger}`);
         }
         this.commandTriggerCollection.set(trigger, command);
@@ -54,9 +73,11 @@ export class CommandManager {
     }
   }
 
-  async registerSlashCommands(guildId?: Snowflake): Promise<void> {
+  async registerSlashCommands(guild?: Guild): Promise<void>{
+    commandLogger.debug("registerSlashCommands");
+
     const application = this.yosuga.client.application;
-    if (!application) {
+    if(!application){
       commandLogger.warn("application undefined");
       return;
     }
@@ -64,23 +85,57 @@ export class CommandManager {
     await application.commands.fetch();
     commandLogger.debug(application.commands);
 
-    const applicationCommands = this.commandCollection
+    const registerCommands = this.commandCollection
       .filter((cmd) => cmd.isInteractionCommand())
       .map((cmd) => cmd.constructInteractionData());
+    commandLogger.debug("registerCommand: ");
+    registerCommands.forEach((cmd) => {
+      commandLogger.debug(cmd);
+    });
 
-    if (guildId) {
-      await application.commands.set(applicationCommands, guildId);
-    } else {
-      await application.commands.set(applicationCommands);
+    if(guild){
+      const appCommands = await application.commands.set(registerCommands, guild.id);
+
+      await this.registerGuildPermission(guild, appCommands);
+    }else{
+      const appCommands = await application.commands.set(registerCommands);
+
+      const guildManager = this.yosuga.client.guilds;
+      await guildManager.fetch();
+
+      await Promise.all(
+        guildManager.cache.map((guild) => this.registerGuildPermission(guild, appCommands))
+      );
     }
+  }
 
-    //TODO 権限
+  async registerGuildPermission(
+    guild: Guild,
+    appCommands: Collection<string, ApplicationCommand>
+  ): Promise<unknown>{
+    commandLogger.debug("registerGuildPermission");
+    const commandManager = guild.client.application!.commands;
 
-    // const adminRoles = await this.fetchAdminRoles();
-    // commandManager?.permissions.
+    commandLogger.debug(`commands: ${appCommands.size}`);
 
-    await application.commands.fetch();
-    commandLogger.debug(application.commands);
+    return Promise.all(
+      appCommands
+        .filter((command) => !command.defaultPermission)
+        .map(async(command) => {
+          const commandData = this.commandCollection.get(command.name)!;
+
+          commandLogger.debug(`command: ${commandData.data.name}`);
+
+          const permission = await constructPermissionData(commandData.data.permission, guild);
+          commandLogger.debug(permission);
+
+          return await commandManager.permissions.set({
+            command: command.id,
+            guild: guild.id,
+            permissions: permission.allowList
+          });
+        })
+    );
   }
 
   async unregisterSlashCommands(guildId?: Snowflake): Promise<void> {
@@ -91,40 +146,30 @@ export class CommandManager {
     }
 
     await application.commands.set([]);
-    if (guildId) {
+    if(guildId){
       await application.commands.set([], guildId);
     }
   }
 
-  getCommand(trigger: string): CommandBase | undefined {
+  getCommand(trigger: string): CommandBase | undefined{
     return this.commandTriggerCollection.get(trigger);
   }
 
-  getCommandList(triggerFilter?: string | string[]): Collection<string, CommandBase> {
+  getCommandList(
+    permission: CommandPermission,
+    triggerFilter?: string | string[]
+  ): Collection<string, CommandBase>{
     commandLogger.debug(`trigger: ${triggerFilter}`);
-    if (triggerFilter) {
+
+    if(triggerFilter){
       commandLogger.debug(`filter`);
       const list = [...triggerFilter];
-      return this.commandTriggerCollection.filter((_, key) => list.includes(key));
-    } else {
+      return this.commandTriggerCollection
+        .filter((_, key) => list.includes(key))
+        .filter((cmd) => cmd.data.permission <= permission);
+    }else{
       commandLogger.debug(`all`);
-      return this.commandCollection;
+      return this.commandCollection.filter((cmd) => cmd.data.permission <= permission);
     }
-  }
-
-  private async fetchAdminRoles(): Promise<Collection<Snowflake, Role>> {
-    const client = this.yosuga.client;
-    await client.guilds.fetch();
-
-    const guilds = client.guilds.cache;
-
-    await Promise.all(guilds.map((guild) => guild.roles.fetch()));
-
-    const collection = new Collection<Snowflake, Role>();
-    const roles = guilds.reduce((acc: Collection<Snowflake, Role>, guild) => {
-      return acc.concat(guild.roles.cache);
-    }, collection);
-
-    return roles.filter((role) => hasAdminPermission(role));
   }
 }

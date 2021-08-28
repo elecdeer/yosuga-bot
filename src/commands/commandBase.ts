@@ -1,14 +1,7 @@
 import { ApplicationCommandData, ApplicationCommandOptionData } from "discord.js";
 import { CommandContext } from "../commandContext";
 import { RequireAtLeastOne } from "type-fest";
-
-export const CommandPermission = {
-  Everyone: 0,
-  GuildAdmin: 5,
-  AppOwner: 100,
-} as const;
-
-type CommandPermission = typeof CommandPermission[keyof typeof CommandPermission];
+import { CommandPermission } from "../PermissionUtil";
 
 export type CommandData = RequireAtLeastOne<
   {
@@ -61,7 +54,7 @@ export abstract class CommandBase {
     return [];
   }
 
-  constructInteractionData(): ApplicationCommandData{
+  constructInteractionData(): ApplicationCommandData {
     const commandOptionsData = this.data.interactionCommand?.commandOptions;
     const options =
       typeof commandOptionsData === "function" ? commandOptionsData() : commandOptionsData;

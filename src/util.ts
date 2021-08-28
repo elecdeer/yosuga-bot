@@ -1,4 +1,4 @@
-import { MessageEmbed, Permissions, Role } from "discord.js";
+import { MessageEmbed } from "discord.js";
 
 export const wait = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -9,10 +9,6 @@ export const wait = (ms: number): Promise<void> =>
 
 export const createYosugaEmbed = (base?: MessageEmbed): MessageEmbed => {
   return (base ?? new MessageEmbed()).setAuthor("Yosuga").setColor(0xffb6c1);
-};
-
-export const hasAdminPermission = (role: Role) => {
-  return role.permissions.bitfield === Permissions.FLAGS.ADMINISTRATOR;
 };
 
 const regexp = /[\\^$.*+?()[\]{}|]/;

@@ -1,7 +1,8 @@
 import log4js from "log4js";
-import { CommandBase, CommandPermission } from "./commandBase";
+import { CommandBase } from "./commandBase";
 import { CommandContext } from "../commandContext";
 import { yosuga } from "../index";
+import { CommandPermission } from "../PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -10,7 +11,7 @@ export class DeployResetCommand extends CommandBase {
     super({
       name: "deployReset",
       description: "アプリケーションコマンドをGuildに登録する.",
-      permission: CommandPermission.GuildAdmin,
+      permission: CommandPermission.AppOwner,
       messageCommand: {},
     });
   }

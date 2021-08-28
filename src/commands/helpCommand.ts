@@ -1,20 +1,12 @@
 import log4js from "log4js";
-import { CommandBase, CommandPermission } from "./commandBase";
+import { CommandBase } from "./commandBase";
 import { ApplicationCommandOptionChoice, MessageEmbed } from "discord.js";
 import { yosuga } from "../index";
 import { CommandManager } from "../commandManager";
 import { CommandContext } from "../commandContext";
+import { CommandPermission, fetchPermission } from "../PermissionUtil";
 
 const commandLogger = log4js.getLogger("command");
-
-const getCommandOptions = (commandManager: CommandManager): ApplicationCommandOptionChoice[] => {
-  const options = commandManager.commandCollection.map((cmd) => ({
-    name: cmd.data.name,
-    value: cmd.data.name,
-  }));
-  commandLogger.debug(`commandOptions: ${options}`);
-  return options;
-};
 
 const OPTION_NAME = "filter";
 
@@ -43,12 +35,13 @@ export class HelpCommand extends CommandBase {
     commandLogger.debug("handle help command");
 
     const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
-    const commands = yosuga.commandManager.getCommandList(option);
+    const permission = await fetchPermission(context.member);
+    const commands = yosuga.commandManager.getCommandList(permission, option);
     commandLogger.debug(option);
     commandLogger.debug(commands);
 
     const embed = new MessageEmbed();
-    embed.setDescription(`コマンド一覧 ${option}`);
+    embed.setDescription(option ? `コマンド ${option}` : `コマンド一覧`);
     embed.addFields(
       commands.map((command) => {
         const name = command.getTriggers().join(" | ");
@@ -63,3 +56,14 @@ export class HelpCommand extends CommandBase {
     await context.reply("plain", embed);
   }
 }
+
+const getCommandOptions = (commandManager: CommandManager): ApplicationCommandOptionChoice[] => {
+  const options = commandManager.commandCollection
+    .filter((item) => item.data.permission <= CommandPermission.GuildAdmin)
+    .map((cmd) => ({
+      name: cmd.data.name,
+      value: cmd.data.name,
+    }));
+  commandLogger.debug(`commandOptions: ${options}`);
+  return options;
+};

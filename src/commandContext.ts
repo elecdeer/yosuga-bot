@@ -24,8 +24,6 @@ export abstract class CommandContext {
   abstract readonly member: GuildMember;
   abstract readonly textChannel: TextChannel;
 
-  // abstract readonly memberPermission:
-
   abstract reply(
     type: ReplyType,
     content: string | MessageEmbed,

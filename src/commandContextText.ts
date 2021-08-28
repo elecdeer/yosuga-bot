@@ -25,7 +25,7 @@ export class CommandContextText extends CommandContext {
     super();
 
     this.guild = message.guild;
-    this.textChannel = message.channel as TextChannel;
+    this.textChannel = message.channel;
     this.member = message.member;
 
     this.config = getGuildConfig(this.guild.id);
