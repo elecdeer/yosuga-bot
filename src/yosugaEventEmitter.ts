@@ -100,17 +100,17 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
       logger.debug("emit command");
       this.emit("command", command, context);
-    }else{
+    } else {
       logger.debug("emit message");
       this.emit("message", guildId, message);
     }
   }
 
-  private async onCommandInteractionCreate(interaction: CommandInteraction){
+  private async onCommandInteractionCreate(interaction: CommandInteraction) {
     logger.debug(`receive interaction`);
     logger.debug(interaction.toJSON());
 
-    if(!isValidCommandInteraction(interaction)){
+    if (!isValidCommandInteraction(interaction)) {
       return;
     }
 

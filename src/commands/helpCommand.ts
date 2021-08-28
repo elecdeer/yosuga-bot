@@ -32,14 +32,14 @@ export class HelpCommand extends CommandBase {
             type: "STRING",
             description: "フィルタ",
             choices: getCommandOptions(yosuga.commandManager),
-            required: fals,
-          ,
-        ,
+            required: false,
+          },
+        ],
       },
     });
   }
 
-  async execute(context: CommandContext): Promise<void>{
+  async execute(context: CommandContext): Promise<void> {
     commandLogger.debug("handle help command");
 
     const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
@@ -55,7 +55,7 @@ export class HelpCommand extends CommandBase {
 
         return {
           name: name,
-          value: command.data.description
+          value: command.data.descriptio,
         };
       })
     );

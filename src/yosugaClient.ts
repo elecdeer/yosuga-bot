@@ -17,6 +17,7 @@ import { TtsControllerSpeaker } from "./speaker/ttsControllerSpeaker";
 import { allSerial } from "./util";
 import { DeployGlobalCommand } from "./commands/deployGlobalCommand";
 import { DeployGuildCommand } from "./commands/deployGuildCommand";
+import { DeployResetCommand } from "./commands/deployResetCommand";
 
 const logger = getLogger("yosugaClient");
 
@@ -41,8 +42,9 @@ export class YosugaClient extends YosugaEventEmitter {
       .then(async (res) => {
         this.client.application = new ClientApplication(this.client, {});
 
-        await this.client.application?.fetch();
-        await this.client.application?.commands.fetch();
+        await this.client.application.fetch();
+        await this.client.application.commands.fetch();
+        logger.debug(this.client.application.commands.cache.toJSON());
 
         return res;
       })
@@ -73,6 +75,7 @@ export class YosugaClient extends YosugaEventEmitter {
     this.commandManager.assign(new ReloadCommand());
     this.commandManager.assign(new DeployGlobalCommand());
     this.commandManager.assign(new DeployGuildCommand());
+    this.commandManager.assign(new DeployResetCommand());
   }
 
   speakersFactory(session: Session): Collection<string, Speaker> {

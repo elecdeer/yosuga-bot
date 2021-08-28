@@ -83,26 +83,26 @@ export class CommandManager {
     commandLogger.debug(application.commands);
   }
 
-  async unregisterSlashCommands(guildId?: Snowflake): Promise<void>{
+  async unregisterSlashCommands(guildId?: Snowflake): Promise<void> {
     const application = this.yosuga.client.application;
-    if(!application){
+    if (!application) {
       commandLogger.warn("application undefined");
       return;
     }
 
     await application.commands.set([]);
-    if(guildId){
+    if (guildId) {
       await application.commands.set([], guildId);
     }
   }
 
-  getCommand(trigger: string): CommandBase | undefined{
+  getCommand(trigger: string): CommandBase | undefined {
     return this.commandTriggerCollection.get(trigger);
   }
 
-  getCommandList(triggerFilter?: string | string[]): Collection<string, CommandBase>{
+  getCommandList(triggerFilter?: string | string[]): Collection<string, CommandBase> {
     commandLogger.debug(`trigger: ${triggerFilter}`);
-    if(triggerFilter){
+    if (triggerFilter) {
       commandLogger.debug(`filter`);
       const list = [...triggerFilter];
       return this.commandTriggerCollection.filter((_, key) => list.includes(key));
