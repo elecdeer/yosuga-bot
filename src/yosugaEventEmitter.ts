@@ -107,6 +107,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
   }
 
   private onCommandInteractionCreate(interaction: CommandInteraction) {
+    logger.debug(yosuga.client.application!.commands);
     logger.debug(`receive interaction ${interaction.command?.name}`);
 
     if (!interaction.command) return;

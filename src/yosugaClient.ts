@@ -1,7 +1,6 @@
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { Client, Collection } from "discord.js";
+import { Client, ClientApplication, Collection } from "discord.js";
 import { yosugaEnv } from "./environment";
-import { client } from "./index";
 import { getLogger } from "log4js";
 import { SessionManager } from "./sessionManager";
 import { CommandManager } from "./commandManager";
@@ -16,6 +15,8 @@ import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 import { Session } from "./session";
 import { TtsControllerSpeaker } from "./speaker/ttsControllerSpeaker";
 import { allSerial } from "./util";
+import { DeployGlobalCommand } from "./commands/deployGlobalCommand";
+import { DeployGuildCommand } from "./commands/deployGuildCommand";
 
 const logger = getLogger("yosugaClient");
 
@@ -38,13 +39,17 @@ export class YosugaClient extends YosugaEventEmitter {
     this.client
       .login(yosugaEnv.discordToken)
       .then(async (res) => {
-        if (!client.application?.owner) await client.application?.fetch();
+        this.client.application = new ClientApplication(this.client, {});
+
+        await this.client.application?.fetch();
+        await this.client.application?.commands.fetch();
+
         return res;
       })
       .then((res) => {
         logger.info("bot login");
         logger.info(`token: ${res}`);
-        logger.info(`applicationOwner: ${client.application?.owner}`);
+        logger.info(`applicationOwner: ${this.client.application?.owner}`);
 
         this.assignCommands();
 
@@ -66,6 +71,8 @@ export class YosugaClient extends YosugaEventEmitter {
     this.commandManager.assign(new HelpCommand());
     this.commandManager.assign(new VersionCommand());
     this.commandManager.assign(new ReloadCommand());
+    this.commandManager.assign(new DeployGlobalCommand());
+    this.commandManager.assign(new DeployGuildCommand());
   }
 
   speakersFactory(session: Session): Collection<string, Speaker> {

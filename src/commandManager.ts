@@ -15,8 +15,6 @@ export class CommandManager {
   constructor(yosuga: YosugaClient) {
     this.yosuga = yosuga;
     this.attachHandler();
-
-    void this.yosuga.client.application?.commands.fetch();
   }
 
   private attachHandler() {
@@ -56,21 +54,30 @@ export class CommandManager {
   }
 
   async registerSlashCommands(guildId?: Snowflake): Promise<void> {
+    const application = this.yosuga.client.application;
+    if (!application) {
+      commandLogger.warn("application undefined");
+      return;
+    }
+
+    await application.commands.fetch();
+
     const applicationCommands = this.commandCollection
       .filter((cmd) => cmd.isInteractionCommand())
       .map((cmd) => cmd.constructInteractionData());
 
-    const commandManager = this.yosuga.client.application?.commands;
     if (guildId) {
-      await commandManager?.set(applicationCommands, guildId);
+      await application.commands.set(applicationCommands, guildId);
     } else {
-      await commandManager?.set(applicationCommands);
+      await application.commands.set(applicationCommands);
     }
 
     //TODO 権限
 
     // const adminRoles = await this.fetchAdminRoles();
     // commandManager?.permissions.
+
+    await application.commands.fetch();
   }
 
   getCommand(trigger: string): CommandBase | undefined {
