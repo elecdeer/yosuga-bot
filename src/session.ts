@@ -189,6 +189,10 @@ export class Session extends SessionEmitter {
     return this.voiceProvider;
   }
 
+  getYosugaUserId(): Snowflake {
+    return this.guild.me!.id;
+  }
+
   getUsernamePronunciation(member: GuildMember | null): string {
     return member?.displayName ?? "不明なユーザ";
   }
