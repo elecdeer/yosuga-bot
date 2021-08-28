@@ -8,12 +8,12 @@ import { CommandContext } from "../commandContext";
 const commandLogger = log4js.getLogger("command");
 
 const getCommandOptions = (commandManager: CommandManager): ApplicationCommandOptionChoice[] => {
-  return commandManager.commandCollection.map((cmd) => {
-    return {
-      name: cmd.data.name,
-      value: cmd.data.name,
-    };
-  });
+  const options = commandManager.commandCollection.map((cmd) => ({
+    name: cmd.data.name,
+    value: cmd.data.name,
+  }));
+  commandLogger.debug(`commandOptions: ${options}`);
+  return options;
 };
 
 const OPTION_NAME = "filter";
@@ -26,31 +26,36 @@ export class HelpCommand extends CommandBase {
       permission: CommandPermission.Everyone,
       messageCommand: {},
       interactionCommand: {
-        commandOptions: [
+        commandOptions: () => [
           {
             name: OPTION_NAME,
             type: "STRING",
             description: "フィルタ",
             choices: getCommandOptions(yosuga.commandManager),
-            required: false,
-          },
-        ],
+            required: fals,
+          ,
+        ,
       },
     });
   }
 
-  async execute(context: CommandContext): Promise<void> {
+  async execute(context: CommandContext): Promise<void>{
+    commandLogger.debug("handle help command");
+
     const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
     const commands = yosuga.commandManager.getCommandList(option);
+    commandLogger.debug(option);
+    commandLogger.debug(commands);
 
     const embed = new MessageEmbed();
+    embed.setDescription(`コマンド一覧 ${option}`);
     embed.addFields(
       commands.map((command) => {
         const name = command.getTriggers().join(" | ");
 
         return {
           name: name,
-          value: command.data.description,
+          value: command.data.description
         };
       })
     );

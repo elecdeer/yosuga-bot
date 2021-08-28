@@ -42,6 +42,7 @@ export class CommandManager {
 
   assign(command: CommandBase): void {
     commandLogger.debug(`assignCommand: ${command.data.name} [${command.getTriggers()}]`);
+    this.commandCollection.set(command.data.name, command);
 
     if (command.isMessageCommand()) {
       command.getTriggers().forEach((trigger) => {
@@ -61,6 +62,7 @@ export class CommandManager {
     }
 
     await application.commands.fetch();
+    commandLogger.debug(application.commands);
 
     const applicationCommands = this.commandCollection
       .filter((cmd) => cmd.isInteractionCommand())
@@ -78,17 +80,34 @@ export class CommandManager {
     // commandManager?.permissions.
 
     await application.commands.fetch();
+    commandLogger.debug(application.commands);
   }
 
-  getCommand(trigger: string): CommandBase | undefined {
+  async unregisterSlashCommands(guildId?: Snowflake): Promise<void>{
+    const application = this.yosuga.client.application;
+    if(!application){
+      commandLogger.warn("application undefined");
+      return;
+    }
+
+    await application.commands.set([]);
+    if(guildId){
+      await application.commands.set([], guildId);
+    }
+  }
+
+  getCommand(trigger: string): CommandBase | undefined{
     return this.commandTriggerCollection.get(trigger);
   }
 
-  getCommandList(triggerFilter?: string | string[]): Collection<string, CommandBase> {
-    if (triggerFilter) {
+  getCommandList(triggerFilter?: string | string[]): Collection<string, CommandBase>{
+    commandLogger.debug(`trigger: ${triggerFilter}`);
+    if(triggerFilter){
+      commandLogger.debug(`filter`);
       const list = [...triggerFilter];
       return this.commandTriggerCollection.filter((_, key) => list.includes(key));
     } else {
+      commandLogger.debug(`all`);
       return this.commandCollection;
     }
   }

@@ -26,7 +26,7 @@ type MessageCommandOption = {
 };
 
 type InteractionCommandOption = {
-  commandOptions?: ApplicationCommandOptionData[];
+  commandOptions?: ApplicationCommandOptionData[] | (() => ApplicationCommandOptionData[]);
 };
 
 export abstract class CommandBase {
@@ -61,12 +61,16 @@ export abstract class CommandBase {
     return [];
   }
 
-  constructInteractionData(): ApplicationCommandData {
+  constructInteractionData(): ApplicationCommandData{
+    const commandOptionsData = this.data.interactionCommand?.commandOptions;
+    const options =
+      typeof commandOptionsData === "function" ? commandOptionsData() : commandOptionsData;
+
     return {
       name: this.data.name,
       description: this.data.description,
       type: "CHAT_INPUT",
-      options: this.data.interactionCommand?.commandOptions,
+      options: options,
       defaultPermission: this.data.permission <= CommandPermission.Everyone,
     };
   }

@@ -53,9 +53,9 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       this.onMessageCreate(message);
     });
 
-    client.on("interactionCreate", (interaction) => {
+    client.on("interactionCreate", async (interaction) => {
       if (!interaction.isCommand()) return;
-      this.onCommandInteractionCreate(interaction);
+      await this.onCommandInteractionCreate(interaction);
     });
 
     client.on("voiceStateUpdate", (oldState, newState) => {
@@ -100,18 +100,17 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
       logger.debug("emit command");
       this.emit("command", command, context);
-    } else {
+    }else{
       logger.debug("emit message");
       this.emit("message", guildId, message);
     }
   }
 
-  private onCommandInteractionCreate(interaction: CommandInteraction) {
-    logger.debug(yosuga.client.application!.commands);
-    logger.debug(`receive interaction ${interaction.command?.name}`);
+  private async onCommandInteractionCreate(interaction: CommandInteraction){
+    logger.debug(`receive interaction`);
+    logger.debug(interaction.toJSON());
 
-    if (!interaction.command) return;
-    if (!isValidCommandInteraction(interaction)) {
+    if(!isValidCommandInteraction(interaction)){
       return;
     }
 
@@ -119,7 +118,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
 
     logger.debug("emit command");
 
-    this.emit("command", interaction.command?.name, context);
+    this.emit("command", interaction.commandName, context);
   }
 
   private onVoiceStateUpdate(newState: VoiceState, oldState: VoiceState) {
