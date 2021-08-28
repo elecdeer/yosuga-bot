@@ -158,7 +158,7 @@ export class Session extends SessionEmitter {
             memberId: userId,
           }
         : {
-            type: "yosug",
+            type: "yosuga",
           },
     };
 
