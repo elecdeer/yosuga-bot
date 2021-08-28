@@ -54,7 +54,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     });
 
     client.on("interactionCreate", (interaction) => {
-      if(!interaction.isCommand()) return;
+      if (!interaction.isCommand()) return;
       this.onCommandInteractionCreate(interaction);
     });
 
@@ -77,7 +77,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     });
   }
 
-  private onMessageCreate(message: Message){
+  private onMessageCreate(message: Message) {
     logger.debug("handle message");
     if (!isValidMessage(message)) {
       return;
@@ -106,7 +106,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     }
   }
 
-  private onCommandInteractionCreate(interaction: CommandInteraction){
+  private onCommandInteractionCreate(interaction: CommandInteraction) {
     logger.debug(`receive interaction ${interaction.command?.name}`);
 
     if (!interaction.command) return;
@@ -149,32 +149,32 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         return;
       }
 
-      if(oldState.streaming && !newState.streaming){
+      if (oldState.streaming && !newState.streaming) {
         this.emit("turnOffGoLive", guildId, newState.member);
         return;
       }
     }
   }
 
-  private onRoleCreate(role: Role){
-    if(hasAdminPermission(role)){
+  private onRoleCreate(role: Role) {
+    if (hasAdminPermission(role)) {
       this.emit("addAdminRole", role);
     }
   }
 
-  private onRoleDelete(role: Role){
-    if(hasAdminPermission(role)){
+  private onRoleDelete(role: Role) {
+    if (hasAdminPermission(role)) {
       this.emit("removeAdminRole", role);
     }
   }
 
-  private onRoleUpdate(oldRole: Role, newRole: Role){
+  private onRoleUpdate(oldRole: Role, newRole: Role) {
     //失った
-    if(hasAdminPermission(oldRole) && !hasAdminPermission(newRole)){
+    if (hasAdminPermission(oldRole) && !hasAdminPermission(newRole)) {
       this.emit("removeAdminRole", oldRole);
     }
     //得た
-    if(!hasAdminPermission(oldRole) && hasAdminPermission(newRole)){
+    if (!hasAdminPermission(oldRole) && hasAdminPermission(newRole)) {
       this.emit("addAdminRole", newRole);
     }
   }
