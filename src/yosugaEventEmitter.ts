@@ -4,21 +4,25 @@ import {
   CommandInteraction,
   GuildMember,
   Message,
+  Role,
   Snowflake,
-  TextChannel,
   VoiceState,
 } from "discord.js";
 import StrictEventEmitter from "strict-event-emitter-types";
 
 import log4js from "log4js";
 import { getGuildConfig } from "./configManager";
-import { CommandContext, VoiceOrStageChannel } from "./types";
+import { VoiceOrStageChannel } from "./types";
 import { yosuga } from "./index";
+import { hasAdminPermission } from "./util";
+import { CommandContext } from "./commandContext";
+import { CommandContextText, isValidMessage } from "./commandContextText";
+import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
 
 const logger = log4js.getLogger("yosugaEvent");
 
 interface Events {
-  command: (cmd: string, args: string[], context: CommandContext) => Promise<void>;
+  command: (cmd: string, context: CommandContext) => Promise<void>;
   message: (guildId: Snowflake, message: Message) => void;
   moveChannel: (
     guildId: Snowflake,
@@ -30,6 +34,8 @@ interface Events {
   turnOffVideo: (guildId: Snowflake, member: GuildMember) => void;
   turnOnGoLive: (guildId: Snowflake, member: GuildMember) => void;
   turnOffGoLive: (guildId: Snowflake, member: GuildMember) => void;
+  addAdminRole: (role: Role) => void;
+  removeAdminRole: (role: Role) => void;
   destroy: () => void;
 }
 
@@ -48,7 +54,7 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     });
 
     client.on("interactionCreate", (interaction) => {
-      if (!interaction.isCommand()) return;
+      if(!interaction.isCommand()) return;
       this.onCommandInteractionCreate(interaction);
     });
 
@@ -56,17 +62,26 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
       this.onVoiceStateUpdate(newState, oldState);
     });
 
+    client.on("roleCreate", (role) => {
+      this.onRoleCreate(role);
+    });
+    client.on("roleDelete", (role) => {
+      this.onRoleDelete(role);
+    });
+    client.on("roleUpdate", (oldRole, newRole) => {
+      this.onRoleUpdate(oldRole, newRole);
+    });
+
     process.on("exit", () => {
       this.emit("destroy");
     });
   }
 
-  private onMessageCreate(message: Message) {
+  private onMessageCreate(message: Message){
     logger.debug("handle message");
-    if (!message.guild) return;
-    if (message.author.bot) return;
-    if (!message.member) return;
-    if (!message.channel.isText()) return;
+    if (!isValidMessage(message)) {
+      return;
+    }
 
     const guildId = message.guild.id;
     const config = getGuildConfig(guildId);
@@ -80,52 +95,30 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
     logger.debug(`at guild: ${guildId} from user: ${message.author.id}`);
     logger.debug(`input prefix: ${prefix}  configPrefix: ${config.commandPrefix}`);
 
-    const voiceChannel = message.member.voice.channel;
     if (prefix === config.commandPrefix) {
-      const context: CommandContext = {
-        type: "text",
-        session: voiceChannel ? yosuga.sessionManager.getSession(voiceChannel.id) : null,
-        config: config,
-        guild: message.guild,
-        user: message.member,
-        textChannel: message.channel as TextChannel,
-      };
-      // logger.debug(context);
+      const context = new CommandContextText(message, yosuga);
+
       logger.debug("emit command");
-      this.emit("command", command, messageSlice, context);
+      this.emit("command", command, context);
     } else {
       logger.debug("emit message");
       this.emit("message", guildId, message);
     }
   }
 
-  private onCommandInteractionCreate(interaction: CommandInteraction) {
+  private onCommandInteractionCreate(interaction: CommandInteraction){
     logger.debug(`receive interaction ${interaction.command?.name}`);
 
-    const guild = interaction.guild;
-    if (!guild) return; //これでmemberがGuildMemberに確定するはず
-    const config = getGuildConfig(guild.id);
-
-    const member: GuildMember = interaction.member as GuildMember;
-    const voiceChannel = member.voice.channel;
-
-    const context: CommandContext = {
-      type: "interaction",
-      interaction: interaction,
-      session: voiceChannel ? yosuga.sessionManager.getSession(voiceChannel.id) : null,
-      config: config,
-      guild: guild,
-      user: member,
-      textChannel: interaction.channel as TextChannel,
-    };
-
-    // logger.debug(context);
-    logger.debug("emit command");
     if (!interaction.command) return;
-    //微妙かも
-    const options = interaction.options.data.map((opt) => String(opt.value));
+    if (!isValidCommandInteraction(interaction)) {
+      return;
+    }
 
-    this.emit("command", interaction.command?.name, options, context);
+    const context = new CommandContextSlash(interaction, yosuga);
+
+    logger.debug("emit command");
+
+    this.emit("command", interaction.command?.name, context);
   }
 
   private onVoiceStateUpdate(newState: VoiceState, oldState: VoiceState) {
@@ -156,10 +149,33 @@ export class YosugaEventEmitter extends (EventEmitter as { new (): YosugaEmitter
         return;
       }
 
-      if (oldState.streaming && !newState.streaming) {
+      if(oldState.streaming && !newState.streaming){
         this.emit("turnOffGoLive", guildId, newState.member);
         return;
       }
+    }
+  }
+
+  private onRoleCreate(role: Role){
+    if(hasAdminPermission(role)){
+      this.emit("addAdminRole", role);
+    }
+  }
+
+  private onRoleDelete(role: Role){
+    if(hasAdminPermission(role)){
+      this.emit("removeAdminRole", role);
+    }
+  }
+
+  private onRoleUpdate(oldRole: Role, newRole: Role){
+    //失った
+    if(hasAdminPermission(oldRole) && !hasAdminPermission(newRole)){
+      this.emit("removeAdminRole", oldRole);
+    }
+    //得た
+    if(!hasAdminPermission(oldRole) && hasAdminPermission(newRole)){
+      this.emit("addAdminRole", newRole);
     }
   }
 }

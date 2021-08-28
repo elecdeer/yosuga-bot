@@ -1,48 +1,60 @@
-import { createEmbedBase } from "../util";
 import log4js from "log4js";
-import { CommandContext } from "../types";
-import { CommandBase } from "./commandBase";
-import { MessageEmbed } from "discord.js";
+import { CommandBase, CommandPermission } from "./commandBase";
+import { ApplicationCommandOptionChoice, MessageEmbed } from "discord.js";
 import { yosuga } from "../index";
+import { CommandManager } from "../commandManager";
+import { CommandContext } from "../commandContext";
 
 const commandLogger = log4js.getLogger("command");
+
+const getCommandOptions = (commandManager: CommandManager): ApplicationCommandOptionChoice[] => {
+  return commandManager.commandCollection.map((cmd) => {
+    return {
+      name: cmd.data.name,
+      value: cmd.data.name,
+    };
+  });
+};
+
+const OPTION_NAME = "filter";
 
 export class HelpCommand extends CommandBase {
   constructor() {
     super({
       name: "help",
       description: "Yosugaのコマンド一覧を表示する.",
-      options: [
-        {
-          name: "command",
-          type: "STRING",
-          description: "フィルタ",
-        },
-      ],
+      permission: CommandPermission.Everyone,
+      messageCommand: {},
+      interactionCommand: {
+        commandOptions: [
+          {
+            name: OPTION_NAME,
+            type: "STRING",
+            description: "フィルタ",
+            choices: getCommandOptions(yosuga.commandManager),
+            required: false,
+          },
+        ],
+      },
     });
   }
 
-  async execute(args: string[], { config }: CommandContext): Promise<MessageEmbed> {
-    const commands = yosuga.commandManager.getCommandList(args);
+  async execute(context: CommandContext): Promise<void> {
+    const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
+    const commands = yosuga.commandManager.getCommandList(option);
 
-    const embed = createEmbedBase();
-    embed.setDescription("Yosugaのコマンド一覧");
-
-    if (args.length > 0) {
-      embed.setDescription(`Yosugaのコマンド一覧 (filter: ${args.join(", ")})`);
-    }
-
+    const embed = new MessageEmbed();
     embed.addFields(
       commands.map((command) => {
         const name = command.getTriggers().join(" | ");
 
         return {
           name: name,
-          value: `${command.data.description} \n usage: ${command.getUsage()}`,
+          value: command.data.description,
         };
       })
     );
 
-    return embed;
+    await context.reply("plain", embed);
   }
 }

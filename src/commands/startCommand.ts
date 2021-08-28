@@ -1,10 +1,9 @@
 import log4js from "log4js";
-import { createEmbedBase } from "../util";
-import { CommandContext, VoiceOrStageChannel } from "../types";
-import { CommandBase } from "./commandBase";
-import { MessageEmbed } from "discord.js";
+import { VoiceOrStageChannel } from "../types";
+import { CommandBase, CommandPermission } from "./commandBase";
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 import { yosuga } from "../index";
+import { CommandContext } from "../commandContext";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -12,36 +11,40 @@ export class StartCommand extends CommandBase {
   constructor() {
     super({
       name: "start",
-      alias: ["s"],
       description: "ボイスチャンネルに接続し,テキストチャンネルの読み上げを開始する.",
+      permission: CommandPermission.Everyone,
+      messageCommand: {
+        alias: ["s"],
+      },
+      interactionCommand: {},
     });
   }
 
-  async execute(args: string[], context: CommandContext): Promise<MessageEmbed> {
-    const { session, textChannel, guild, user } = context;
-    commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
-    if (context.type === "interaction") {
-      await context.interaction.deferReply();
-      // await context.interaction.defer();
-    }
+  async execute(context: CommandContext): Promise<void> {
+    const { session, textChannel, guild, member } = context;
 
-    const voiceChannel = user.voice.channel;
+    commandLogger.info(`try connect: ${textChannel.name}@${guild.name} `);
+
+    const voiceChannel = member.voice.channel;
     if (voiceChannel) {
       if (session) {
         //既に接続済み
         if (session.getTextChannel().id === textChannel.id) {
           //同じテキストルーム
-          return createEmbedBase().setDescription("接続済みです");
+          await context.reply("warn", "接続済みです");
         } else {
           //別テキストルーム
 
-          const embed = createEmbedBase().setDescription(
-            `読み上げチャンネルが${textChannel.name}に変更されました`
+          //TODO 確認処理
+          await context.reply(
+            "plain",
+            `読み上げチャンネルが${textChannel.name}に変更されました`,
+            session.getTextChannel()
           );
-          await session.getTextChannel().send({ embeds: [embed] });
 
           session.changeTextChannel(textChannel);
-          return createEmbedBase().setDescription(`接続しました!`);
+
+          await context.reply("plain", `接続しました!`);
         }
       } else {
         try {
@@ -49,13 +52,13 @@ export class StartCommand extends CommandBase {
 
           const connection = await connectToChannel(voiceChannel);
           sessionManager.startSession(connection, textChannel, voiceChannel);
-          return createEmbedBase().setDescription("接続しました！");
+          await context.reply("plain", `接続しました!`);
         } catch (error) {
-          return createEmbedBase().setDescription("接続エラーが発生しました.");
+          await context.reply("error", "接続エラーが発生しました.");
         }
       }
     } else {
-      return createEmbedBase().setDescription("先にボイスチャンネルに入る必要があります.");
+      await context.reply("warn", "先にボイスチャンネルに入る必要があります.");
     }
   }
 }
@@ -73,6 +76,7 @@ const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
     return connection;
   } catch (error) {
     connection.destroy();
+    commandLogger.error(error);
     throw error;
   }
 };

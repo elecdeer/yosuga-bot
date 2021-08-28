@@ -39,7 +39,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
     speechText: SpeechText,
     voiceParam: VoiceParam<void>,
     pauseParam: PauseParam
-  ): Promise<AudioResource> {
+  ): Promise<AudioResource | null> {
     const query: VoiceroidDaemonQuery = {
       Text: speechText.text,
       Speaker: {
@@ -63,7 +63,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
       });
     }
 
-    throw Error("Failed to Synthesis");
+    return null;
   }
 
   override async checkInitialActiveness(): Promise<SpeakerState> {

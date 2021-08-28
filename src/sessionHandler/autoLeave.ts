@@ -1,7 +1,7 @@
 import { SessionEventHandlerRegistrant } from "../types";
 import { Session } from "../session";
 import { GuildMember } from "discord.js";
-import { createEmbedBase } from "../util";
+import { createYosugaEmbed } from "../util";
 import { getLogger } from "log4js";
 
 const logger = getLogger("sessionEvent");
@@ -31,7 +31,7 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
   });
 
   const leaveRoom = () => {
-    const embed = createEmbedBase().setDescription(
+    const embed = createYosugaEmbed().setDescription(
       "一定時間ボイスチャンネルに誰もいなくなったため退出しました."
     );
 

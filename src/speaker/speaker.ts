@@ -1,8 +1,11 @@
 import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource } from "@discordjs/voice";
 import { Session } from "../session";
+import { getLogger } from "log4js";
 
 export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
+
+const logger = getLogger("speakerLogger");
 
 export abstract class Speaker<T = unknown> {
   protected readonly session: Session;
@@ -16,7 +19,11 @@ export abstract class Speaker<T = unknown> {
   }
 
   async initialize(): Promise<Speaker<T>> {
-    this.status = await this.checkInitialActiveness();
+    try {
+      this.status = await this.checkInitialActiveness();
+    } catch (e) {
+      logger.error(e);
+    }
     return this;
   }
 
@@ -24,7 +31,7 @@ export abstract class Speaker<T = unknown> {
     speechText: SpeechText,
     voiceParam: VoiceParam<T>,
     pauseParam: PauseParam
-  ): Promise<AudioResource>;
+  ): Promise<AudioResource | null>;
 
   protected abstract checkInitialActiveness(): Promise<SpeakerState>;
 }

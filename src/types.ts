@@ -1,16 +1,6 @@
-import {
-  ChatInputApplicationCommandData,
-  CommandInteraction,
-  Guild,
-  GuildMember,
-  MessageEmbed,
-  StageChannel,
-  TextChannel,
-  VoiceChannel,
-} from "discord.js";
+import { StageChannel, VoiceChannel } from "discord.js";
 
 import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
 
 // ====================
@@ -143,31 +133,26 @@ export type GlobalEventHandlerRegistrant = (emitter: YosugaEventEmitter) => void
 // Command
 // ====================
 
-export type CommandExecutor = (
-  args: Array<string>,
-  context: CommandContext
-) => Promise<MessageEmbed>;
+// export type CommandExecutor = (
+//   args: Array<string>,
+//   context: CommandContext
+// ) => Promise<MessageEmbed>;
 
-export type CommandData = ChatInputApplicationCommandData & {
-  alias?: string[];
-  // execute: CommandExecutor;
-};
-
-export type CommandContextBase = {
-  session: Session | null;
-  config: GuildConfigWithoutVoice;
-  guild: Guild;
-  user: GuildMember;
-  textChannel: TextChannel;
-};
-
-export type TextCommandContext = CommandContextBase & {
-  type: "text";
-};
-
-export type InteractionCommandContext = CommandContextBase & {
-  type: "interaction";
-  interaction: CommandInteraction;
-};
-
-export type CommandContext = TextCommandContext | InteractionCommandContext;
+// export type CommandContextBase = {
+//   session: Session | null;
+//   config: GuildConfigWithoutVoice;
+//   guild: Guild;
+//   user: GuildMember;
+//   textChannel: TextChannel;
+// };
+//
+// export type TextCommandContext = CommandContextBase & {
+//   type: "text";
+// };
+//
+// export type InteractionCommandContext = CommandContextBase & {
+//   type: "interaction";
+//   interaction: CommandInteraction;
+// };
+//
+// export type CommandContext = TextCommandContext | InteractionCommandContext;

@@ -1,10 +1,18 @@
-import { MessageEmbed } from "discord.js";
-import { promisify } from "util";
+import { MessageEmbed, Permissions, Role } from "discord.js";
 
-export const wait = promisify(setTimeout);
+export const wait = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
 
-export const createEmbedBase = (): MessageEmbed => {
-  return new MessageEmbed().setTitle("Yosuga").setColor(0xffb6c1);
+export const createYosugaEmbed = (base?: MessageEmbed): MessageEmbed => {
+  return (base ?? new MessageEmbed()).setAuthor("Yosuga").setColor(0xffb6c1);
+};
+
+export const hasAdminPermission = (role: Role) => {
+  return role.permissions.bitfield === Permissions.FLAGS.ADMINISTRATOR;
 };
 
 const regexp = /[\\^$.*+?()[\]{}|]/;

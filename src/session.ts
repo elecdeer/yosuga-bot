@@ -10,7 +10,7 @@ import {
   VoiceOrStageChannel,
 } from "./types";
 import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
-import { createEmbedBase } from "./util";
+import { createYosugaEmbed } from "./util";
 import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
 import { registerMessageHandler } from "./sessionHandler/message";
 import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
@@ -130,7 +130,7 @@ export class Session extends SessionEmitter {
     if (!voiceOption) {
       logger.warn("音声合成システムが無効です");
 
-      const embed = createEmbedBase().setDescription("⚠ 音声合成システムが無効となっています");
+      const embed = createYosugaEmbed().setDescription("⚠ 音声合成システムが無効となっています");
       void this.textChannel.send({ embeds: [embed] });
       return;
     }

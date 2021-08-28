@@ -31,8 +31,6 @@ export class YosugaClient extends YosugaEventEmitter {
     this.client = discordClient;
 
     this.commandManager = new CommandManager(this);
-    this.assignCommands();
-
     this.sessionManager = new SessionManager(this);
   }
 
@@ -48,9 +46,11 @@ export class YosugaClient extends YosugaEventEmitter {
         logger.info(`token: ${res}`);
         logger.info(`applicationOwner: ${client.application?.owner}`);
 
-        void this.commandManager.registerSlashCommand().catch((err) => {
-          logger.warn(err);
-        });
+        this.assignCommands();
+
+        // void this.commandManager.registerSlashCommand().catch((err) => {
+        //   logger.warn(err);
+        // });
       })
       .catch((err) => {
         logger.error("failed to login discord");
