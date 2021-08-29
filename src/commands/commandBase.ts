@@ -1,6 +1,7 @@
 import { ApplicationCommandData, ApplicationCommandOptionData } from "discord.js";
-import { CommandContext } from "../commandContext";
 import { RequireAtLeastOne } from "type-fest";
+
+import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../permissionUtil";
 
 export type CommandData = RequireAtLeastOne<

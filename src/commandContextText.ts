@@ -1,8 +1,9 @@
-import { CommandContext, ReplyType } from "./commandContext";
 import { Guild, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
-import { YosugaClient } from "./yosugaClient";
+
+import { CommandContext, ReplyType } from "./commandContext";
 import { getGuildConfig, GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
+import { YosugaClient } from "./yosugaClient";
 
 export type ValidMessage = Message & {
   guild: Guild;

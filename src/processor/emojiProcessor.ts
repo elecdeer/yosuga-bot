@@ -1,11 +1,11 @@
-import { ProcessorProvider } from "../types";
-import { processorLogger } from "./processor";
-
 import {
   existsPronunciation,
   getEmojiRegExp,
   getPronunciation,
 } from "@elecdeer/emoji-pronunciation-ja";
+
+import { ProcessorProvider } from "../types";
+import { processorLogger } from "./processor";
 
 const emojiReg = getEmojiRegExp();
 

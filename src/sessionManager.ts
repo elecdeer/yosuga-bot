@@ -1,10 +1,11 @@
-import { VoiceOrStageChannel } from "./types";
-import log4js from "log4js";
-import { Session } from "./session";
-import { Collection, Snowflake, TextChannel } from "discord.js";
 import { VoiceConnection } from "@discordjs/voice";
-import { YosugaClient } from "./yosugaClient";
+import { Collection, Snowflake, TextChannel } from "discord.js";
+import log4js from "log4js";
+
 import { yosuga } from "./index";
+import { Session } from "./session";
+import { VoiceOrStageChannel } from "./types";
+import { YosugaClient } from "./yosugaClient";
 
 const logger = log4js.getLogger("sessionManager");
 

@@ -19,7 +19,7 @@
     "lint-staged": "lint-staged"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
+    "*.{ts,tsx}": [
       "prettier src/**/*.ts src/*.ts --write",
       "eslint src/**/*.ts src/*.ts --max-warnings 0"
     ]
@@ -63,6 +63,7 @@
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "emoji-regex": "^9.2.2",
+    "eslint-plugin-import": "^2.24.2",
     "ffmpeg-static": "^4.4.0",
     "http-status": "^1.5.0",
     "husky": "^7.0.2",

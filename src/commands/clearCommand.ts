@@ -1,7 +1,8 @@
 import log4js from "log4js";
-import { CommandBase } from "./commandBase";
+
 import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../permissionUtil";
+import { CommandBase } from "./commandBase";
 
 const commandLogger = log4js.getLogger("command");
 

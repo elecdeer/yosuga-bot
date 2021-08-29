@@ -1,21 +1,22 @@
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { Client, ClientApplication, Collection } from "discord.js";
-import { yosugaEnv } from "./environment";
 import { getLogger } from "log4js";
-import { SessionManager } from "./sessionManager";
+
 import { CommandManager } from "./commandManager";
-import { StartCommand } from "./commands/startCommand";
-import { EndCommand } from "./commands/endCommand";
 import { ClearCommand } from "./commands/clearCommand";
-import { HelpCommand } from "./commands/helpCommand";
-import { VersionCommand } from "./commands/versionCommand";
-import { ReloadCommand } from "./commands/reloadCommand";
-import { Speaker } from "./speaker/speaker";
-import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
-import { Session } from "./session";
 import { DeployGlobalCommand } from "./commands/deployGlobalCommand";
 import { DeployGuildCommand } from "./commands/deployGuildCommand";
 import { DeployResetCommand } from "./commands/deployResetCommand";
+import { EndCommand } from "./commands/endCommand";
+import { HelpCommand } from "./commands/helpCommand";
+import { ReloadCommand } from "./commands/reloadCommand";
+import { StartCommand } from "./commands/startCommand";
+import { VersionCommand } from "./commands/versionCommand";
+import { yosugaEnv } from "./environment";
+import { Session } from "./session";
+import { SessionManager } from "./sessionManager";
+import { Speaker } from "./speaker/speaker";
+import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
 
 const logger = getLogger("yosugaClient");
 

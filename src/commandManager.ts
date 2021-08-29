@@ -1,8 +1,9 @@
-import { CommandBase } from "./commands/commandBase";
-import log4js from "log4js";
 import { ApplicationCommand, Collection, Guild, Snowflake } from "discord.js";
-import { YosugaClient } from "./yosugaClient";
+import log4js from "log4js";
+
+import { CommandBase } from "./commands/commandBase";
 import { CommandPermission, constructPermissionData, fetchPermission } from "./permissionUtil";
+import { YosugaClient } from "./yosugaClient";
 
 const commandLogger = log4js.getLogger("command");
 

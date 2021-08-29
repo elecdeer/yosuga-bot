@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import urlRegex from "url-regex-safe";
-import httpStatus from "http-status";
 import axios from "axios";
-import ogs from "open-graph-scraper";
-import { processorLogger } from "./processor";
-import { ProcessorProvider } from "../types";
 import charset from "charset";
-
+import httpStatus from "http-status";
 import iconv from "iconv-lite";
+import ogs from "open-graph-scraper";
+import urlRegex from "url-regex-safe";
+
+import { ProcessorProvider } from "../types";
+import { processorLogger } from "./processor";
 
 const LinkType = {
   Image: "画像",

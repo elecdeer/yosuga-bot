@@ -1,8 +1,9 @@
 //サーバのカスタム絵文字
 
+import { Util } from "discord.js";
+
 import { ProcessorProvider } from "../types";
 import { processorLogger } from "./processor";
-import { Util } from "discord.js";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
 export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechText) => {

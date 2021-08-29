@@ -1,8 +1,9 @@
 import log4js from "log4js";
-import { reloadConfigData } from "../configManager";
-import { CommandBase } from "./commandBase";
+
 import { CommandContext } from "../commandContext";
+import { reloadConfigData } from "../configManager";
 import { CommandPermission } from "../permissionUtil";
+import { CommandBase } from "./commandBase";
 
 const commandLogger = log4js.getLogger("command");
 

@@ -1,4 +1,3 @@
-import { CommandContext, ReplyType } from "./commandContext";
 import {
   CommandInteraction,
   CommandInteractionOptionResolver,
@@ -7,9 +6,11 @@ import {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
-import { YosugaClient } from "./yosugaClient";
+
+import { CommandContext, ReplyType } from "./commandContext";
 import { getGuildConfig, GuildConfigWithoutVoice } from "./configManager";
 import { Session } from "./session";
+import { YosugaClient } from "./yosugaClient";
 
 export type ValidCommandInteraction = CommandInteraction & {
   guild: Guild;

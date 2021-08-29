@@ -1,8 +1,9 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
-import StrictEventEmitter from "strict-event-emitter-types";
 import EventEmitter from "events";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import StrictEventEmitter from "strict-event-emitter-types";
+
 import { VoiceOrStageChannel } from "./types";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
 
 // const logger = getLogger("session");
 
