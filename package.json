@@ -14,7 +14,8 @@
     "check:type": "tsc",
     "check:format": "prettier --check src/**/*.ts src/*.ts",
     "check:lint": "eslint src/**/*.ts src/*.ts",
-    "format": "prettier src/**/*.ts src/*.ts --write"
+    "format": "prettier src/**/*.ts src/*.ts --write",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -57,7 +58,9 @@
     "emoji-regex": "^9.2.2",
     "ffmpeg-static": "^4.4.0",
     "http-status": "^1.5.0",
+    "husky": "^7.0.2",
     "libsodium-wrappers": "^0.7.9",
+    "lint-staged": "^11.1.2",
     "log4js": "^6.3.0",
     "lowdb": "^1.0.0",
     "open-graph-scraper": "^4.9.1",
