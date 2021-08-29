@@ -73,7 +73,7 @@ export class CommandManager {
     }
   }
 
-  async registerSlashCommands(guild?: Guild): Promise<void> {
+  async registerSlashCommands(guild?: Guild)     {
     commandLogger.debug("registerSlashCommands");
 
     const application = this.yosuga.client.application;
