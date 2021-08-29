@@ -5,8 +5,9 @@ import axios from "axios";
 import ogs from "open-graph-scraper";
 import { processorLogger } from "./processor";
 import { ProcessorProvider } from "../types";
+import charset from "charset";
 
-import { codeToString, convert } from "encoding-japanese";
+import iconv from "iconv-lite";
 
 const LinkType = {
   Image: "画像",
@@ -69,16 +70,16 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
   processorLogger.debug(`check: ${url}`);
 
-  const res = await axios({
-    method: "GET",
-    url: encodeURI(url),
-    validateStatus: (status) => 200 <= status || status < 400,
-    timeout: 2000,
-    headers: {
-      "User-Agent": "bot",
-    },
-    responseType: "arraybuffer",
-  }).catch((err: Error) => err);
+  const res = await axios
+    .get<ArrayBuffer>(encodeURI(url), {
+      validateStatus: (status) => 200 <= status || status < 400,
+      timeout: 2000,
+      headers: {
+        "User-Agent": "bot",
+      },
+      responseType: "arraybuffer",
+    })
+    .catch((err: Error) => err);
   if (res instanceof Error) {
     return { type: LinkType.InvalidUrl };
   }
@@ -97,7 +98,13 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
   }
 
   if (contentType.startsWith("text/html")) {
-    const html = codeToString(convert(res.data, "UNICODE"));
+    const buffer = Buffer.from(res.data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+    const charCode = charset(res.headers, buffer);
+    processorLogger.debug(charCode);
+
+    const html = iconv.decode(buffer, charCode ?? "utf8");
 
     const ogRes = await ogs({
       url: "",

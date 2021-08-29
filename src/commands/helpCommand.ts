@@ -4,7 +4,7 @@ import { ApplicationCommandOptionChoice, MessageEmbed } from "discord.js";
 import { yosuga } from "../index";
 import { CommandManager } from "../commandManager";
 import { CommandContext } from "../commandContext";
-import { CommandPermission, fetchPermission } from "../PermissionUtil";
+import { CommandPermission, fetchPermission } from "../permissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 

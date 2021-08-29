@@ -17,7 +17,7 @@ import { yosuga } from "./index";
 import { CommandContext } from "./commandContext";
 import { CommandContextText, isValidMessage } from "./commandContextText";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
-import { hasAdminPermission } from "./PermissionUtil";
+import { hasAdminPermission } from "./permissionUtil";
 
 const logger = log4js.getLogger("yosugaEvent");
 
