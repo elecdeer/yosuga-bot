@@ -1,7 +1,8 @@
-import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource } from "@discordjs/voice";
-import { Session } from "../session";
 import { getLogger } from "log4js";
+
+import { Session } from "../session";
+import { PauseParam, SpeechText, VoiceParam } from "../types";
 
 export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 

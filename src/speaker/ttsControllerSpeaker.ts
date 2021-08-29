@@ -1,15 +1,16 @@
-import { Speaker, SpeakerState } from "./speaker";
-import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
-import { Session } from "../session";
-import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import axios from "axios";
 import { getLogger } from "log4js";
 import { opus } from "prism-media";
 import { Readable } from "stream";
-import { ttsControllerOccupier } from "./ttsControllerOccupier";
 import { URLSearchParams } from "url";
+
+import { Session } from "../session";
+import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { wait } from "../util";
+import { SIOAudioRecorder } from "./socketIOAudioRecorder";
+import { Speaker, SpeakerState } from "./speaker";
+import { ttsControllerOccupier } from "./ttsControllerOccupier";
 
 type TtsControllerSpeakerConfig = {
   urlBase: string;

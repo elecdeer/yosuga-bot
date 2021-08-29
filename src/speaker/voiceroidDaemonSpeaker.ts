@@ -1,10 +1,11 @@
-import { Speaker, SpeakerState } from "./speaker";
-import { PauseParam, SpeechText, VoiceParam } from "../types";
 import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
-import { Readable } from "stream";
 import { getLogger } from "log4js";
+import { Readable } from "stream";
+
 import { Session } from "../session";
+import { PauseParam, SpeechText, VoiceParam } from "../types";
+import { Speaker, SpeakerState } from "./speaker";
 
 export type VoiceroidDaemonQuery = Partial<{
   Text: string;

@@ -10,7 +10,7 @@ module.exports = {
     sourceType: "module",
     project: "./tsconfig.eslint.json",
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "import"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -21,6 +21,23 @@ module.exports = {
     "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "import/order": [
+      "error",
+      {
+        groups: [["builtin", "external"], ["parent", "sibling", "index"], "object", "type"],
+        pathGroups: [
+          {
+            pattern: "@alias/**",
+            group: "parent",
+            position: "before",
+          },
+        ],
+        alphabetize: {
+          order: "asc",
+        },
+        "newlines-between": "always",
+      },
+    ],
   },
   settings: {
     settings: {

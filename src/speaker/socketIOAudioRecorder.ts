@@ -1,9 +1,10 @@
 //ラッパー
 
-import { io, Socket as SIOSocket } from "socket.io-client";
 import ss, { Socket } from "@sap_oss/node-socketio-stream";
-import { Readable } from "stream";
 import { getLogger } from "log4js";
+import { io, Socket as SIOSocket } from "socket.io-client";
+import { Readable } from "stream";
+
 import { wait } from "../util";
 
 const logger = getLogger("SIOAudioRecorder");

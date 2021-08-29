@@ -1,7 +1,7 @@
 declare module "@sap_oss/node-socketio-stream" {
+  import { EventEmitter } from "events";
   import { Socket as SIOSocket } from "socket.io-client";
   import { Duplex, DuplexOptions, Readable, ReadableOptions } from "stream";
-  import { EventEmitter } from "events";
 
   export default lookup;
 

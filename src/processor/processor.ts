@@ -1,4 +1,5 @@
 import { getLogger } from "log4js";
+
 import { SpeechText, TextProcessor } from "../types";
 
 export const processorLogger = getLogger("processor");

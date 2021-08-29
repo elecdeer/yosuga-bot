@@ -1,7 +1,7 @@
 import { StageChannel, VoiceChannel } from "discord.js";
 
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
 import { Session } from "./session";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
 
 // ====================
 // General

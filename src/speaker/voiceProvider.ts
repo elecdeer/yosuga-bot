@@ -1,8 +1,9 @@
 import { AudioResource } from "@discordjs/voice";
-import { PauseParam, SpeechText, VoiceOption } from "../types";
 import { Collection } from "discord.js";
-import { Speaker } from "./speaker";
+
 import { Session } from "../session";
+import { PauseParam, SpeechText, VoiceOption } from "../types";
+import { Speaker } from "./speaker";
 
 export class VoiceProvider {
   protected session: Session;

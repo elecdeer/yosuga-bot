@@ -1,5 +1,3 @@
-import { Session } from "./session";
-import { GuildConfigWithoutVoice } from "./configManager";
 import {
   CommandInteractionOptionResolver,
   Guild,
@@ -7,6 +5,9 @@ import {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
+
+import { GuildConfigWithoutVoice } from "./configManager";
+import { Session } from "./session";
 import { createYosugaEmbed } from "./util";
 
 export type ReplyType = "plain" | "warn" | "error" | "prohibit";

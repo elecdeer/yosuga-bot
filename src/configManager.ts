@@ -1,10 +1,11 @@
-import FileSync from "lowdb/adapters/FileSync";
-import low from "lowdb";
-import { GuildConfig, UserConfig, VoiceOption } from "./types";
-import { yosugaEnv } from "./environment";
-import { getLogger } from "log4js";
-import { VoiceProvider } from "./speaker/voiceProvider";
 import { Snowflake } from "discord.js";
+import { getLogger } from "log4js";
+import low from "lowdb";
+import FileSync from "lowdb/adapters/FileSync";
+
+import { yosugaEnv } from "./environment";
+import { VoiceProvider } from "./speaker/voiceProvider";
+import { GuildConfig, UserConfig, VoiceOption } from "./types";
 
 type GuildConfigRecord = Record<string, Partial<GuildConfig>> & { default: GuildConfig };
 type UserConfigRecord = Record<string, Partial<UserConfig>>;

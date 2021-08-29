@@ -1,15 +1,16 @@
-import { SessionEventHandlerRegistrant, SpeechText } from "../types";
 import { getLogger } from "log4js";
-import { ProcessorChain } from "../processor/processor";
-import { maxLengthProcessor } from "../processor/maxLengthProcessor";
-import { urlProcessor } from "../processor/urlProcessor";
+
+import { GuildConfigWithoutVoice } from "../configManager";
+import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
-import { codeBlockProcessor } from "../processor/codeBlockProcessor";
-import { omitSymbolProcessor } from "../processor/omitSymbolProcessor";
-import { GuildConfigWithoutVoice } from "../configManager";
+import { maxLengthProcessor } from "../processor/maxLengthProcessor";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
+import { omitSymbolProcessor } from "../processor/omitSymbolProcessor";
+import { ProcessorChain } from "../processor/processor";
 import { tildeReplaceProcessor } from "../processor/tildeReplaceProcessor";
+import { urlProcessor } from "../processor/urlProcessor";
+import { SessionEventHandlerRegistrant, SpeechText } from "../types";
 
 const logger = getLogger("text");
 

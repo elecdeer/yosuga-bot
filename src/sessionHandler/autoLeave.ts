@@ -1,8 +1,9 @@
-import { SessionEventHandlerRegistrant } from "../types";
-import { Session } from "../session";
 import { GuildMember } from "discord.js";
-import { createYosugaEmbed } from "../util";
 import { getLogger } from "log4js";
+
+import { Session } from "../session";
+import { SessionEventHandlerRegistrant } from "../types";
+import { createYosugaEmbed } from "../util";
 
 const logger = getLogger("sessionEvent");
 export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {

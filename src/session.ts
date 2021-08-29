@@ -1,30 +1,31 @@
-import { SessionEmitter } from "./sessionEmitter";
-import { GuildMember, Snowflake, TextChannel } from "discord.js";
-import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
-import { getLogger } from "log4js";
-import {
-  PartiallyPartial,
-  SessionEventHandlerRegistrant,
-  SpeechText,
-  VoiceOrStageChannel,
-} from "./types";
-import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
-import { createYosugaEmbed } from "./util";
-import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
-import { registerMessageHandler } from "./sessionHandler/message";
-import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
-import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
-import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
-import { registerAutoLeave } from "./sessionHandler/autoLeave";
 import {
   AudioPlayer,
   createAudioPlayer,
   NoSubscriberBehavior,
   VoiceConnection,
 } from "@discordjs/voice";
-import { VoiceProvider } from "./speaker/voiceProvider";
+import { GuildMember, Snowflake, TextChannel } from "discord.js";
+import { getLogger } from "log4js";
+
+import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
 import { yosuga } from "./index";
+import { SessionEmitter } from "./sessionEmitter";
+import { registerAutoLeave } from "./sessionHandler/autoLeave";
+import { registerMessageHandler } from "./sessionHandler/message";
+import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
+import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
+import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
+import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
+import { VoiceProvider } from "./speaker/voiceProvider";
+import { createSpeechQueue, SpeechQueue } from "./speechQueue";
+import {
+  PartiallyPartial,
+  SessionEventHandlerRegistrant,
+  SpeechText,
+  VoiceOrStageChannel,
+} from "./types";
+import { createYosugaEmbed } from "./util";
+import { YosugaEventEmitter } from "./yosugaEventEmitter";
 
 const logger = getLogger("session");
 

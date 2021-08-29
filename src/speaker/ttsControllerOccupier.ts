@@ -1,6 +1,7 @@
-import { Session } from "../session";
 import { Collection, Snowflake } from "discord.js";
 import { getLogger } from "log4js";
+
+import { Session } from "../session";
 
 const logger = getLogger("ttsControllerOccupier");
 

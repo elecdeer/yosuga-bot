@@ -13,8 +13,16 @@
     "check": "npm-run-all check:*",
     "check:type": "tsc",
     "check:format": "prettier --check src/**/*.ts src/*.ts",
-    "check:lint": "eslint src/**/*.ts src/*.ts",
-    "format": "prettier src/**/*.ts src/*.ts --write"
+    "check:lint": "eslint src/**/*.ts src/*.ts --max-warnings 0",
+    "format": "prettier src/**/*.ts src/*.ts --write",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier src/**/*.ts src/*.ts --write",
+      "eslint src/**/*.ts src/*.ts --max-warnings 0"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -55,9 +63,12 @@
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "emoji-regex": "^9.2.2",
+    "eslint-plugin-import": "^2.24.2",
     "ffmpeg-static": "^4.4.0",
     "http-status": "^1.5.0",
+    "husky": "^7.0.2",
     "libsodium-wrappers": "^0.7.9",
+    "lint-staged": "^11.1.2",
     "log4js": "^6.3.0",
     "lowdb": "^1.0.0",
     "open-graph-scraper": "^4.9.1",
