@@ -11,6 +11,8 @@ type UserConfigRecord = Record<string, Partial<UserConfig>>;
 
 const logger = getLogger("configManager");
 
+//TODO クラスにしてうまいことasyncをどうにかする
+
 const guildConfigInitialDefault: GuildConfig = {
   commandPrefix: "yosuga",
   voiceOption: {

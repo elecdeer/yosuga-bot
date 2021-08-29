@@ -2,7 +2,7 @@ import log4js from "log4js";
 import { CommandBase } from "./commandBase";
 import { imageEnv } from "../environment";
 import { CommandContext } from "../commandContext";
-import { CommandPermission } from "../PermissionUtil";
+import { CommandPermission } from "../permissionUtil";
 
 const commandLogger = log4js.getLogger("command");
 
