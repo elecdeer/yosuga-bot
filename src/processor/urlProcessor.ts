@@ -108,7 +108,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
     const ogRes = await ogs({
       url: "",
-      htl: html,
+      html: html,
     });
 
     if (ogRes.error) {
