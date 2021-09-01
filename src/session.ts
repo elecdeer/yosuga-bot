@@ -7,7 +7,7 @@ import {
 import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
 
-import { getGuildConfig, getVoiceConfig, GuildConfigWithoutVoice } from "./configManager";
+import { UnifiedConfig } from "./configManager";
 import { yosuga } from "./index";
 import { SessionEmitter } from "./sessionEmitter";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
@@ -25,7 +25,7 @@ import {
   VoiceOrStageChannel,
 } from "./types";
 import { createYosugaEmbed } from "./util";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
+import { YosugaClient } from "./yosugaClient";
 
 const logger = getLogger("session");
 
@@ -69,12 +69,12 @@ export class Session extends SessionEmitter {
   lastPushedSpeech: PushSpeechRecord;
 
   constructor(
-    yosugaEmitter: YosugaEventEmitter,
+    yosuga: YosugaClient,
     connection: VoiceConnection,
     textChannel: TextChannel,
     voiceChannel: VoiceOrStageChannel
   ) {
-    super(yosugaEmitter, voiceChannel, textChannel);
+    super(yosuga, voiceChannel, textChannel);
     this.connection = connection;
 
     this.voiceProvider = new VoiceProvider(this, yosuga.speakersFactory(this));
@@ -97,7 +97,7 @@ export class Session extends SessionEmitter {
     };
 
     handlerRegistrants.forEach((registrant) => {
-      registrant(this);
+      void registrant(this);
     });
   }
 
@@ -115,24 +115,25 @@ export class Session extends SessionEmitter {
     this.removeAllListeners();
   }
 
-  pushSpeech(
+  async pushSpeech(
     param: PartiallyPartial<SpeechText, "speed" | "volume">,
     userId?: Snowflake,
     timestamp?: number
-  ): void {
+  ): Promise<void> {
     // logger.debug("push speeech queue", param.Text);
 
     // logger.debug(this.speakerMap);
 
     //check状態のことを考えるべきかも
-    const voiceOption = getVoiceConfig(this.voiceProvider, this.guild.id, userId);
+
+    const voiceOption = await this.voiceProvider.getValidVoiceOption(this.guild.id, userId);
     logger.debug(voiceOption);
 
     if (!voiceOption) {
       logger.warn("音声合成システムが無効です");
 
       const embed = createYosugaEmbed().setDescription("⚠ 音声合成システムが無効となっています");
-      void this.textChannel.send({ embeds: [embed] });
+      await this.textChannel.send({ embeds: [embed] });
       return;
     }
 
@@ -142,7 +143,7 @@ export class Session extends SessionEmitter {
       ...param,
     };
     //ここでやらない方がいい気もする
-    const config = getGuildConfig(this.guild.id);
+    const config = await this.getConfig();
     fullParam.speed *= config.masterSpeed;
     fullParam.volume *= config.masterVolume;
 
@@ -183,8 +184,8 @@ export class Session extends SessionEmitter {
     return this.voiceChannel;
   }
 
-  getConfig(): Readonly<GuildConfigWithoutVoice> {
-    return getGuildConfig(this.guild.id);
+  async getConfig(): Promise<Readonly<UnifiedConfig>> {
+    return await this.yosuga.configManager.getUnifiedConfig(this.guild.id);
   }
 
   getGuildId(): Snowflake {

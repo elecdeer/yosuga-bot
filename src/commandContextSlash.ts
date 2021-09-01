@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 
 import { CommandContext, ReplyType } from "./commandContext";
-import { getGuildConfig, GuildConfigWithoutVoice } from "./configManager";
+import { UnifiedConfig } from "./configManager";
 import { Session } from "./session";
 import { YosugaClient } from "./yosugaClient";
 
@@ -34,7 +34,7 @@ export class CommandContextSlash extends CommandContext {
   override readonly guild: Guild;
   override readonly textChannel: TextChannel;
   override readonly member: GuildMember;
-  override readonly config: GuildConfigWithoutVoice;
+  override readonly config: Promise<UnifiedConfig>;
   override readonly session: Session | null;
 
   readonly interaction: CommandInteraction;
@@ -48,13 +48,16 @@ export class CommandContextSlash extends CommandContext {
     this.textChannel = interaction.channel;
     this.member = interaction.member;
 
-    this.config = getGuildConfig(this.guild.id);
+    this.config = yosuga.configManager.getUnifiedConfig(this.guild.id);
     const voiceChannel = this.member.voice.channel;
     this.session = voiceChannel ? yosuga.sessionManager.getSession(this.guild.id) : null;
 
     this.interaction = interaction;
 
     this.differTimer = setTimeout(() => {
+      if (this.interaction.replied || this.interaction.deferred) {
+        return;
+      }
       void this.interaction.deferReply();
     }, 2500);
   }

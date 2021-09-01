@@ -10,12 +10,12 @@ const logger = getLogger("speechQueue");
 export type SpeechQueue = async.QueueObject<SpeechTask>;
 export const createSpeechQueue = (session: Session): SpeechQueue => {
   const worker = async (task: SpeechTask): Promise<void> => {
-    const config = session.getConfig();
+    const config = await session.getConfig();
 
     const voiceProvider = session.getVoiceProvider();
 
     const resource = await voiceProvider
-      .synthesis(task.speechText, task.voiceOption, config.pauseParam)
+      .synthesis(task.speechText, task.voiceOption)
       .catch((err) => {
         logger.error(err);
       });

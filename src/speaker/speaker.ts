@@ -2,13 +2,13 @@ import { AudioResource } from "@discordjs/voice";
 import { getLogger } from "log4js";
 
 import { Session } from "../session";
-import { PauseParam, SpeechText, VoiceParam } from "../types";
+import { AdditionalVoiceParam, PauseParam, SpeechText, VoiceParam } from "../types";
 
 export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 
 const logger = getLogger("speakerLogger");
 
-export abstract class Speaker<T = unknown> {
+export abstract class Speaker<T extends AdditionalVoiceParam = AdditionalVoiceParam> {
   protected readonly session: Session;
 
   readonly engineType: string;
@@ -30,8 +30,7 @@ export abstract class Speaker<T = unknown> {
 
   abstract synthesis(
     speechText: SpeechText,
-    voiceParam: VoiceParam<T>,
-    pauseParam: PauseParam
+    voiceParam: VoiceParam<T>
   ): Promise<AudioResource | null>;
 
   protected abstract checkInitialActiveness(): Promise<SpeakerState>;

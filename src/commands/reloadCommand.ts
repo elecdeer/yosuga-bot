@@ -1,7 +1,6 @@
 import log4js from "log4js";
 
 import { CommandContext } from "../commandContext";
-import { reloadConfigData } from "../configManager";
 import { CommandPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
 
@@ -21,12 +20,12 @@ export class ReloadCommand extends CommandBase {
   async execute(context: CommandContext): Promise<void> {
     commandLogger.debug("reload config");
 
-    try {
-      await reloadConfigData();
-      await context.reply("plain", `リロードしました.`);
-    } catch (err) {
-      commandLogger.warn(err);
-      await context.reply("error", `設定ファイルの読み込みに失敗しました.`);
-    }
+    // try {
+    //   await reloadConfigData();
+    //   await context.reply("plain", `リロードしました.`);
+    // } catch (err) {
+    //   commandLogger.warn(err);
+    //   await context.reply("error", `設定ファイルの読み込みに失敗しました.`);
+    // }
   }
 }

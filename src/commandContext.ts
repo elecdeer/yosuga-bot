@@ -6,7 +6,7 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { GuildConfigWithoutVoice } from "./configManager";
+import { UnifiedConfig } from "./configManager";
 import { Session } from "./session";
 import { createYosugaEmbed } from "./util";
 
@@ -20,7 +20,7 @@ const REPLY_TYPE_EMOJI: Record<ReplyType, string> = {
 
 export abstract class CommandContext {
   abstract readonly session: Session | null;
-  abstract readonly config: GuildConfigWithoutVoice;
+  abstract readonly config: Promise<UnifiedConfig>;
   abstract readonly guild: Guild;
   abstract readonly member: GuildMember;
   abstract readonly textChannel: TextChannel;

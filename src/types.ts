@@ -1,7 +1,6 @@
 import { StageChannel, VoiceChannel } from "discord.js";
 
 import { Session } from "./session";
-import { YosugaEventEmitter } from "./yosugaEventEmitter";
 
 // ====================
 // General
@@ -11,21 +10,32 @@ export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T
 
 export type VoiceOrStageChannel = VoiceChannel | StageChannel;
 
+export type Awaited = PromiseLike<void> | void;
+export type EventsBase = Record<string, [...unknown[]]>;
+export interface TypedEventEmitter<TEvents extends EventsBase> {
+  on<K extends keyof TEvents>(event: K, listener: (...args: TEvents[K]) => Awaited): this;
+  once<K extends keyof TEvents>(event: K, listener: (...args: TEvents[K]) => Awaited): this;
+  emit<K extends keyof TEvents>(event: K, ...args: TEvents[K]): boolean;
+  off<K extends keyof TEvents>(event: K, listener: (...args: TEvents[K]) => Awaited): this;
+  removeAllListeners<K extends keyof TEvents>(event?: K): this;
+}
+
 // ====================
 // Voice
 // ====================
 
 // export type synthesisEngine = "voiceroidDaemon" | "assistantSeika";
 
-export type VoiceParam<T> = {
+export type AdditionalVoiceParam = Record<string, string | number | boolean>;
+export type VoiceParam<T extends AdditionalVoiceParam> = {
   pitch: number;
   intonation: number;
   additionalOption?: T;
 };
 
-export type VoiceOption = {
+export type SpeakerOption = {
   speakerName: string;
-  voiceParam: VoiceParam<unknown>;
+  voiceParam: VoiceParam<AdditionalVoiceParam>;
 };
 
 //
@@ -58,7 +68,7 @@ export type SpeechText = {
 };
 
 export type SpeechTask = {
-  voiceOption: VoiceOption;
+  voiceOption: SpeakerOption;
   speechText: SpeechText;
 };
 
@@ -93,41 +103,41 @@ export type ProcessorProvider<T> = (arg: T) => TextProcessor;
 // ====================
 // Config
 // ====================
-
-export type GuildConfig = {
-  commandPrefix: string;
-  voiceOption: VoiceOption;
-  pauseParam: PauseParam;
-  wordDictionary: WordDictionary;
-  masterVolume: number;
-  masterSpeed: number;
-  fastSpeedScale: number;
-  readStatusUpdate: boolean;
-  readTimeSignal: boolean;
-  timeToAutoLeaveSec: number;
-  timeToReadMemberNameSec: number;
-  ignorePrefix: string;
-  maxStringLength: number;
-  enableSlashCommand: boolean;
-};
-
-export type WordDictionary = WordItem[];
-export type WordItem = {
-  type: "segment" | "all" | "regex";
-  word: string;
-  read: string;
-};
-
-export type UserConfig = {
-  voiceOption: VoiceOption;
-};
+//
+// export type GuildConfig = {
+//   commandPrefix: string;
+//   voiceOption: SpeakerOption;
+//   pauseParam: PauseParam;
+//   wordDictionary: WordDictionary;
+//   masterVolume: number;
+//   masterSpeed: number;
+//   fastSpeedScale: number;
+//   readStatusUpdate: boolean;
+//   readTimeSignal: boolean;
+//   timeToAutoLeaveSec: number;
+//   timeToReadMemberNameSec: number;
+//   ignorePrefix: string;
+//   maxStringLength: number;
+//   enableSlashCommand: boolean;
+// };
+//
+// export type WordDictionary = WordItem[];
+// export type WordItem = {
+//   type: "segment" | "all" | "regex";
+//   word: string;
+//   read: string;
+// };
+//
+// export type UserConfig = {
+//   voiceOption: SpeakerOption;
+// };
 
 // ====================
 // Event
 // ====================
 
-export type SessionEventHandlerRegistrant = (session: Session) => void;
-export type GlobalEventHandlerRegistrant = (emitter: YosugaEventEmitter) => void;
+export type SessionEventHandlerRegistrant = (session: Session) => Awaited;
+// export type GlobalEventHandlerRegistrant = (emitter: YosugaEventEmitter) => void;
 
 // ====================
 // Command

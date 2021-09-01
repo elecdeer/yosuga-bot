@@ -6,7 +6,7 @@ import { Readable } from "stream";
 import { URLSearchParams } from "url";
 
 import { Session } from "../session";
-import { PauseParam, SpeechText, VoiceParam } from "../types";
+import { AdditionalVoiceParam, PauseParam, SpeechText, VoiceParam } from "../types";
 import { wait } from "../util";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker, SpeakerState } from "./speaker";
@@ -38,6 +38,7 @@ export class TtsControllerSpeaker extends Speaker {
 
     logger.debug("checkInitialActiveness");
 
+    const config = await this.session.getConfig();
     const stream = await this.synthesisStream(
       {
         text: "テスト",
@@ -47,8 +48,7 @@ export class TtsControllerSpeaker extends Speaker {
       {
         intonation: 1,
         pitch: 1,
-      },
-      this.session.getConfig().pauseParam
+      }
     );
 
     if (!stream) {
@@ -76,10 +76,9 @@ export class TtsControllerSpeaker extends Speaker {
 
   override async synthesis(
     speechText: SpeechText,
-    voiceParam: VoiceParam<unknown>,
-    pauseParam: PauseParam
+    voiceParam: VoiceParam<AdditionalVoiceParam>
   ): Promise<AudioResource | null> {
-    const stream = await this.synthesisStream(speechText, voiceParam, pauseParam);
+    const stream = await this.synthesisStream(speechText, voiceParam);
 
     if (!stream) return null;
 
@@ -92,8 +91,7 @@ export class TtsControllerSpeaker extends Speaker {
 
   protected async synthesisStream(
     speechText: SpeechText,
-    voiceParam: VoiceParam<unknown>,
-    pauseParam: PauseParam
+    voiceParam: VoiceParam<AdditionalVoiceParam>
   ): Promise<Readable | null> {
     logger.debug(this.config);
 

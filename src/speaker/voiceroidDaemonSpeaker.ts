@@ -4,7 +4,7 @@ import { getLogger } from "log4js";
 import { Readable } from "stream";
 
 import { Session } from "../session";
-import { PauseParam, SpeechText, VoiceParam } from "../types";
+import { SpeechText, VoiceParam } from "../types";
 import { Speaker, SpeakerState } from "./speaker";
 
 export type VoiceroidDaemonQuery = Partial<{
@@ -24,7 +24,7 @@ export type VoiceroidDaemonSpeakerParam = Partial<{
 
 const logger = getLogger("voiceroidDaemonSpeaker");
 
-export class VoiceroidDaemonSpeaker extends Speaker<void> {
+export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
   protected urlBase: string;
   private checkUrl: string;
   private speechTextUrl: string;
@@ -38,8 +38,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
 
   override async synthesis(
     speechText: SpeechText,
-    voiceParam: VoiceParam<void>,
-    pauseParam: PauseParam
+    voiceParam: VoiceParam<Record<string, never>>
   ): Promise<AudioResource | null> {
     const query: VoiceroidDaemonQuery = {
       Text: speechText.text,
@@ -48,9 +47,6 @@ export class VoiceroidDaemonSpeaker extends Speaker<void> {
         Speed: speechText.speed,
         Pitch: voiceParam.pitch,
         Emphasis: voiceParam.intonation,
-        PauseMiddle: pauseParam.shortPause,
-        PauseLong: pauseParam.longPause,
-        PauseSentence: pauseParam.sentencePause,
       },
     };
 
