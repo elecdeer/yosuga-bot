@@ -1,6 +1,7 @@
 import { kvsLocalStorage } from "@kvs/node-localstorage";
 import { KVS } from "@kvs/types";
 import assert from "assert";
+import deepmerge from "deepmerge";
 import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
@@ -77,12 +78,16 @@ export class ConfigManager {
 
     if (guildId) {
       const guildConfig = await this.getGuildConfig(guildId);
-      unifiedConfig = Object.assign(unifiedConfig, guildConfig);
+      if (guildConfig) {
+        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, guildConfig);
+      }
     }
 
     if (userId) {
       const userConfig = await this.getUserConfig(userId);
-      unifiedConfig = Object.assign(unifiedConfig, userConfig);
+      if (userConfig) {
+        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, userConfig);
+      }
     }
 
     return unifiedConfig;
