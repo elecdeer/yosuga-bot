@@ -22,8 +22,10 @@ import { DeployGuildCommand } from "./commands/deployGuildCommand";
 import { DeployResetCommand } from "./commands/deployResetCommand";
 import { EndCommand } from "./commands/endCommand";
 import { HelpCommand } from "./commands/helpCommand";
+import { MasterConfigCommand } from "./commands/masterConfigCommand";
 import { ReloadCommand } from "./commands/reloadCommand";
 import { StartCommand } from "./commands/startCommand";
+import { UserConfigCommand } from "./commands/userConfigCommand";
 import { VersionCommand } from "./commands/versionCommand";
 import { ConfigManager } from "./configManager";
 import { yosugaEnv } from "./environment";
@@ -32,6 +34,7 @@ import { hasAdminPermission } from "./permissionUtil";
 import { Session } from "./session";
 import { SessionManager } from "./sessionManager";
 import { Speaker } from "./speaker/speaker";
+import { TtsControllerSpeaker } from "./speaker/ttsControllerSpeaker";
 import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 
@@ -106,35 +109,55 @@ export class YosugaClient extends (EventEmitter as { new (): TypedEventEmitter<E
     this.commandManager.assign(new DeployGlobalCommand());
     this.commandManager.assign(new DeployGuildCommand());
     this.commandManager.assign(new DeployResetCommand());
+    this.commandManager.assign(new MasterConfigCommand());
+    this.commandManager.assign(new UserConfigCommand());
   }
 
-  speakersFactory(session: Session): Collection<string, Speaker> {
-    const collection = new Collection<string, Speaker>();
-
-    //うまいことして環境変数からいじれるようにする
-    if (yosugaEnv.voiceroidDaemonUrl) {
-      collection.set("yukari", new VoiceroidDaemonSpeaker(session, yosugaEnv.voiceroidDaemonUrl));
-    }
-
-    //test
-    // collection.set(
-    //   "akane",
-    //   new TtsControllerSpeaker(session, {
-    //     urlBase: "http://192.168.0.14:1000",
-    //     outputDevice: "CABLE Input",
-    //     voiceName: "琴葉 茜",
-    //     wsUrl: "http://192.168.0.14443",
-    //   })
-    // );
-
-    const daemonSpeakers = collection.filter((speaker) => speaker.engineType === "voiceroidDaemon");
-    void Promise.all(daemonSpeakers.map((speaker) => speaker.initialize()));
-
-    // const ttsSpeakers = collection.filter((speaker) => speaker.engineType === "ttsController");
-    // void allSerial(ttsSpeakers.map((speaker) => () => speaker.initialize()));
-
-    return collection;
-  }
+  // speakersFactory(session: Session): Collection<string, Speaker> {
+  //   const collection = new Collection<string, Speaker>();
+  //
+  //   //仮
+  //   void (async () => {
+  //     const config = await session.getConfig();
+  //     Object.values(config.speakerBuildOptions).forEach((speakerOption) => {
+  //       if (speakerOption.type === "voiceroidDaemon") {
+  //         collection.set(
+  //           speakerOption.voiceName,
+  //           new VoiceroidDaemonSpeaker(session, speakerOption)
+  //         );
+  //         return;
+  //       }
+  //       if (speakerOption.type === "ttsController") {
+  //         collection.set(speakerOption.voiceName, new TtsControllerSpeaker(session, speakerOption));
+  //         return;
+  //       }
+  //     });
+  //   })();
+  //
+  //   //うまいことして環境変数からいじれるようにする
+  //   if (yosugaEnv.voiceroidDaemonUrl) {
+  //     collection.set("yukari", new VoiceroidDaemonSpeaker(session, yosugaEnv.voiceroidDaemonUrl));
+  //   }
+  //
+  //   //test
+  //   // collection.set(
+  //   //   "akane",
+  //   //   new TtsControllerSpeaker(session, {
+  //   //     urlBase: "http://192.168.0.14:1000",
+  //   //     outputDevice: "CABLE Input",
+  //   //     voiceName: "琴葉 茜",
+  //   //     wsUrl: "http://192.168.0.14:443",
+  //   //   })
+  //   // );
+  //
+  //   const daemonSpeakers = collection.filter((speaker) => speaker.engineType === "voiceroidDaemon");
+  //   void Promise.all(daemonSpeakers.map((speaker) => speaker.initialize()));
+  //
+  //   // const ttsSpeakers = collection.filter((speaker) => speaker.engineType === "ttsController");
+  //   // void allSerial(ttsSpeakers.map((speaker) => () => speaker.initialize()));
+  //
+  //   return collection;
+  // }
 
   //=========================================
   // Events

@@ -12,23 +12,35 @@ import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker, SpeakerState } from "./speaker";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
 
-type TtsControllerSpeakerConfig = {
+export type TtsSpeakerBuildOption = {
+  type: "ttsController";
   urlBase: string;
   voiceName: string;
   outputDevice: string;
   wsUrl: string;
+  callName: string;
+};
+
+type TtsControllerQuery = {
+  text: string;
+  name: string;
+  speaker: string;
+  volume: number;
+  speed: number;
+  pitch: number;
+  range: number;
 };
 
 const logger = getLogger("ttsControllerSpeaker");
 
 export class TtsControllerSpeaker extends Speaker {
-  protected config: TtsControllerSpeakerConfig;
+  protected option: TtsSpeakerBuildOption;
   protected recorder: SIOAudioRecorder;
 
-  constructor(session: Session, config: TtsControllerSpeakerConfig) {
+  constructor(session: Session, option: TtsSpeakerBuildOption) {
     super(session, "ttsController");
-    this.config = config;
-    this.recorder = new SIOAudioRecorder(this.config.wsUrl);
+    this.option = option;
+    this.recorder = new SIOAudioRecorder(this.option.wsUrl);
   }
 
   override async checkInitialActiveness(): Promise<SpeakerState> {
@@ -93,21 +105,33 @@ export class TtsControllerSpeaker extends Speaker {
     speechText: SpeechText,
     voiceParam: VoiceParam<AdditionalVoiceParam>
   ): Promise<Readable | null> {
-    logger.debug(this.config);
+    logger.debug(this.option);
+    //
+    // const urlParams = new URLSearchParams();
+    // urlParams.append("text", speechText.text);
+    // urlParams.append("name", this.option.callName);
+    // urlParams.append("speaker", this.option.outputDevice);
+    // urlParams.append("volume", String(speechText.volume));
+    // urlParams.append("speed", String(speechText.speed));
+    // urlParams.append("pitch", String(voiceParam.pitch));
+    // urlParams.append("range", String(voiceParam.intonation));
 
-    const urlParams = new URLSearchParams();
-    urlParams.append("text", speechText.text);
-    urlParams.append("name", this.config.voiceName);
-    urlParams.append("speaker", this.config.outputDevice);
-    urlParams.append("volume", String(speechText.volume));
-    urlParams.append("speed", String(speechText.speed));
-    urlParams.append("pitch", String(voiceParam.pitch));
-    urlParams.append("range", String(voiceParam.intonation));
+    // const url = `${this.option.urlBase}/?${urlParams.toString()}`;
+    // logger.debug(`url: ${url}`);
+    const params: TtsControllerQuery = {
+      text: speechText.text,
+      name: this.option.callName,
+      speaker: this.option.outputDevice,
+      volume: speechText.volume,
+      speed: speechText.speed,
+      pitch: voiceParam.pitch,
+      range: voiceParam.intonation,
+    };
 
-    const url = `${this.config.urlBase}/?${urlParams.toString()}`;
-    logger.debug(`url: ${url}`);
-
-    const start = () => axios.get(url);
+    const start = () =>
+      axios.get(this.option.urlBase, {
+        params: params,
+      });
 
     try {
       const stream = await this.recorder.recordAudioStream(start);

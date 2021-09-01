@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 
 import { CommandContext, ReplyType } from "./commandContext";
-import { UnifiedConfig } from "./configManager";
+import { ConfigManager } from "./configManager";
 import { Session } from "./session";
 import { YosugaClient } from "./yosugaClient";
 
@@ -33,9 +33,9 @@ export const isValidCommandInteraction = (
 export class CommandContextSlash extends CommandContext {
   override readonly guild: Guild;
   override readonly textChannel: TextChannel;
-  override readonly member: GuildMember;
-  override readonly config: Promise<UnifiedConfig>;
   override readonly session: Session | null;
+  override readonly configManager: ConfigManager;
+  override readonly member: GuildMember;
 
   readonly interaction: CommandInteraction;
 
@@ -48,7 +48,7 @@ export class CommandContextSlash extends CommandContext {
     this.textChannel = interaction.channel;
     this.member = interaction.member;
 
-    this.config = yosuga.configManager.getUnifiedConfig(this.guild.id);
+    this.configManager = yosuga.configManager;
     const voiceChannel = this.member.voice.channel;
     this.session = voiceChannel ? yosuga.sessionManager.getSession(this.guild.id) : null;
 

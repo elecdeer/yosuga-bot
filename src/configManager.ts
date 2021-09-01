@@ -40,6 +40,9 @@ export type MasterConfig = Record<string, UnifiedConfig>;
 export type GuildConfig = Record<string, Partial<GuildLevelConfig & UserLevelConfig>>;
 export type UserConfig = Record<string, Partial<UserLevelConfig>>;
 
+type ValueResolvable<T> = Exclude<T, undefined> | ((value: T) => Exclude<T, undefined>);
+type ValueResolvableOptional<T> = T | ((value: T | undefined) => T | undefined);
+
 const logger = getLogger("configManager");
 
 export class ConfigManager {
@@ -93,6 +96,60 @@ export class ConfigManager {
     return unifiedConfig;
   }
 
+  async setMasterConfig<T extends keyof ValueOf<MasterConfig>>(
+    key: T,
+    value: ValueResolvable<ValueOf<MasterConfig>[T]>
+  ): Promise<boolean> {
+    const appId = this.yosuga.client.application!.id;
+    assert(this.masterStorage);
+    const base = (await this.masterStorage.get(appId))!;
+
+    if (typeof value === "function") {
+      base[key] = value(base[key]);
+    } else {
+      base[key] = value;
+    }
+
+    await this.masterStorage.set(appId, base);
+    return true;
+  }
+
+  async setGuildConfig<T extends keyof ValueOf<GuildConfig>>(
+    guildId: Snowflake,
+    key: T,
+    value: ValueResolvableOptional<ValueOf<GuildConfig>[T]>
+  ): Promise<boolean> {
+    assert(this.guildStorage);
+    const base = (await this.guildStorage.get(guildId)) ?? {};
+
+    if (typeof value === "function") {
+      base[key] = value(base[key]);
+    } else {
+      base[key] = value;
+    }
+
+    await this.guildStorage.set(guildId, base);
+    return true;
+  }
+
+  async setUserConfig<T extends keyof ValueOf<UserConfig>>(
+    userId: Snowflake,
+    key: T,
+    value: ValueResolvableOptional<ValueOf<GuildConfig>[T]>
+  ): Promise<boolean> {
+    assert(this.userStorage);
+    const base = (await this.userStorage.get(userId)) ?? {};
+
+    if (typeof value === "function") {
+      base[key] = value(base[key]);
+    } else {
+      base[key] = value;
+    }
+
+    await this.userStorage.set(userId, base);
+    return true;
+  }
+
   async initialize(): Promise<void> {
     logger.debug("initialize configManager");
     const appId = this.yosuga.client.application!.id;
@@ -118,6 +175,8 @@ export class ConfigManager {
       storeFilePath: path.join(yosugaEnv.configPath, "userConfig"),
       version: 1,
     });
+
+    // this.userStorage.set();
 
     logger.debug("loaded!");
   }

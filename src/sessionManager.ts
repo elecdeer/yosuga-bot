@@ -29,6 +29,7 @@ export class SessionManager {
     voiceChannel: VoiceOrStageChannel
   ): Session {
     const session = new Session(yosuga, connection, textChannel, voiceChannel);
+
     const guildId = textChannel.guild.id;
 
     this.sessionCollection.set(guildId, session);

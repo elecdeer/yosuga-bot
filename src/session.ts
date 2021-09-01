@@ -76,10 +76,8 @@ export class Session extends SessionEmitter {
   ) {
     super(yosuga, voiceChannel, textChannel);
     this.connection = connection;
-
-    this.voiceProvider = new VoiceProvider(this, yosuga.speakersFactory(this));
-
     this.speechQueue = this.initializeQueue();
+    this.voiceProvider = new VoiceProvider(this);
 
     this.player = createAudioPlayer({
       debug: true,

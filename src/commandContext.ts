@@ -6,7 +6,7 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { UnifiedConfig } from "./configManager";
+import { ConfigManager, UnifiedConfig } from "./configManager";
 import { Session } from "./session";
 import { createYosugaEmbed } from "./util";
 
@@ -20,7 +20,7 @@ const REPLY_TYPE_EMOJI: Record<ReplyType, string> = {
 
 export abstract class CommandContext {
   abstract readonly session: Session | null;
-  abstract readonly config: Promise<UnifiedConfig>;
+  abstract readonly configManager: ConfigManager;
   abstract readonly guild: Guild;
   abstract readonly member: GuildMember;
   abstract readonly textChannel: TextChannel;
@@ -39,6 +39,10 @@ export abstract class CommandContext {
       const embed = createYosugaEmbed(content);
       return embed.setDescription(`${prefix} ${embed.description}`);
     }
+  }
+
+  getConfig(): Promise<UnifiedConfig> {
+    return this.configManager.getUnifiedConfig(this.guild.id, this.member.id);
   }
 
   abstract getOptions(): CommandInteractionOptionResolver | undefined;

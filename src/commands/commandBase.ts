@@ -49,10 +49,11 @@ export abstract class CommandBase {
   abstract execute(context: CommandContext): Promise<void>;
 
   getTriggers(): string[] {
-    if (this.isMessageCommand()) {
-      return [this.data.name, ...(this.data.messageCommand?.alias ?? [])];
+    const trigger = [this.data.name];
+    if (this.isMessageCommand() && this.data.messageCommand?.alias) {
+      trigger.push(...this.data.messageCommand?.alias);
     }
-    return [];
+    return trigger;
   }
 
   constructInteractionData(): ApplicationCommandData {
