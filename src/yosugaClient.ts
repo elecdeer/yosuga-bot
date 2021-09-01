@@ -11,7 +11,6 @@ import {
 } from "discord.js";
 import EventEmitter from "events";
 import { getLogger } from "log4js";
-import StrictEventEmitter from "strict-event-emitter-types";
 
 import { CommandContext } from "./commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";

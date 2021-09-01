@@ -3,8 +3,10 @@ import { KVS } from "@kvs/types";
 import assert from "assert";
 import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
+import path from "path";
 import { ValueOf } from "type-fest";
 
+import { yosugaEnv } from "./environment";
 import { SpeakerBuildOption } from "./speaker/voiceProvider";
 import { SpeakerOption } from "./types";
 import { YosugaClient } from "./yosugaClient";
@@ -91,7 +93,7 @@ export class ConfigManager {
     const appId = this.yosuga.client.application!.id;
     this.masterStorage = await kvsLocalStorage<MasterConfig>({
       name: "master-config",
-      storeFilePath: "./masterconfig",
+      storeFilePath: path.join(yosugaEnv.configPath, "masterConfig"),
       version: 1,
       async upgrade({ kvs, oldVersion }) {
         if (oldVersion === 0) {
@@ -102,13 +104,13 @@ export class ConfigManager {
 
     this.guildStorage = await kvsLocalStorage<GuildConfig>({
       name: "guild-config",
-      storeFilePath: "./guildconfig",
+      storeFilePath: path.join(yosugaEnv.configPath, "guildConfig"),
       version: 1,
     });
 
     this.userStorage = await kvsLocalStorage<UserConfig>({
       name: "user-config",
-      storeFilePath: "./userconfig",
+      storeFilePath: path.join(yosugaEnv.configPath, "userConfig"),
       version: 1,
     });
 
