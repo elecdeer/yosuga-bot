@@ -1,6 +1,6 @@
 import { getLogger } from "log4js";
 
-import { GuildConfigWithoutVoice } from "../configManager";
+import { UnifiedConfig } from "../configManager";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
@@ -16,10 +16,10 @@ const logger = getLogger("text");
 
 let processorCache: {
   processor: ProcessorChain;
-  config: GuildConfigWithoutVoice;
+  config: UnifiedConfig;
 } | null;
 
-const createProcessor = (config: GuildConfigWithoutVoice) => {
+const createProcessor = (config: UnifiedConfig) => {
   //なんかもったいない気がするのでCacheしてるけどしなくてもいいかも
   if (config === processorCache?.config) {
     return processorCache.processor;
@@ -50,7 +50,7 @@ const createProcessor = (config: GuildConfigWithoutVoice) => {
 };
 
 export const registerMessageHandler: SessionEventHandlerRegistrant = (session) => {
-  session.on("message", (message) => {
+  session.on("message", async (message) => {
     logger.debug(`content: ${message.content}  escape: ${escape(message.content)}`);
     logger.debug(`cleanContent: ${message.cleanContent}`);
 
@@ -59,7 +59,7 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
     logger.debug(`stickers: ${message.stickers}`);
 
     const baseText = message.cleanContent;
-    const config = session.getConfig();
+    const config = await session.getConfig();
     if (baseText.startsWith(config.ignorePrefix)) {
       logger.debug("ignored");
       return;
@@ -120,11 +120,10 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
 
     const processor = createProcessor(config);
 
-    void processor.process(speechTexts, true).then((processedTexts) => {
-      logger.debug(`text: ${processedTexts}`);
-      processedTexts.forEach((item) => {
-        session.pushSpeech(item, message.author.id, message.createdTimestamp);
-      });
+    const processedTexts = await processor.process(speechTexts, true);
+    logger.debug(`text: ${processedTexts}`);
+    processedTexts.forEach((item) => {
+      void session.pushSpeech(item, message.author.id, message.createdTimestamp);
     });
   });
 };

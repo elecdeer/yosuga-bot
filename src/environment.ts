@@ -4,8 +4,7 @@ import * as fs from "fs";
 config();
 
 export type YosugaEnv = {
-  guildConfigPath: string;
-  userConfigPath: string;
+  configPath: string;
   discordToken: string;
   discordAppId: string;
   discordPublicKey: string;
@@ -26,8 +25,7 @@ export type ImageEnv = {
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
   const env: Partial<YosugaEnv> = {
-    guildConfigPath: process.env.GUILD_CONFIG_PATH,
-    userConfigPath: process.env.USER_CONFIG_PATH,
+    configPath: process.env.CONFIG_PATH,
     discordToken: process.env.DISCORD_TOKEN,
     discordAppId: process.env.DISCORD_APP_ID,
     discordPublicKey: process.env.DISCORD_PUB_KEY,
@@ -38,8 +36,7 @@ const initEnv = (): YosugaEnv => {
     socketIOAudioRecorderWSUrl: process.env.SOCKETIO_AUDIO_RECORDER_WS_URL,
   };
 
-  if (!env.guildConfigPath) env.guildConfigPath = "guildConfig.json";
-  if (!env.userConfigPath) env.userConfigPath = "userConfig.json";
+  if (!env.configPath) env.configPath = "./config";
   if (!env.discordToken) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
   if (!env.voiceroidDaemonUrl) {
     console.warn(

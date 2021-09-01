@@ -1,34 +1,133 @@
+import { kvsLocalStorage } from "@kvs/node-localstorage";
+import { KVS } from "@kvs/types";
+import assert from "assert";
+import deepmerge from "deepmerge";
 import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
+import path from "path";
+import { ValueOf } from "type-fest";
 
 import { yosugaEnv } from "./environment";
-import { VoiceProvider } from "./speaker/voiceProvider";
-import { GuildConfig, UserConfig, VoiceOption } from "./types";
+import { SpeakerBuildOption } from "./speaker/voiceProvider";
+import { SpeakerOption } from "./types";
+import { YosugaClient } from "./yosugaClient";
 
-type GuildConfigRecord = Record<string, Partial<GuildConfig>> & { default: GuildConfig };
-type UserConfigRecord = Record<string, Partial<UserConfig>>;
+export type MasterLevelConfig = {
+  speakerBuildOptions: Record<string, SpeakerBuildOption>;
+};
+
+export type GuildLevelConfig = {
+  commandPrefix: string;
+  ignorePrefix: string;
+  masterVolume: number;
+  masterSpeed: number;
+  fastSpeedScale: number;
+  readStatusUpdate: boolean;
+  readTimeSignal: boolean;
+  timeToAutoLeaveSec: number;
+  timeToReadMemberNameSec: number;
+  maxStringLength: number;
+};
+
+export type UserLevelConfig = {
+  speakerOption: SpeakerOption | null;
+};
+
+export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
+
+//DISCORD_APP_ID: ConfigUnity
+export type MasterConfig = Record<string, UnifiedConfig>;
+export type GuildConfig = Record<string, Partial<GuildLevelConfig & UserLevelConfig>>;
+export type UserConfig = Record<string, Partial<UserLevelConfig>>;
 
 const logger = getLogger("configManager");
 
-//TODO クラスにしてうまいことasyncをどうにかする
+export class ConfigManager {
+  private readonly yosuga: YosugaClient;
+  protected masterStorage: KVS<MasterConfig> | null;
+  protected guildStorage: KVS<GuildConfig> | null;
+  protected userStorage: KVS<UserConfig> | null;
 
-const guildConfigInitialDefault: GuildConfig = {
+  constructor(yosuga: YosugaClient) {
+    this.yosuga = yosuga;
+    this.masterStorage = null;
+    this.guildStorage = null;
+    this.userStorage = null;
+  }
+
+  async getMasterConfig(): Promise<ValueOf<MasterConfig>> {
+    const appId = this.yosuga.client.application?.id;
+    assert(appId);
+    assert(this.masterStorage);
+    const config = await this.masterStorage.get(appId);
+    return config ?? masterConfigDefault;
+  }
+
+  async getGuildConfig(guildId: Snowflake): Promise<ValueOf<GuildConfig> | undefined> {
+    assert(this.guildStorage);
+    return await this.guildStorage.get(guildId);
+  }
+
+  async getUserConfig(userId: Snowflake): Promise<ValueOf<UserConfig> | undefined> {
+    assert(this.userStorage);
+    return await this.userStorage.get(userId);
+  }
+
+  async getUnifiedConfig(guildId?: Snowflake, userId?: Snowflake): Promise<UnifiedConfig> {
+    let unifiedConfig = await this.getMasterConfig();
+
+    if (guildId) {
+      const guildConfig = await this.getGuildConfig(guildId);
+      if (guildConfig) {
+        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, guildConfig);
+      }
+    }
+
+    if (userId) {
+      const userConfig = await this.getUserConfig(userId);
+      if (userConfig) {
+        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, userConfig);
+      }
+    }
+
+    return unifiedConfig;
+  }
+
+  async initialize(): Promise<void> {
+    logger.debug("initialize configManager");
+    const appId = this.yosuga.client.application!.id;
+    this.masterStorage = await kvsLocalStorage<MasterConfig>({
+      name: "master-config",
+      storeFilePath: path.join(yosugaEnv.configPath, "masterConfig"),
+      version: 1,
+      async upgrade({ kvs, oldVersion }) {
+        if (oldVersion === 0) {
+          await kvs.set(appId, masterConfigDefault);
+        }
+      },
+    });
+
+    this.guildStorage = await kvsLocalStorage<GuildConfig>({
+      name: "guild-config",
+      storeFilePath: path.join(yosugaEnv.configPath, "guildConfig"),
+      version: 1,
+    });
+
+    this.userStorage = await kvsLocalStorage<UserConfig>({
+      name: "user-config",
+      storeFilePath: path.join(yosugaEnv.configPath, "userConfig"),
+      version: 1,
+    });
+
+    logger.debug("loaded!");
+  }
+}
+
+const masterConfigDefault: UnifiedConfig = {
+  speakerBuildOptions: {},
+
   commandPrefix: "yosuga",
-  voiceOption: {
-    speakerName: "yukari",
-    voiceParam: {
-      intonation: 1,
-      pitch: 1,
-    },
-  },
-  pauseParam: {
-    shortPause: 150,
-    longPause: 370,
-    sentencePause: 800,
-  },
-  wordDictionary: [],
+  ignorePrefix: "!!",
   masterVolume: 1,
   masterSpeed: 1.1,
   fastSpeedScale: 1.5,
@@ -36,87 +135,7 @@ const guildConfigInitialDefault: GuildConfig = {
   readTimeSignal: false,
   timeToAutoLeaveSec: 10,
   timeToReadMemberNameSec: 30,
-  ignorePrefix: "!!",
   maxStringLength: 80,
-  enableSlashCommand: false,
-};
 
-const guildAdapter = new FileSync<GuildConfigRecord>(yosugaEnv.guildConfigPath);
-const guildConfigData = low(guildAdapter);
-void guildConfigData
-  .defaults({
-    default: guildConfigInitialDefault,
-  })
-  .write();
-
-const userAdapter = new FileSync<UserConfigRecord>(yosugaEnv.userConfigPath);
-const userConfigData = low(userAdapter);
-
-export type GuildConfigWithoutVoice = Omit<GuildConfig, "voiceParam">;
-
-export const reloadConfigData = async (): Promise<void> => {
-  guildConfigData.read();
-  userConfigData.read();
-  logger.debug(guildConfigData.toJSON());
-  logger.debug(userConfigData.toJSON());
-};
-
-void reloadConfigData().catch((err) => {
-  logger.error("設定ファイルの読み込みに失敗しました");
-  throw err;
-});
-
-/**
- * guildIdから各guildの設定を取得
- * @param guildId
- */
-export const getGuildConfig = (guildId: Snowflake): Readonly<GuildConfigWithoutVoice> => {
-  return {
-    ...guildConfigInitialDefault,
-    ...guildConfigData.get("default").value(),
-    ...guildConfigData.get(guildId).value(),
-  };
-};
-
-/**
- * guildIdとuserId、speakerMapから利用可能な読み上げ設定を取得
- * mergeは行わない
- * @param voiceProvider
- * @param guildId
- * @param userId
- */
-export const getVoiceConfig = (
-  voiceProvider: VoiceProvider,
-  guildId: Snowflake,
-  userId?: Snowflake
-): Readonly<VoiceOption> | null => {
-  logger.debug(voiceProvider.speakerCollection);
-  const activeSpeakerCollection = voiceProvider.speakerCollection.filter(
-    (speaker) => speaker.status == "active"
-  );
-
-  if (userId) {
-    const userConfig = userConfigData.get(userId).value()?.voiceOption;
-    logger.debug("user", userConfigData.get(userId).value());
-
-    if (userConfig && activeSpeakerCollection.has(userConfig.speakerName)) {
-      return userConfig;
-    }
-  }
-
-  const guildConfig = guildConfigData.get(guildId).value()?.voiceOption;
-  logger.debug("guild", guildConfigData.get(guildId).value());
-
-  if (guildConfig && activeSpeakerCollection.has(guildConfig.speakerName)) {
-    return guildConfig;
-  }
-
-  const defaultConfig = guildConfigData.get("default").value()?.voiceOption;
-  logger.debug("default", guildConfigData.get("default").value());
-
-  if (defaultConfig && activeSpeakerCollection.has(defaultConfig.speakerName)) {
-    return defaultConfig;
-  }
-
-  return null;
+  speakerOption: null,
 };

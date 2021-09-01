@@ -30,7 +30,7 @@ export const client: Client = new Discord.Client({
 });
 
 export const yosuga = new YosugaClient(client);
-yosuga.initClient();
+void yosuga.initClient();
 
 process.on("exit", (code) => {
   logger.info(`Exit... ${code}`);

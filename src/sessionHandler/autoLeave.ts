@@ -6,8 +6,8 @@ import { SessionEventHandlerRegistrant } from "../types";
 import { createYosugaEmbed } from "../util";
 
 const logger = getLogger("sessionEvent");
-export const registerAutoLeave: SessionEventHandlerRegistrant = (session) => {
-  const config = session.getConfig();
+export const registerAutoLeave: SessionEventHandlerRegistrant = async (session) => {
+  const config = await session.getConfig();
   const timeToAutoLeaveMs = config.timeToAutoLeaveSec * 1000;
 
   session.on("leaveChannel", (member: GuildMember) => {
