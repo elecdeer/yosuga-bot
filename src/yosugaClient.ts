@@ -1,7 +1,6 @@
 import {
   Client,
   ClientApplication,
-  Collection,
   CommandInteraction,
   GuildMember,
   Message,
@@ -28,15 +27,12 @@ import { ReloadCommand } from "./commands/reloadCommand";
 import { StartCommand } from "./commands/startCommand";
 import { UserConfigCommand } from "./commands/userConfigCommand";
 import { VersionCommand } from "./commands/versionCommand";
+import { VoiceStatusCommand } from "./commands/voiceStatusCommand";
 import { ConfigManager } from "./configManager";
 import { yosugaEnv } from "./environment";
 import { yosuga } from "./index";
 import { hasAdminPermission } from "./permissionUtil";
-import { Session } from "./session";
 import { SessionManager } from "./sessionManager";
-import { Speaker } from "./speaker/speaker";
-import { TtsControllerSpeaker } from "./speaker/ttsControllerSpeaker";
-import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 
 const logger = getLogger("yosugaClient");
@@ -113,6 +109,7 @@ export class YosugaClient extends (EventEmitter as { new (): TypedEventEmitter<E
     this.commandManager.assign(new MasterConfigCommand());
     this.commandManager.assign(new GuildConfigCommand());
     this.commandManager.assign(new UserConfigCommand());
+    this.commandManager.assign(new VoiceStatusCommand());
   }
 
   //=========================================

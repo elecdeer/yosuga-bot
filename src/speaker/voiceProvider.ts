@@ -69,6 +69,16 @@ export class VoiceProvider {
     }
     return result;
   }
+
+  async getSpeakersStatus(): Promise<{ name: string; status: string }[]> {
+    const collection = await this.speakerCollection;
+    return collection.map((speaker, key) => {
+      return {
+        name: `${key} [${speaker.engineType}]`,
+        status: speaker.status,
+      };
+    });
+  }
 }
 
 const constructSpeakerCollection = async (

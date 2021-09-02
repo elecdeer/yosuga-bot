@@ -14,6 +14,7 @@ import { SetReadStatusUpdateSub } from "./configSubCommands/setReadStatusUpdateS
 import { SetSpeedSub } from "./configSubCommands/setSpeedSub";
 import { SetVoiceSub } from "./configSubCommands/setVoiceSub";
 import { SetVolumeSub } from "./configSubCommands/setVolumeSub";
+import { ShowConfigSub } from "./configSubCommands/showConfigSub";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -37,5 +38,6 @@ export class MasterConfigCommand extends CommandGroup {
     this.addSubCommand(new SetAutoLeaveSecSub("MASTER"));
     this.addSubCommand(new SetReadNameIntervalSub("MASTER"));
     this.addSubCommand(new SetMaxLengthSub("MASTER"));
+    this.addSubCommand(new ShowConfigSub("MASTER"));
   }
 }
