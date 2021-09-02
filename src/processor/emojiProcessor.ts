@@ -4,8 +4,7 @@ import {
   getPronunciation,
 } from "@elecdeer/emoji-pronunciation-ja";
 
-import { ProcessorProvider } from "../types";
-import { processorLogger } from "./processor";
+import { processorLogger, ProcessorProvider } from "./processorChain";
 
 const emojiReg = getEmojiRegExp();
 

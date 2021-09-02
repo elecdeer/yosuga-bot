@@ -6,8 +6,7 @@ import iconv from "iconv-lite";
 import ogs from "open-graph-scraper";
 import urlRegex from "url-regex-safe";
 
-import { ProcessorProvider } from "../types";
-import { processorLogger } from "./processor";
+import { processorLogger, ProcessorProvider } from "./processorChain";
 
 const LinkType = {
   Image: "画像",

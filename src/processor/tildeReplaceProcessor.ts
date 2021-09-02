@@ -1,4 +1,4 @@
-import { ProcessorProvider } from "../types";
+import { ProcessorProvider } from "./processorChain";
 
 const tildeRegex = /(?<![0-9０-９一二三四五六七八九〇])[〜～~](?![0-9０-９一二三四五六七八九〇])/gm;
 
