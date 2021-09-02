@@ -2,6 +2,7 @@ import {
   CommandInteractionOptionResolver,
   Guild,
   GuildMember,
+  Message,
   MessageEmbed,
   TextChannel,
 } from "discord.js";
@@ -29,9 +30,9 @@ export abstract class CommandContext {
     type: ReplyType,
     content: string | MessageEmbed,
     channel?: Readonly<TextChannel>
-  ): Promise<unknown>;
+  ): Promise<Message>;
 
-  protected constructEmbed(type: ReplyType, content: string | MessageEmbed): MessageEmbed {
+  constructEmbed(type: ReplyType, content: string | MessageEmbed): MessageEmbed {
     const prefix = REPLY_TYPE_EMOJI[type];
     if (typeof content === "string") {
       return createYosugaEmbed().setDescription(`${prefix} ${content}`);

@@ -3,6 +3,7 @@ import {
   CommandInteractionOptionResolver,
   Guild,
   GuildMember,
+  Message,
   MessageEmbed,
   TextChannel,
 } from "discord.js";
@@ -62,11 +63,11 @@ export class CommandContextSlash extends CommandContext {
     }, 2500);
   }
 
-  override reply(
+  override async reply(
     type: ReplyType,
     content: string | MessageEmbed,
     channel?: Readonly<TextChannel>
-  ): Promise<unknown> {
+  ): Promise<Message> {
     const embed = this.constructEmbed(type, content);
 
     if (channel) {
@@ -76,9 +77,13 @@ export class CommandContextSlash extends CommandContext {
     if (!this.interaction.replied) {
       if (!this.interaction.deferred) {
         clearTimeout(this.differTimer);
-        return this.interaction.reply({ embeds: [embed] });
+        const message = await this.interaction.reply({ embeds: [embed], fetchReply: true });
+        //DMはそもそもない
+        return message as Message;
       } else {
-        return this.interaction.followUp({ embeds: [embed] });
+        const message = await this.interaction.followUp({ embeds: [embed] });
+        //DMはそもそもない
+        return message as Message;
       }
     } else {
       return this.textChannel.send({ embeds: [embed] });

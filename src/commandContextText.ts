@@ -40,7 +40,7 @@ export class CommandContextText extends CommandContext {
     type: ReplyType,
     content: string | MessageEmbed,
     channel?: Readonly<TextChannel>
-  ): Promise<unknown> {
+  ): Promise<Message> {
     const embed = this.constructEmbed(type, content);
 
     return (channel ?? this.textChannel).send({ embeds: [embed] });

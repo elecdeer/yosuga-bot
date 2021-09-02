@@ -72,8 +72,13 @@ export class StartCommand extends CommandBase {
           const sessionManager = yosuga.sessionManager;
 
           const connection = await connectToChannel(voiceChannel);
-          sessionManager.startSession(connection, textChannel, voiceChannel);
-          await context.reply("plain", `接続しました!`);
+          const session = sessionManager.startSession(connection, textChannel, voiceChannel);
+          const message = await context.reply("plain", `接続しました!\nボイスの初期化中...`);
+
+          await session.getVoiceProvider().getSpeakersStatus();
+          await message.edit({
+            embeds: [context.constructEmbed("plain", "接続しました!\nボイスの初期化完了.")],
+          });
         } catch (error) {
           await context.reply("error", "接続エラーが発生しました.");
         }
