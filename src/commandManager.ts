@@ -87,6 +87,7 @@ export class CommandManager {
     const registerCommands = this.commandCollection
       .filter((cmd) => cmd.isInteractionCommand())
       .map((cmd) => cmd.constructInteractionData());
+
     commandLogger.debug("registerCommand: ");
     registerCommands.forEach((cmd) => {
       commandLogger.debug(cmd);
@@ -99,8 +100,15 @@ export class CommandManager {
     } else {
       const appCommands = await application.commands.set(registerCommands);
 
+      commandLogger.debug("deployed commands");
+      appCommands.forEach((cmd) => {
+        commandLogger.debug(` ${cmd.name}: ${cmd.id}`);
+      });
+
       const guildManager = this.yosuga.client.guilds;
       await guildManager.fetch();
+
+      commandLogger.debug(guildManager.cache);
 
       await Promise.all(
         guildManager.cache.map((guild) => this.registerGuildPermission(guild, appCommands))
@@ -130,11 +138,21 @@ export class CommandManager {
           );
           commandLogger.debug(permission);
 
-          return await commandManager.permissions.set({
-            command: command.id,
-            guild: guild.id,
-            permissions: permission.allowList,
-          });
+          return await commandManager.permissions
+            .set({
+              command: command.id,
+              guild: guild.id,
+              permissions: permission.allowList,
+            })
+            .catch((err) => {
+              commandLogger.error(
+                `error at guild: ${guild.id}(${guild.name}) command: ${command.id}(${command.name})`
+              );
+              commandLogger.error(permission.allowList);
+              commandLogger.error(err);
+
+              throw err;
+            });
         })
     );
   }

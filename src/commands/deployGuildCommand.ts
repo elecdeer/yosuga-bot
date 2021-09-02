@@ -21,10 +21,10 @@ export class DeployGuildCommand extends CommandBase {
     commandLogger.debug("deploy-guild");
     try {
       await yosuga.commandManager.registerSlashCommands(context.guild);
-      await context.reply("plain", "登録しました.");
+      await context.reply("plain", "正常に登録が完了しました.");
     } catch (e) {
       commandLogger.error(e);
-      await context.reply("error", "登録に失敗しました");
+      await context.reply("error", "登録中にエラーが発生しました.");
     }
   }
 }
