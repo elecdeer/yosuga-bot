@@ -1,7 +1,6 @@
 import { ApplicationCommandSubCommandData } from "discord.js";
 
 import { CommandContextSlash } from "../commandContextSlash";
-import { CommandGroup } from "./commandGroup";
 
 export abstract class SubCommandBase {
   readonly data: Readonly<ApplicationCommandSubCommandData>;
@@ -15,5 +14,5 @@ export abstract class SubCommandBase {
     //optionsをResolvableにした方がいいのかも？
   }
 
-  abstract execute(context: CommandContextSlash, parent: CommandGroup): Promise<void>;
+  abstract execute(context: CommandContextSlash): Promise<void>;
 }

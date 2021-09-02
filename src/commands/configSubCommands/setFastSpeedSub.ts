@@ -23,7 +23,7 @@ export class SetFastSpeedSub extends ConfigSubCommand {
     );
   }
 
-  override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
+  override async execute(context: CommandContextSlash): Promise<void> {
     const options = context.getOptions();
     const configManager = context.configManager;
 

@@ -35,6 +35,6 @@ export class CommandGroup extends CommandBase {
 
     assert(context instanceof CommandContextSlash);
 
-    return subCommand.execute(context, this);
+    return subCommand.execute(context);
   }
 }
