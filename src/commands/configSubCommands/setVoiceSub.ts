@@ -42,7 +42,7 @@ export class SetVoiceSub extends ConfigSubCommand {
     const voiceName = options.getString("voicename");
 
     const masterConfig = await configManager.getMasterConfig();
-    if (voiceName && masterConfig.speakerBuildOptions[voiceName]) {
+    if (voiceName && !masterConfig.speakerBuildOptions[voiceName]) {
       await context.reply("warn", "登録されていないボイス名を指定しています.");
     }
 

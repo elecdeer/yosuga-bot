@@ -21,10 +21,10 @@ export class DeployGlobalCommand extends CommandBase {
     commandLogger.debug("deploy-global");
     try {
       await yosuga.commandManager.registerSlashCommands();
-      await context.reply("plain", "登録しました.");
+      await context.reply("plain", "正常に登録が完了しました.");
     } catch (e) {
       commandLogger.error(e);
-      await context.reply("error", "登録に失敗しました");
+      await context.reply("error", "登録中にエラーが発生しました.");
     }
   }
 }
