@@ -1,21 +1,25 @@
 import { CommandContextSlash } from "../../commandContextSlash";
+import { masterConfigDefault } from "../../configManager";
 import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
-export class SetReadStatusUpdateSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "read-status-update",
-      description: "GoLiveの開始時などに読み上げるかどうかの設定",
-      options: [
-        {
-          name: "enable",
-          description: "読み上げるかどうか",
-          type: "BOOLEAN",
-          required: true,
-        },
-      ],
-    });
+export class SetReadStatusUpdateSub extends ConfigSubCommand {
+  constructor(level: ConfigCommandLevel) {
+    super(
+      {
+        name: "read-status-update",
+        description: "GoLiveの開始時などに読み上げるかどうかの設定",
+        options: [
+          {
+            name: "enable",
+            description: "読み上げるかどうか",
+            type: "BOOLEAN",
+            required: isRequiredOption(level),
+          },
+        ],
+      },
+      level
+    );
   }
 
   override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
@@ -23,15 +27,15 @@ export class SetReadStatusUpdateSub extends SubCommandBase {
     const configManager = context.configManager;
 
     const configKey = "readStatusUpdate";
-    const enable = options.getBoolean("enable", true);
+    const value = options.getBoolean("enable") || undefined;
 
     //この辺あんまり良くないけどしょうがない感じもする
-    switch (parent.data.name) {
-      case "master-config":
-        await configManager.setMasterConfig(configKey, enable);
+    switch (this.level) {
+      case "MASTER":
+        await configManager.setMasterConfig(configKey, value ?? masterConfigDefault[configKey]);
         break;
-      case "guild-config":
-        await configManager.setGuildConfig(context.guild.id, configKey, enable);
+      case "GUILD":
+        await configManager.setGuildConfig(context.guild.id, configKey, value);
         break;
     }
 

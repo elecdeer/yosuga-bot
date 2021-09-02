@@ -27,15 +27,15 @@ export class MasterConfigCommand extends CommandGroup {
 
     this.addSubCommand(new AddSpeakerDaemonSub());
     this.addSubCommand(new AddSpeakerTtsSub());
-    this.addSubCommand(new SetVoiceSub());
-    this.addSubCommand(new SetVolumeSub());
-    this.addSubCommand(new SetSpeedSub());
-    this.addSubCommand(new SetFastSpeedSub());
-    this.addSubCommand(new SetCommandPrefixSub());
-    this.addSubCommand(new SetReadStatusUpdateSub());
-    this.addSubCommand(new SetIgnorePrefixSub());
-    this.addSubCommand(new SetAutoLeaveSecSub());
-    this.addSubCommand(new SetReadNameIntervalSub());
-    this.addSubCommand(new SetMaxLengthSub());
+    this.addSubCommand(new SetVoiceSub("MASTER"));
+    this.addSubCommand(new SetVolumeSub("MASTER"));
+    this.addSubCommand(new SetSpeedSub("MASTER"));
+    this.addSubCommand(new SetFastSpeedSub("MASTER"));
+    this.addSubCommand(new SetCommandPrefixSub("MASTER"));
+    this.addSubCommand(new SetReadStatusUpdateSub("MASTER"));
+    this.addSubCommand(new SetIgnorePrefixSub("MASTER"));
+    this.addSubCommand(new SetAutoLeaveSecSub("MASTER"));
+    this.addSubCommand(new SetReadNameIntervalSub("MASTER"));
+    this.addSubCommand(new SetMaxLengthSub("MASTER"));
   }
 }

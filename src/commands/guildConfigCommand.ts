@@ -23,15 +23,15 @@ export class GuildConfigCommand extends CommandGroup {
       permission: CommandPermission.GuildAdmin,
     });
 
-    this.addSubCommand(new SetVoiceSub());
-    this.addSubCommand(new SetVolumeSub());
-    this.addSubCommand(new SetSpeedSub());
-    this.addSubCommand(new SetFastSpeedSub());
-    this.addSubCommand(new SetCommandPrefixSub());
-    this.addSubCommand(new SetReadStatusUpdateSub());
-    this.addSubCommand(new SetIgnorePrefixSub());
-    this.addSubCommand(new SetAutoLeaveSecSub());
-    this.addSubCommand(new SetReadNameIntervalSub());
-    this.addSubCommand(new SetMaxLengthSub());
+    this.addSubCommand(new SetVoiceSub("GUILD"));
+    this.addSubCommand(new SetVolumeSub("GUILD"));
+    this.addSubCommand(new SetSpeedSub("GUILD"));
+    this.addSubCommand(new SetFastSpeedSub("GUILD"));
+    this.addSubCommand(new SetCommandPrefixSub("GUILD"));
+    this.addSubCommand(new SetReadStatusUpdateSub("GUILD"));
+    this.addSubCommand(new SetIgnorePrefixSub("GUILD"));
+    this.addSubCommand(new SetAutoLeaveSecSub("GUILD"));
+    this.addSubCommand(new SetReadNameIntervalSub("GUILD"));
+    this.addSubCommand(new SetMaxLengthSub("GUILD"));
   }
 }

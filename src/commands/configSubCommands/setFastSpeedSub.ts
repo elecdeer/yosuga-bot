@@ -1,22 +1,26 @@
 import { CommandContextSlash } from "../../commandContextSlash";
+import { masterConfigDefault } from "../../configManager";
 import { isInRange } from "../../util";
 import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
-export class SetFastSpeedSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "fast-speed-scale",
-      description: "早口の時の読み上げ速度倍率の設定",
-      options: [
-        {
-          name: "value",
-          description: "倍率（0.1 - 10）",
-          type: "NUMBER",
-          required: true,
-        },
-      ],
-    });
+export class SetFastSpeedSub extends ConfigSubCommand {
+  constructor(level: ConfigCommandLevel) {
+    super(
+      {
+        name: "fast-speed-scale",
+        description: "早口の時の読み上げ速度倍率の設定",
+        options: [
+          {
+            name: "value",
+            description: "倍率（0.1 - 10）",
+            type: "NUMBER",
+            required: isRequiredOption(level),
+          },
+        ],
+      },
+      level
+    );
   }
 
   override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
@@ -24,19 +28,19 @@ export class SetFastSpeedSub extends SubCommandBase {
     const configManager = context.configManager;
 
     const configKey = "fastSpeedScale";
-    const fastSpeed = options.getNumber("value", true);
+    const fastSpeed = options.getNumber("value") || undefined;
 
-    if (!isInRange(fastSpeed, 0.1, 10)) {
+    if (fastSpeed && !isInRange(fastSpeed, 0.1, 10)) {
       await context.reply("error", "設定する値は0.1 ~ 10の範囲内である必要があります.");
       return;
     }
 
     //この辺あんまり良くないけどしょうがない感じもする
-    switch (parent.data.name) {
-      case "master-config":
-        await configManager.setMasterConfig(configKey, fastSpeed);
+    switch (this.level) {
+      case "MASTER":
+        await configManager.setMasterConfig(configKey, fastSpeed ?? masterConfigDefault[configKey]);
         break;
-      case "guild-config":
+      case "GUILD":
         await configManager.setGuildConfig(context.guild.id, configKey, fastSpeed);
         break;
     }

@@ -1,21 +1,25 @@
 import { CommandContextSlash } from "../../commandContextSlash";
+import { masterConfigDefault } from "../../configManager";
 import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
-export class SetCommandPrefixSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "command-prefix",
-      description: "テキストコマンドの呼び出し接頭辞の設定",
-      options: [
-        {
-          name: "prefix",
-          description: "接頭辞",
-          type: "STRING",
-          required: true,
-        },
-      ],
-    });
+export class SetCommandPrefixSub extends ConfigSubCommand {
+  constructor(level: ConfigCommandLevel) {
+    super(
+      {
+        name: "command-prefix",
+        description: "テキストコマンドの呼び出し接頭辞の設定",
+        options: [
+          {
+            name: "prefix",
+            description: "接頭辞",
+            type: "STRING",
+            required: isRequiredOption(level),
+          },
+        ],
+      },
+      level
+    );
   }
 
   override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
@@ -23,14 +27,14 @@ export class SetCommandPrefixSub extends SubCommandBase {
     const configManager = context.configManager;
 
     const configKey = "commandPrefix";
-    const prefix = options.getString("prefix", true);
+    const prefix = options.getString("prefix") || undefined;
 
     //この辺あんまり良くないけどしょうがない感じもする
-    switch (parent.data.name) {
-      case "master-config":
-        await configManager.setMasterConfig(configKey, prefix);
+    switch (this.level) {
+      case "MASTER":
+        await configManager.setMasterConfig(configKey, prefix ?? masterConfigDefault[configKey]);
         break;
-      case "guild-config":
+      case "GUILD":
         await configManager.setGuildConfig(context.guild.id, configKey, prefix);
         break;
     }

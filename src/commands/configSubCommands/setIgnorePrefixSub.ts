@@ -1,21 +1,25 @@
 import { CommandContextSlash } from "../../commandContextSlash";
+import { masterConfigDefault } from "../../configManager";
 import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
-export class SetIgnorePrefixSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "ignore-prefix",
-      description: "読み上げを無視する接頭辞",
-      options: [
-        {
-          name: "prefix",
-          description: "接頭辞",
-          type: "STRING",
-          required: true,
-        },
-      ],
-    });
+export class SetIgnorePrefixSub extends ConfigSubCommand {
+  constructor(level: ConfigCommandLevel) {
+    super(
+      {
+        name: "ignore-prefix",
+        description: "読み上げを無視する接頭辞",
+        options: [
+          {
+            name: "prefix",
+            description: "接頭辞",
+            type: "STRING",
+            required: isRequiredOption(level),
+          },
+        ],
+      },
+      level
+    );
   }
 
   override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
@@ -23,14 +27,14 @@ export class SetIgnorePrefixSub extends SubCommandBase {
     const configManager = context.configManager;
 
     const configKey = "ignorePrefix";
-    const prefix = options.getString("prefix", true);
+    const prefix = options.getString("prefix") || undefined;
 
     //この辺あんまり良くないけどしょうがない感じもする
-    switch (parent.data.name) {
-      case "master-config":
-        await configManager.setMasterConfig(configKey, prefix);
+    switch (this.level) {
+      case "MASTER":
+        await configManager.setMasterConfig(configKey, prefix ?? masterConfigDefault[configKey]);
         break;
-      case "guild-config":
+      case "GUILD":
         await configManager.setGuildConfig(context.guild.id, configKey, prefix);
         break;
     }

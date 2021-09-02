@@ -1,21 +1,25 @@
 import { CommandContextSlash } from "../../commandContextSlash";
+import { masterConfigDefault } from "../../configManager";
 import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
-export class SetMaxLengthSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "max-string-length",
-      description: "読み上げを省略しない最大文字数を設定",
-      options: [
-        {
-          name: "value",
-          description: "文字数",
-          type: "NUMBER",
-          required: true,
-        },
-      ],
-    });
+export class SetMaxLengthSub extends ConfigSubCommand {
+  constructor(level: ConfigCommandLevel) {
+    super(
+      {
+        name: "max-string-length",
+        description: "読み上げを省略しない最大文字数を設定",
+        options: [
+          {
+            name: "value",
+            description: "文字数",
+            type: "NUMBER",
+            required: isRequiredOption(level),
+          },
+        ],
+      },
+      level
+    );
   }
 
   override async execute(context: CommandContextSlash, parent: CommandGroup): Promise<void> {
@@ -23,19 +27,19 @@ export class SetMaxLengthSub extends SubCommandBase {
     const configManager = context.configManager;
 
     const configKey = "maxStringLength";
-    const length = options.getNumber("value", true);
+    const length = options.getNumber("value") || undefined;
 
-    if (length < 0) {
+    if (length && length < 0) {
       await context.reply("error", "設定する値は整数である必要があります.");
       return;
     }
 
     //この辺あんまり良くないけどしょうがない感じもする
-    switch (parent.data.name) {
-      case "master-config":
-        await configManager.setMasterConfig(configKey, length);
+    switch (this.level) {
+      case "MASTER":
+        await configManager.setMasterConfig(configKey, length ?? masterConfigDefault[configKey]);
         break;
-      case "guild-config":
+      case "GUILD":
         await configManager.setGuildConfig(context.guild.id, configKey, length);
         break;
     }

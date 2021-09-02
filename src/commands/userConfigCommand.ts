@@ -14,6 +14,6 @@ export class UserConfigCommand extends CommandGroup {
       permission: CommandPermission.Everyone,
     });
 
-    this.addSubCommand(new SetVoiceSub());
+    this.addSubCommand(new SetVoiceSub("USER"));
   }
 }

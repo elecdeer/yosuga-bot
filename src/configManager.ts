@@ -5,7 +5,6 @@ import deepmerge from "deepmerge";
 import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
-import { ValueOf } from "type-fest";
 
 import { yosugaEnv } from "./environment";
 import { SpeakerBuildOption } from "./speaker/voiceProvider";
@@ -15,6 +14,12 @@ import { YosugaClient } from "./yosugaClient";
 export type MasterLevelConfig = {
   speakerBuildOptions: Record<string, SpeakerBuildOption>;
 };
+
+// export const isMasterLevelConfigProp = (
+//   prop: keyof UnifiedConfig
+// ): prop is keyof MasterLevelConfig => {
+//   return ["speakerBuildOptions"];
+// };
 
 export type GuildLevelConfig = {
   commandPrefix: string;
@@ -30,26 +35,30 @@ export type GuildLevelConfig = {
 };
 
 export type UserLevelConfig = {
-  speakerOption: SpeakerOption | null;
+  speakerOption: SpeakerOption;
 };
 
 export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
 
-//DISCORD_APP_ID: ConfigUnity
-export type MasterConfig = Record<string, UnifiedConfig>;
-export type GuildConfig = Record<string, Partial<GuildLevelConfig & UserLevelConfig>>;
-export type UserConfig = Record<string, Partial<UserLevelConfig>>;
+export type MasterConfig = UnifiedConfig;
+export type GuildConfig = Partial<GuildLevelConfig & UserLevelConfig>;
+export type UserConfig = Partial<UserLevelConfig>;
 
-type ValueResolvable<T> = Exclude<T, undefined> | ((value: T) => Exclude<T, undefined>);
-type ValueResolvableOptional<T> = T | ((value: T | undefined) => T | undefined);
+//DISCORD_APP_ID: ConfigUnity
+export type MasterConfigRecord = Record<string, MasterConfig>;
+export type GuildConfigRecord = Record<string, GuildConfig>;
+export type UserConfigRecord = Record<string, UserConfig>;
+
+type ValueResolvable<T> = T | ((value: T) => T);
+type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
 
 const logger = getLogger("configManager");
 
 export class ConfigManager {
   private readonly yosuga: YosugaClient;
-  protected masterStorage: KVS<MasterConfig> | null;
-  protected guildStorage: KVS<GuildConfig> | null;
-  protected userStorage: KVS<UserConfig> | null;
+  protected masterStorage: KVS<MasterConfigRecord> | null;
+  protected guildStorage: KVS<GuildConfigRecord> | null;
+  protected userStorage: KVS<UserConfigRecord> | null;
 
   constructor(yosuga: YosugaClient) {
     this.yosuga = yosuga;
@@ -58,7 +67,7 @@ export class ConfigManager {
     this.userStorage = null;
   }
 
-  async getMasterConfig(): Promise<ValueOf<MasterConfig>> {
+  async getMasterConfig(): Promise<MasterConfig> {
     const appId = this.yosuga.client.application?.id;
     assert(appId);
     assert(this.masterStorage);
@@ -66,12 +75,12 @@ export class ConfigManager {
     return config ?? masterConfigDefault;
   }
 
-  async getGuildConfig(guildId: Snowflake): Promise<ValueOf<GuildConfig> | undefined> {
+  async getGuildConfig(guildId: Snowflake): Promise<GuildConfig | undefined> {
     assert(this.guildStorage);
     return await this.guildStorage.get(guildId);
   }
 
-  async getUserConfig(userId: Snowflake): Promise<ValueOf<UserConfig> | undefined> {
+  async getUserConfig(userId: Snowflake): Promise<UserConfig | undefined> {
     assert(this.userStorage);
     return await this.userStorage.get(userId);
   }
@@ -96,13 +105,13 @@ export class ConfigManager {
     return unifiedConfig;
   }
 
-  async setMasterConfig<T extends keyof ValueOf<MasterConfig>>(
+  async setMasterConfig<T extends keyof MasterConfig>(
     key: T,
-    value: ValueResolvable<ValueOf<MasterConfig>[T]>
+    value: ValueResolvable<MasterConfig[T]>
   ): Promise<boolean> {
     const appId = this.yosuga.client.application!.id;
     assert(this.masterStorage);
-    const base = (await this.masterStorage.get(appId))!;
+    const base = (await this.masterStorage.get(appId)) ?? masterConfigDefault;
 
     if (typeof value === "function") {
       base[key] = value(base[key]);
@@ -114,10 +123,10 @@ export class ConfigManager {
     return true;
   }
 
-  async setGuildConfig<T extends keyof ValueOf<GuildConfig>>(
+  async setGuildConfig<T extends keyof GuildConfig>(
     guildId: Snowflake,
     key: T,
-    value: ValueResolvableOptional<ValueOf<GuildConfig>[T]>
+    value: ValueResolvableOptional<GuildConfig[T]>
   ): Promise<boolean> {
     assert(this.guildStorage);
     const base = (await this.guildStorage.get(guildId)) ?? {};
@@ -129,13 +138,14 @@ export class ConfigManager {
     }
 
     await this.guildStorage.set(guildId, base);
+
     return true;
   }
 
-  async setUserConfig<T extends keyof ValueOf<UserConfig>>(
+  async setUserConfig<T extends keyof UserConfig>(
     userId: Snowflake,
     key: T,
-    value: ValueResolvableOptional<ValueOf<GuildConfig>[T]>
+    value: ValueResolvableOptional<UserConfig[T]>
   ): Promise<boolean> {
     assert(this.userStorage);
     const base = (await this.userStorage.get(userId)) ?? {};
@@ -153,7 +163,7 @@ export class ConfigManager {
   async initialize(): Promise<void> {
     logger.debug("initialize configManager");
     const appId = this.yosuga.client.application!.id;
-    this.masterStorage = await kvsLocalStorage<MasterConfig>({
+    this.masterStorage = await kvsLocalStorage<MasterConfigRecord>({
       name: "master-config",
       storeFilePath: path.join(yosugaEnv.configPath, "masterConfig"),
       version: 1,
@@ -164,13 +174,13 @@ export class ConfigManager {
       },
     });
 
-    this.guildStorage = await kvsLocalStorage<GuildConfig>({
+    this.guildStorage = await kvsLocalStorage<GuildConfigRecord>({
       name: "guild-config",
       storeFilePath: path.join(yosugaEnv.configPath, "guildConfig"),
       version: 1,
     });
 
-    this.userStorage = await kvsLocalStorage<UserConfig>({
+    this.userStorage = await kvsLocalStorage<UserConfigRecord>({
       name: "user-config",
       storeFilePath: path.join(yosugaEnv.configPath, "userConfig"),
       version: 1,
@@ -196,5 +206,11 @@ export const masterConfigDefault: Readonly<UnifiedConfig> = {
   timeToReadMemberNameSec: 30,
   maxStringLength: 80,
 
-  speakerOption: null,
+  speakerOption: {
+    speakerName: "null",
+    voiceParam: {
+      pitch: 1,
+      intonation: 1,
+    },
+  },
 };
