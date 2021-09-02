@@ -23,6 +23,7 @@ export class DeployGlobalCommand extends CommandBase {
       await yosuga.commandManager.registerSlashCommands();
       await context.reply("plain", "登録しました.");
     } catch (e) {
+      commandLogger.error(e);
       await context.reply("error", "登録に失敗しました");
     }
   }
