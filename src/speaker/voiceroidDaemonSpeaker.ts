@@ -7,6 +7,12 @@ import { Session } from "../session";
 import { SpeechText, VoiceParam } from "../types";
 import { Speaker, SpeakerState } from "./speaker";
 
+export type DaemonSpeakerBuildOption = {
+  type: "voiceroidDaemon";
+  voiceName: string;
+  urlBase: string;
+};
+
 export type VoiceroidDaemonQuery = Partial<{
   Text: string;
   Kana: string;
@@ -29,11 +35,12 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
   private checkUrl: string;
   private speechTextUrl: string;
 
-  constructor(session: Session, urlBase: string) {
+  constructor(session: Session, option: DaemonSpeakerBuildOption) {
     super(session, "voiceroidDaemon");
-    this.urlBase = urlBase;
-    this.checkUrl = `${urlBase}/`;
-    this.speechTextUrl = `${urlBase}/api/speechtext`;
+    this.urlBase = option.urlBase;
+    this.checkUrl = option.urlBase;
+
+    this.speechTextUrl = new URL("/api/speechtext", option.urlBase).href;
   }
 
   override async synthesis(
@@ -49,7 +56,8 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
         Emphasis: voiceParam.intonation,
       },
     };
-
+    // logger.debug(this.speechTextUrl);
+    // logger.debug(query);
     const res = await axios.post<Readable>(this.speechTextUrl, query, {
       responseType: "stream",
     });

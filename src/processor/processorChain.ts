@@ -1,8 +1,11 @@
 import { getLogger } from "log4js";
 
-import { SpeechText, TextProcessor } from "../types";
+import { SpeechText } from "../types";
 
 export const processorLogger = getLogger("processor");
+
+export type TextProcessor = (text: Readonly<SpeechText>) => Promise<SpeechText[] | SpeechText>;
+export type ProcessorProvider<T> = (arg: T) => TextProcessor;
 
 export class ProcessorChain {
   processors: TextProcessor[];

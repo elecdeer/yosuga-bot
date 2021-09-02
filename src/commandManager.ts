@@ -64,14 +64,12 @@ export class CommandManager {
     commandLogger.debug(`assignCommand: ${command.data.name} [${command.getTriggers()}]`);
     this.commandCollection.set(command.data.name, command);
 
-    if (command.isMessageCommand()) {
-      command.getTriggers().forEach((trigger) => {
-        if (this.commandTriggerCollection.has(trigger)) {
-          throw new Error(`コマンド名が重複しています: ${trigger}`);
-        }
-        this.commandTriggerCollection.set(trigger, command);
-      });
-    }
+    command.getTriggers().forEach((trigger) => {
+      if (this.commandTriggerCollection.has(trigger)) {
+        throw new Error(`コマンド名が重複しています: ${trigger}`);
+      }
+      this.commandTriggerCollection.set(trigger, command);
+    });
   }
 
   async registerSlashCommands(guild?: Guild): Promise<void> {
@@ -125,9 +123,11 @@ export class CommandManager {
         .map(async (command) => {
           const commandData = this.commandCollection.get(command.name)!;
 
-          commandLogger.debug(`command: ${commandData.data.name}`);
-
           const permission = await constructPermissionData(commandData.data.permission, guild);
+
+          commandLogger.debug(
+            `command: ${commandData.data.name} permission: ${commandData.data.permission}`
+          );
           commandLogger.debug(permission);
 
           return await commandManager.permissions.set({

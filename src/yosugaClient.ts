@@ -1,7 +1,6 @@
 import {
   Client,
   ClientApplication,
-  Collection,
   CommandInteraction,
   GuildMember,
   Message,
@@ -21,18 +20,19 @@ import { DeployGlobalCommand } from "./commands/deployGlobalCommand";
 import { DeployGuildCommand } from "./commands/deployGuildCommand";
 import { DeployResetCommand } from "./commands/deployResetCommand";
 import { EndCommand } from "./commands/endCommand";
+import { GuildConfigCommand } from "./commands/guildConfigCommand";
 import { HelpCommand } from "./commands/helpCommand";
+import { MasterConfigCommand } from "./commands/masterConfigCommand";
 import { ReloadCommand } from "./commands/reloadCommand";
 import { StartCommand } from "./commands/startCommand";
+import { UserConfigCommand } from "./commands/userConfigCommand";
 import { VersionCommand } from "./commands/versionCommand";
+import { VoiceStatusCommand } from "./commands/voiceStatusCommand";
 import { ConfigManager } from "./configManager";
 import { yosugaEnv } from "./environment";
 import { yosuga } from "./index";
 import { hasAdminPermission } from "./permissionUtil";
-import { Session } from "./session";
 import { SessionManager } from "./sessionManager";
-import { Speaker } from "./speaker/speaker";
-import { VoiceroidDaemonSpeaker } from "./speaker/voiceroidDaemonSpeaker";
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 
 const logger = getLogger("yosugaClient");
@@ -106,34 +106,10 @@ export class YosugaClient extends (EventEmitter as { new (): TypedEventEmitter<E
     this.commandManager.assign(new DeployGlobalCommand());
     this.commandManager.assign(new DeployGuildCommand());
     this.commandManager.assign(new DeployResetCommand());
-  }
-
-  speakersFactory(session: Session): Collection<string, Speaker> {
-    const collection = new Collection<string, Speaker>();
-
-    //うまいことして環境変数からいじれるようにする
-    if (yosugaEnv.voiceroidDaemonUrl) {
-      collection.set("yukari", new VoiceroidDaemonSpeaker(session, yosugaEnv.voiceroidDaemonUrl));
-    }
-
-    //test
-    // collection.set(
-    //   "akane",
-    //   new TtsControllerSpeaker(session, {
-    //     urlBase: "http://192.168.0.14:1000",
-    //     outputDevice: "CABLE Input",
-    //     voiceName: "琴葉 茜",
-    //     wsUrl: "http://192.168.0.14443",
-    //   })
-    // );
-
-    const daemonSpeakers = collection.filter((speaker) => speaker.engineType === "voiceroidDaemon");
-    void Promise.all(daemonSpeakers.map((speaker) => speaker.initialize()));
-
-    // const ttsSpeakers = collection.filter((speaker) => speaker.engineType === "ttsController");
-    // void allSerial(ttsSpeakers.map((speaker) => () => speaker.initialize()));
-
-    return collection;
+    this.commandManager.assign(new MasterConfigCommand());
+    this.commandManager.assign(new GuildConfigCommand());
+    this.commandManager.assign(new UserConfigCommand());
+    this.commandManager.assign(new VoiceStatusCommand());
   }
 
   //=========================================

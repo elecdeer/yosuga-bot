@@ -19,11 +19,11 @@ export class SIOAudioRecorder {
   }
 
   async recordAudioStream(startPlayingRemoteAudio: () => Promise<unknown>): Promise<Readable> {
-    logger.debug("emit start");
+    // logger.debug("emit start");
     this.socketIO.emit("start");
     const stream = this.receiveStream();
     await startPlayingRemoteAudio();
-    await wait(100);
+    // await wait(200);
     return await stream;
   }
 
@@ -35,22 +35,26 @@ export class SIOAudioRecorder {
       }, 3000);
 
       this.socketStream.once("sendStream", (stream: Readable) => {
-        logger.debug("on sendStream");
+        // logger.debug("on sendStream");
+
+        //中身が無くてもdataはlistenする必要がある
+        //無いと音質が下がる
         stream.on("data", (chunk) => {
-          logger.debug(chunk);
+          // logger.debug(chunk);
         });
+
         stream.on("close", () => {
-          logger.debug("close");
+          // logger.debug("close");
         });
         stream.on("end", () => {
-          logger.debug("end");
+          // logger.debug("end");
         });
         stream.on("pause", () => {
-          logger.debug("pause");
+          // logger.debug("pause");
           // stream.resume();
         });
         stream.on("error", (err) => {
-          logger.debug("error", err);
+          // logger.debug("error", err);
         });
 
         clearTimeout(timeoutTimer);

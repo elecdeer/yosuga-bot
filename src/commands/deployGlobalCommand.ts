@@ -10,7 +10,7 @@ const commandLogger = log4js.getLogger("command");
 export class DeployGlobalCommand extends CommandBase {
   constructor() {
     super({
-      name: "deployGlobal",
+      name: "deploy-global",
       description: "アプリケーションコマンドをDiscordに登録する.",
       permission: CommandPermission.AppOwner,
       messageCommand: {},
@@ -18,7 +18,7 @@ export class DeployGlobalCommand extends CommandBase {
   }
 
   async execute(context: CommandContext): Promise<void> {
-    commandLogger.debug("deployGlobal");
+    commandLogger.debug("deploy-global");
     try {
       await yosuga.commandManager.registerSlashCommands();
       await context.reply("plain", "登録しました.");

@@ -3,12 +3,13 @@ import {
   CommandInteractionOptionResolver,
   Guild,
   GuildMember,
+  Message,
   MessageEmbed,
   TextChannel,
 } from "discord.js";
 
 import { CommandContext, ReplyType } from "./commandContext";
-import { UnifiedConfig } from "./configManager";
+import { ConfigManager } from "./configManager";
 import { Session } from "./session";
 import { YosugaClient } from "./yosugaClient";
 
@@ -33,9 +34,9 @@ export const isValidCommandInteraction = (
 export class CommandContextSlash extends CommandContext {
   override readonly guild: Guild;
   override readonly textChannel: TextChannel;
-  override readonly member: GuildMember;
-  override readonly config: Promise<UnifiedConfig>;
   override readonly session: Session | null;
+  override readonly configManager: ConfigManager;
+  override readonly member: GuildMember;
 
   readonly interaction: CommandInteraction;
 
@@ -48,7 +49,7 @@ export class CommandContextSlash extends CommandContext {
     this.textChannel = interaction.channel;
     this.member = interaction.member;
 
-    this.config = yosuga.configManager.getUnifiedConfig(this.guild.id);
+    this.configManager = yosuga.configManager;
     const voiceChannel = this.member.voice.channel;
     this.session = voiceChannel ? yosuga.sessionManager.getSession(this.guild.id) : null;
 
@@ -62,11 +63,11 @@ export class CommandContextSlash extends CommandContext {
     }, 2500);
   }
 
-  override reply(
+  override async reply(
     type: ReplyType,
     content: string | MessageEmbed,
     channel?: Readonly<TextChannel>
-  ): Promise<unknown> {
+  ): Promise<Message> {
     const embed = this.constructEmbed(type, content);
 
     if (channel) {
@@ -76,9 +77,13 @@ export class CommandContextSlash extends CommandContext {
     if (!this.interaction.replied) {
       if (!this.interaction.deferred) {
         clearTimeout(this.differTimer);
-        return this.interaction.reply({ embeds: [embed] });
+        const message = await this.interaction.reply({ embeds: [embed], fetchReply: true });
+        //DMはそもそもない
+        return message as Message;
       } else {
-        return this.interaction.followUp({ embeds: [embed] });
+        const message = await this.interaction.followUp({ embeds: [embed] });
+        //DMはそもそもない
+        return message as Message;
       }
     } else {
       return this.textChannel.send({ embeds: [embed] });

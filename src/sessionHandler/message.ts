@@ -7,7 +7,7 @@ import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
 import { maxLengthProcessor } from "../processor/maxLengthProcessor";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
 import { omitSymbolProcessor } from "../processor/omitSymbolProcessor";
-import { ProcessorChain } from "../processor/processor";
+import { ProcessorChain } from "../processor/processorChain";
 import { tildeReplaceProcessor } from "../processor/tildeReplaceProcessor";
 import { urlProcessor } from "../processor/urlProcessor";
 import { SessionEventHandlerRegistrant, SpeechText } from "../types";

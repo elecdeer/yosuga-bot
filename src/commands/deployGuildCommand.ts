@@ -10,7 +10,7 @@ const commandLogger = log4js.getLogger("command");
 export class DeployGuildCommand extends CommandBase {
   constructor() {
     super({
-      name: "deployGuild",
+      name: "deploy-guild",
       description: "アプリケーションコマンドをGuildに登録する.",
       permission: CommandPermission.GuildAdmin,
       messageCommand: {},
@@ -18,7 +18,7 @@ export class DeployGuildCommand extends CommandBase {
   }
 
   async execute(context: CommandContext): Promise<void> {
-    commandLogger.debug("deployGuild");
+    commandLogger.debug("deploy-guild");
     try {
       await yosuga.commandManager.registerSlashCommands(context.guild);
       await context.reply("plain", "登録しました.");

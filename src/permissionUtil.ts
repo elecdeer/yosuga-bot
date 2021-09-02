@@ -46,9 +46,9 @@ export const constructPermissionData = async (
 
   const allowList: ApplicationCommandPermissionData[] = [];
 
-  if (CommandPermission.GuildAdmin <= permission) {
+  if (permission <= CommandPermission.GuildAdmin) {
     const roles = await fetchAdminRolesInGuild(guild);
-    logger.debug(`adminRoles: ${roles.map((role) => role.name).join(",")}`);
+    // logger.debug(`adminRoles: ${roles.map((role) => role.name).join(",")}`);
 
     const list: ApplicationCommandPermissionData[] = roles.map((role) => ({
       type: "ROLE",
@@ -59,7 +59,7 @@ export const constructPermissionData = async (
     allowList.push(...list);
   }
 
-  if (CommandPermission.AppOwner <= permission) {
+  if (permission <= CommandPermission.AppOwner) {
     allowList.push({
       type: "USER",
       id: guild.client.application?.owner?.id ?? "",
