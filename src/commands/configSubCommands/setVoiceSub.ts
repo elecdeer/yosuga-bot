@@ -2,7 +2,7 @@ import { CommandContextSlash } from "../../commandContextSlash";
 import { CommandGroup } from "../commandGroup";
 import { SubCommandBase } from "../subCommandBase";
 
-export class VoiceSub extends SubCommandBase {
+export class SetVoiceSub extends SubCommandBase {
   constructor() {
     super({
       name: "voice",
@@ -55,7 +55,7 @@ export class VoiceSub extends SubCommandBase {
         await configManager.setMasterConfig(configKey, speakerOption);
         break;
       case "guild-config":
-        await configManager.setGuildConfig(context.member.id, configKey, speakerOption);
+        await configManager.setGuildConfig(context.guild.id, configKey, speakerOption);
         break;
       case "user-config":
         await configManager.setUserConfig(context.member.id, configKey, speakerOption);

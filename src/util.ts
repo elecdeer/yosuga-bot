@@ -17,6 +17,8 @@ export const escapeRegexp = (str: string): string => {
   return str && regexp.test(str) ? str.replace(regexpGlobal, "\\$&") : str;
 };
 
+//普通のPromise.allを置き換える形では無理
+//Promiseが作られた時点で中の処理は走ってしまうので
 export const allSerial = async (
   promiseProviders: (() => PromiseLike<unknown>)[]
 ): Promise<unknown[]> => {
@@ -25,4 +27,8 @@ export const allSerial = async (
     results.push(await p());
   }
   return results;
+};
+
+export const isInRange = (value: number, min: number, max: number): boolean => {
+  return min <= value && value <= max;
 };

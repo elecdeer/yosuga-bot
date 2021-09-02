@@ -182,7 +182,7 @@ export class ConfigManager {
   }
 }
 
-const masterConfigDefault: UnifiedConfig = {
+export const masterConfigDefault: Readonly<UnifiedConfig> = {
   speakerBuildOptions: {},
 
   commandPrefix: "yosuga",

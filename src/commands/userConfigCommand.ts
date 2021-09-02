@@ -2,7 +2,7 @@ import log4js from "log4js";
 
 import { CommandPermission } from "../permissionUtil";
 import { CommandGroup } from "./commandGroup";
-import { VoiceSub } from "./configSubCommands/voiceSub";
+import { SetVoiceSub } from "./configSubCommands/setVoiceSub";
 
 const commandLogger = log4js.getLogger("command");
 
@@ -14,6 +14,6 @@ export class UserConfigCommand extends CommandGroup {
       permission: CommandPermission.Everyone,
     });
 
-    this.addSubCommand(new VoiceSub());
+    this.addSubCommand(new SetVoiceSub());
   }
 }
