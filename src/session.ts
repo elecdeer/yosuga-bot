@@ -6,6 +6,7 @@ import {
 } from "@discordjs/voice";
 import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
+import { SetOptional } from "type-fest";
 
 import { UnifiedConfig } from "./configManager";
 import { yosuga } from "./index";
@@ -18,12 +19,7 @@ import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
 import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
 import { VoiceProvider } from "./speaker/voiceProvider";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import {
-  PartiallyPartial,
-  SessionEventHandlerRegistrant,
-  SpeechText,
-  VoiceOrStageChannel,
-} from "./types";
+import { SessionEventHandlerRegistrant, SpeechText, VoiceOrStageChannel } from "./types";
 import { createYosugaEmbed } from "./util";
 import { YosugaClient } from "./yosugaClient";
 
@@ -114,7 +110,7 @@ export class Session extends SessionEmitter {
   }
 
   async pushSpeech(
-    param: PartiallyPartial<SpeechText, "speed" | "volume">,
+    param: SetOptional<SpeechText, "speed" | "volume">,
     userId?: Snowflake,
     timestamp?: number
   ): Promise<void> {

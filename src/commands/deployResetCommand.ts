@@ -10,7 +10,7 @@ const commandLogger = log4js.getLogger("command");
 export class DeployResetCommand extends CommandBase {
   constructor() {
     super({
-      name: "deployReset",
+      name: "deploy-reset",
       description: "アプリケーションコマンドをGuildに登録する.",
       permission: CommandPermission.AppOwner,
       messageCommand: {},
@@ -18,7 +18,7 @@ export class DeployResetCommand extends CommandBase {
   }
 
   async execute(context: CommandContext): Promise<void> {
-    commandLogger.debug("deployReset");
+    commandLogger.debug("deploy-reset");
     try {
       await yosuga.commandManager.unregisterSlashCommands(context.guild.id);
       await context.reply("plain", "削除しました.");

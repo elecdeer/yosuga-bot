@@ -6,7 +6,7 @@ import { Session } from "./session";
 // General
 // ====================
 
-export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+// export type PartiallyPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type VoiceOrStageChannel = VoiceChannel | StageChannel;
 

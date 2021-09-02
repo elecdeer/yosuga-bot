@@ -4,23 +4,28 @@ import { RequireAtLeastOne } from "type-fest";
 import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../permissionUtil";
 
-export type CommandData = RequireAtLeastOne<
-  {
-    name: string;
-    description: string;
-    permission: CommandPermission;
-    messageCommand?: MessageCommandOption;
-    interactionCommand?: InteractionCommandOption;
-  },
-  "messageCommand" | "interactionCommand"
->;
+export type BasicCommandData = {
+  name: string;
+  description: string;
+  permission: CommandPermission;
+};
 
-type MessageCommandOption = {
+export type CommandData = BasicCommandData &
+  RequireAtLeastOne<
+    {
+      messageCommand?: MessageCommandOption;
+      interactionCommand?: InteractionCommandOption;
+    },
+    "messageCommand" | "interactionCommand"
+  >;
+
+export type MessageCommandOption = {
   alias?: string[];
 };
 
-type InteractionCommandOption = {
-  commandOptions?: ApplicationCommandOptionData[] | (() => ApplicationCommandOptionData[]);
+type Resolvable<T> = T | (() => T);
+export type InteractionCommandOption = {
+  commandOptions?: Resolvable<ApplicationCommandOptionData[]>;
 };
 
 export abstract class CommandBase {
@@ -28,14 +33,6 @@ export abstract class CommandBase {
 
   protected constructor(data: CommandData) {
     this.data = data;
-
-    if (data.messageCommand) {
-      //
-    }
-
-    if (data.interactionCommand) {
-      //
-    }
   }
 
   isMessageCommand(): boolean {

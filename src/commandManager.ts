@@ -123,9 +123,11 @@ export class CommandManager {
         .map(async (command) => {
           const commandData = this.commandCollection.get(command.name)!;
 
-          commandLogger.debug(`command: ${commandData.data.name}`);
-
           const permission = await constructPermissionData(commandData.data.permission, guild);
+
+          commandLogger.debug(
+            `command: ${commandData.data.name} permission: ${commandData.data.permission}`
+          );
           commandLogger.debug(permission);
 
           return await commandManager.permissions.set({
