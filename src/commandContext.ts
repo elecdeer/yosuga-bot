@@ -10,6 +10,7 @@ import {
 import { ConfigManager, UnifiedConfig } from "./configManager";
 import { Session } from "./session";
 import { createYosugaEmbed } from "./util";
+import { YosugaClient } from "./yosugaClient";
 
 export type ReplyType = "plain" | "warn" | "error" | "prohibit";
 const REPLY_TYPE_EMOJI: Record<ReplyType, string> = {
@@ -20,6 +21,7 @@ const REPLY_TYPE_EMOJI: Record<ReplyType, string> = {
 };
 
 export abstract class CommandContext {
+  abstract readonly yosuga: YosugaClient;
   abstract readonly session: Session | null;
   abstract readonly configManager: ConfigManager;
   abstract readonly guild: Guild;

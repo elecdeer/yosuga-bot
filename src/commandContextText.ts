@@ -15,6 +15,7 @@ export const isValidMessage = (message: Message): message is ValidMessage =>
   !!message.guild && !message.author.bot && !!message.member && message.channel.isText();
 
 export class CommandContextText extends CommandContext {
+  override readonly yosuga: YosugaClient;
   override readonly guild: Guild;
   override readonly textChannel: TextChannel;
   override readonly member: GuildMember;
@@ -25,6 +26,7 @@ export class CommandContextText extends CommandContext {
   constructor(message: ValidMessage, yosuga: YosugaClient) {
     super();
 
+    this.yosuga = yosuga;
     this.guild = message.guild;
     this.textChannel = message.channel;
     this.member = message.member;

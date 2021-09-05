@@ -32,6 +32,7 @@ export const isValidCommandInteraction = (
 };
 
 export class CommandContextSlash extends CommandContext {
+  override readonly yosuga: YosugaClient;
   override readonly guild: Guild;
   override readonly textChannel: TextChannel;
   override readonly session: Session | null;
@@ -45,6 +46,7 @@ export class CommandContextSlash extends CommandContext {
   constructor(interaction: ValidCommandInteraction, yosuga: YosugaClient) {
     super();
 
+    this.yosuga = yosuga;
     this.guild = interaction.guild;
     this.textChannel = interaction.channel;
     this.member = interaction.member;
