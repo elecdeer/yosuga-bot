@@ -63,7 +63,7 @@ export abstract class CommandBase {
       description: this.data.description,
       type: "CHAT_INPUT",
       options: options,
-      defaultPermission: this.data.permission <= CommandPermission.Everyone,
+      defaultPermission: true,
     };
   }
 }
