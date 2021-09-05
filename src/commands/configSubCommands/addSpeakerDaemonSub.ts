@@ -1,5 +1,4 @@
 import { CommandContextSlash } from "../../commandContextSlash";
-import { CommandGroup } from "../commandGroup";
 import { SubCommandBase } from "../subCommandBase";
 
 export class AddSpeakerDaemonSub extends SubCommandBase {

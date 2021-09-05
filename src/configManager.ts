@@ -15,12 +15,6 @@ export type MasterLevelConfig = {
   speakerBuildOptions: Record<string, SpeakerBuildOption>;
 };
 
-// export const isMasterLevelConfigProp = (
-//   prop: keyof UnifiedConfig
-// ): prop is keyof MasterLevelConfig => {
-//   return ["speakerBuildOptions"];
-// };
-
 export type GuildLevelConfig = {
   commandPrefix: string;
   ignorePrefix: string;
@@ -50,7 +44,7 @@ export type GuildConfigRecord = Record<string, GuildConfig>;
 export type UserConfigRecord = Record<string, UserConfig>;
 
 type ValueResolvable<T> = T | ((value: T) => T);
-type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
+export type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
 
 const logger = getLogger("configManager");
 
@@ -105,18 +99,42 @@ export class ConfigManager {
     return unifiedConfig;
   }
 
+  async setConfig<T extends keyof UnifiedConfig>(
+    accessor:
+      | { level: "MASTER" }
+      | { level: "GUILD"; guildId: Snowflake }
+      | { level: "USER"; userId: Snowflake },
+    key: T,
+    value: ValueResolvableOptional<UnifiedConfig[T]>
+  ): Promise<boolean> {
+    if (accessor.level === "MASTER") {
+      return this.setMasterConfig(key, value);
+    }
+
+    if (accessor.level === "GUILD") {
+      return this.setGuildConfig(accessor.guildId, key, value);
+    }
+
+    if (accessor.level === "USER") {
+      return this.setUserConfig(accessor.userId, key, value);
+    }
+
+    //never
+    return false;
+  }
+
   async setMasterConfig<T extends keyof MasterConfig>(
     key: T,
-    value: ValueResolvable<MasterConfig[T]>
+    value: ValueResolvableOptional<MasterConfig[T]>
   ): Promise<boolean> {
     const appId = this.yosuga.client.application!.id;
     assert(this.masterStorage);
     const base = (await this.masterStorage.get(appId)) ?? masterConfigDefault;
 
     if (typeof value === "function") {
-      base[key] = value(base[key]);
+      base[key] = value(base[key]) ?? masterConfigDefault[key];
     } else {
-      base[key] = value;
+      base[key] = value ?? masterConfigDefault[key];
     }
 
     await this.masterStorage.set(appId, base);

@@ -1,8 +1,8 @@
+import { Snowflake } from "discord.js";
+
 import { CommandContextSlash } from "../../commandContextSlash";
 import { masterConfigDefault } from "../../configManager";
 import { isInRange } from "../../util";
-import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
 import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
 
 export class SetVolumeSub extends ConfigSubCommand {
@@ -36,6 +36,28 @@ export class SetVolumeSub extends ConfigSubCommand {
       return;
     }
 
+    const oldVolume = (await configManager.getMasterConfig())[configKey];
+
+    const accessor:
+      | { level: "MASTER" }
+      | { level: "GUILD"; guildId: Snowflake }
+      | { level: "USER"; userId: Snowflake } =
+      this.level === "MASTER"
+        ? {
+            level: "MASTER",
+          }
+        : this.level === "GUILD"
+        ? {
+            level: "GUILD",
+            guildId: context.guild.id,
+          }
+        : {
+            level: "USER",
+            userId: context.member.id,
+          };
+
+    await configManager.setConfig(accessor, configKey, volume);
+
     //この辺あんまり良くないけどしょうがない感じもする
     switch (this.level) {
       case "MASTER":
@@ -46,6 +68,8 @@ export class SetVolumeSub extends ConfigSubCommand {
         break;
     }
 
-    await context.reply("plain", "設定しました.");
+    const newVolume = (await configManager.getMasterConfig())[configKey];
+
+    await context.reply("plain", this.constructReplyEmbed(oldVolume, newVolume));
   }
 }
