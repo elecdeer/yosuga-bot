@@ -58,4 +58,20 @@ export class SetVoiceSub extends SetConfigSubCommand<UserConfig, "speakerOption"
       },
     };
   }
+
+  protected override async validateValue(
+    value: UserConfig["speakerOption"] | undefined,
+    context: Omit<CommandContextSlash, "reply">
+  ): Promise<ValidationResult> {
+    const buildOptions = await context.getUnifiedConfigAccessor().get("speakerBuildOptions");
+
+    if (value && !buildOptions[value.speakerName]) {
+      return {
+        status: "warn",
+        message: "登録されていないボイス名を指定しています.",
+      };
+    }
+
+    return super.validateValue(value, context);
+  }
 }

@@ -56,7 +56,7 @@ export abstract class SetConfigSubCommand<
 
   protected async validateValue(
     value: TConfig[TKey] | undefined,
-    context: CommandContextSlash
+    context: Omit<CommandContextSlash, "reply">
   ): Promise<ValidationResult> {
     return {
       status: "valid",

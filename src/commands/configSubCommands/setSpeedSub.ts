@@ -40,7 +40,7 @@ export class SetSpeedSub extends SetConfigSubCommand<GuildConfig, "masterSpeed">
 
   override async validateValue(
     value: GuildConfig["masterSpeed"] | undefined,
-    context: CommandContextSlash
+    context: Omit<CommandContextSlash, "reply">
   ): Promise<ValidationResult> {
     if (value && !isInRange(value, 0, 2)) {
       return {

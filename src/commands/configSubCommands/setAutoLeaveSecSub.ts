@@ -39,7 +39,7 @@ export class SetAutoLeaveSecSub extends SetConfigSubCommand<GuildConfig, "timeTo
 
   override async validateValue(
     value: GuildConfig["timeToAutoLeaveSec"] | undefined,
-    context: CommandContextSlash
+    context: Omit<CommandContextSlash, "reply">
   ): Promise<ValidationResult> {
     if (value && value < 0) {
       return {

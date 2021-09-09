@@ -37,7 +37,7 @@ export class SetVolumeSub extends SetConfigSubCommand<GuildConfig, "masterVolume
 
   override async validateValue(
     value: GuildConfig["masterVolume"] | undefined,
-    context: CommandContextSlash
+    context: Omit<CommandContextSlash, "reply">
   ): Promise<ValidationResult> {
     if (value && !isInRange(value, 0, 2)) {
       return {
