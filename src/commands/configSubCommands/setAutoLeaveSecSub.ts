@@ -1,10 +1,17 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { CommandGroup } from "../commandGroup";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetAutoLeaveSecSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+import { CommandContextSlash } from "../../commandContextSlash";
+import { GuildConfig } from "../../config/configManager";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+  ValidationResult,
+} from "./setConfigSubCommand";
+
+export class SetAutoLeaveSecSub extends SetConfigSubCommand<GuildConfig, "timeToAutoLeaveSec"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "auto-leave-time",
@@ -18,32 +25,28 @@ export class SetAutoLeaveSecSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "timeToAutoLeaveSec"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<GuildConfig["timeToAutoLeaveSec"]> | undefined
+  ): GuildConfig["timeToAutoLeaveSec"] | undefined {
+    return options.getNumber("value") || undefined;
+  }
 
-    const configKey = "timeToAutoLeaveSec";
-    const sec = options.getNumber("value") || undefined;
-
-    if (sec && sec < 0) {
-      await context.reply("error", "設定する値は整数である必要があります.");
-      return;
+  override async validateValue(
+    value: GuildConfig["timeToAutoLeaveSec"] | undefined,
+    context: Omit<CommandContextSlash, "reply">
+  ): Promise<ValidationResult> {
+    if (value && value < 0) {
+      return {
+        status: "error",
+        message: "設定する値は整数である必要があります.",
+      };
     }
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, sec ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, sec);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+    return super.validateValue(value, context);
   }
 }

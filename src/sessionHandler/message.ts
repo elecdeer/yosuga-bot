@@ -1,6 +1,6 @@
 import { getLogger } from "log4js";
 
-import { UnifiedConfig } from "../configManager";
+import { UnifiedConfig } from "../config/configManager";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";

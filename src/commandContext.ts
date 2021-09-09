@@ -7,7 +7,8 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { ConfigManager, UnifiedConfig } from "./configManager";
+import { ConfigManager, UnifiedConfig } from "./config/configManager";
+import { UnifiedConfigAccessor } from "./config/unifiedConfigAccessor";
 import { Session } from "./session";
 import { createYosugaEmbed } from "./util";
 import { YosugaClient } from "./yosugaClient";
@@ -34,6 +35,12 @@ export abstract class CommandContext {
     channel?: Readonly<TextChannel>
   ): Promise<Message>;
 
+  abstract getOptions(): CommandInteractionOptionResolver | undefined;
+
+  getUnifiedConfigAccessor(): UnifiedConfigAccessor {
+    return this.configManager.getUnifiedConfigAccessor(this.guild.id, this.member.id);
+  }
+
   constructEmbed(type: ReplyType, content: string | MessageEmbed): MessageEmbed {
     const prefix = REPLY_TYPE_EMOJI[type];
     if (typeof content === "string") {
@@ -43,10 +50,4 @@ export abstract class CommandContext {
       return embed.setDescription(`${prefix} ${embed.description}`);
     }
   }
-
-  getConfig(): Promise<UnifiedConfig> {
-    return this.configManager.getUnifiedConfig(this.guild.id, this.member.id);
-  }
-
-  abstract getOptions(): CommandInteractionOptionResolver | undefined;
 }

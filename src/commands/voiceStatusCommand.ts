@@ -1,3 +1,4 @@
+import assert from "assert";
 import { MessageEmbed } from "discord.js";
 
 import { CommandContext } from "../commandContext";
@@ -32,12 +33,14 @@ export class VoiceStatusCommand extends CommandBase {
       await context.reply("plain", embed);
     } else {
       const configManager = context.configManager;
-      const config = await configManager.getMasterConfig();
+      const config = configManager.getMasterConfigAccessor();
+      const voices = await config.get("speakerBuildOptions");
+      assert(voices);
 
       const embed = new MessageEmbed();
       embed.setDescription("登録されているボイス名");
       embed.setFields(
-        Object.values(config.speakerBuildOptions).map((item) => ({
+        Object.values(voices).map((item) => ({
           name: item.voiceName,
           value: item.type,
         }))

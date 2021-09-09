@@ -1,10 +1,16 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetVoiceSub extends ConfigSubCommand {
+import { CommandContextSlash } from "../../commandContextSlash";
+import { UserConfig } from "../../config/configManager";
+import { isInRange } from "../../util";
+import {
+  ConfigCommandLevel,
+  isRequiredOption,
+  SetConfigSubCommand,
+  ValidationResult,
+} from "./setConfigSubCommand";
+
+export class SetVoiceSub extends SetConfigSubCommand<UserConfig, "speakerOption"> {
   constructor(level: ConfigCommandLevel) {
     super(
       {
@@ -29,49 +35,57 @@ export class SetVoiceSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "speakerOption"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
-
-    const configKey = "speakerOption";
-
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<UserConfig["speakerOption"]> | undefined
+  ): UserConfig["speakerOption"] | undefined {
     const voiceName = options.getString("voicename");
-
-    const masterConfig = await configManager.getMasterConfig();
-    if (voiceName && !masterConfig.speakerBuildOptions[voiceName]) {
-      await context.reply("warn", "登録されていないボイス名を指定しています.");
+    if (!voiceName) {
+      return undefined;
     }
 
-    const speakerOption = voiceName
-      ? {
-          speakerName: voiceName,
-          voiceParam: {
-            pitch: options.getNumber("pitch") ?? 1,
-            intonation: options.getNumber("intonation") ?? 1,
-          },
-        }
-      : undefined;
+    return {
+      speakerName: voiceName,
+      voiceParam: {
+        pitch: options.getNumber("pitch") ?? 1,
+        intonation: options.getNumber("intonation") ?? 1,
+      },
+    };
+  }
 
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(
-          configKey,
-          speakerOption ?? masterConfigDefault[configKey]
-        );
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, speakerOption);
-        break;
-      case "USER":
-        await configManager.setUserConfig(context.member.id, configKey, speakerOption);
-        break;
+  protected override async validateValue(
+    value: UserConfig["speakerOption"] | undefined,
+    context: Omit<CommandContextSlash, "reply">
+  ): Promise<ValidationResult> {
+    const buildOptions = await context.getUnifiedConfigAccessor().get("speakerBuildOptions");
+
+    if (value) {
+      if (!buildOptions[value.speakerName]) {
+        return {
+          status: "warn",
+          message: "登録されていないボイス名を指定しています.",
+        };
+      }
+
+      if (!isInRange(value.voiceParam.pitch, 0, 2)) {
+        return {
+          status: "error",
+          message: "pitchに設定する値は0 ~ 2の範囲内である必要があります.",
+        };
+      }
+      if (!isInRange(value.voiceParam.intonation, 0, 2)) {
+        return {
+          status: "error",
+          message: "intonationに設定する値は0 ~ 2の範囲内である必要があります.",
+        };
+      }
     }
 
-    await context.reply("plain", "設定しました.");
+    return super.validateValue(value, context);
   }
 }

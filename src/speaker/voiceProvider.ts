@@ -28,33 +28,9 @@ export class VoiceProvider {
   ): Promise<SpeakerOption | null> {
     const configManager = this.session.yosuga.configManager;
     const collection = await this.speakerCollection;
-    if (userId) {
-      const userConfig = await configManager.getUserConfig(userId);
-      if (this.isActiveSpeaker(collection, userConfig?.speakerOption?.speakerName)) {
-        return userConfig!.speakerOption!;
-      }
-    }
-    if (guildId) {
-      const guildConfig = await configManager.getGuildConfig(guildId);
-      if (this.isActiveSpeaker(collection, guildConfig?.speakerOption?.speakerName)) {
-        return guildConfig!.speakerOption!;
-      }
-    }
+    const accessor = configManager.getValidVoiceConfigAccessor(collection, guildId, userId);
 
-    const masterConfig = await configManager.getMasterConfig();
-    if (this.isActiveSpeaker(collection, masterConfig.speakerOption?.speakerName)) {
-      return masterConfig.speakerOption;
-    }
-    return null;
-  }
-
-  isActiveSpeaker(
-    speakerCollection: Collection<string, Speaker>,
-    speakerName: string | undefined
-  ): boolean {
-    if (!speakerName) return false;
-    const speaker = speakerCollection.get(speakerName);
-    return speaker?.status === "active";
+    return (await accessor.get("speakerOption")) ?? null;
   }
 
   async synthesis(speechText: SpeechText, voiceOption: SpeakerOption): Promise<AudioResource> {

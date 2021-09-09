@@ -1,11 +1,18 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { isInRange } from "../../util";
-import { CommandGroup } from "../commandGroup";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetFastSpeedSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+import { CommandContextSlash } from "../../commandContextSlash";
+import { GuildConfig, masterConfigDefault } from "../../config/configManager";
+import { isInRange } from "../../util";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+  ValidationResult,
+} from "./setConfigSubCommand";
+
+export class SetFastSpeedSub extends SetConfigSubCommand<GuildConfig, "fastSpeedScale"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "fast-speed-scale",
@@ -19,32 +26,28 @@ export class SetFastSpeedSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "fastSpeedScale"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<GuildConfig["fastSpeedScale"]> | undefined
+  ): GuildConfig["fastSpeedScale"] | undefined {
+    return options.getNumber("value") || undefined;
+  }
 
-    const configKey = "fastSpeedScale";
-    const fastSpeed = options.getNumber("value") || undefined;
-
-    if (fastSpeed && !isInRange(fastSpeed, 0.1, 10)) {
-      await context.reply("error", "設定する値は0.1 ~ 10の範囲内である必要があります.");
-      return;
+  override async validateValue(
+    value: GuildConfig["fastSpeedScale"] | undefined,
+    context: Omit<CommandContextSlash, "reply">
+  ): Promise<ValidationResult> {
+    if (value && !isInRange(value, 0.1, 10)) {
+      return {
+        status: "error",
+        message: "設定する値は0.1 ~ 10の範囲内である必要があります.",
+      };
     }
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, fastSpeed ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, fastSpeed);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+    return super.validateValue(value, context);
   }
 }

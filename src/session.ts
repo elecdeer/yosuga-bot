@@ -8,7 +8,7 @@ import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
-import { UnifiedConfig } from "./configManager";
+import { UnifiedConfig } from "./config/configManager";
 import { yosuga } from "./index";
 import { SessionEmitter } from "./sessionEmitter";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
@@ -179,7 +179,7 @@ export class Session extends SessionEmitter {
   }
 
   async getConfig(): Promise<Readonly<UnifiedConfig>> {
-    return await this.yosuga.configManager.getUnifiedConfig(this.guild.id);
+    return this.yosuga.configManager.getUnifiedConfigAccessor(this.guild.id).getAllValue();
   }
 
   getGuildId(): Snowflake {

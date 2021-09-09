@@ -26,8 +26,8 @@ export class MasterConfigCommand extends CommandGroup {
       permission: CommandPermission.AppOwner,
     });
 
-    this.addSubCommand(new AddSpeakerDaemonSub());
-    this.addSubCommand(new AddSpeakerTtsSub());
+    this.addSubCommand(new AddSpeakerDaemonSub("MASTER"));
+    this.addSubCommand(new AddSpeakerTtsSub("MASTER"));
     this.addSubCommand(new SetVoiceSub("MASTER"));
     this.addSubCommand(new SetVolumeSub("MASTER"));
     this.addSubCommand(new SetSpeedSub("MASTER"));
