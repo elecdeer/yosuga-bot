@@ -1,10 +1,17 @@
+import { CommandInteractionOptionResolver } from "discord.js";
+
 import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
+import { masterConfigDefault, UserConfig } from "../../config/configManager";
 import { CommandGroup } from "../commandGroup";
 import { SubCommandBase } from "../subCommandBase";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import {
+  ConfigCommandLevel,
+  SetConfigSubCommand,
+  isRequiredOption,
+  ValidationResult,
+} from "./setConfigSubCommand";
 
-export class SetVoiceSub extends ConfigSubCommand {
+export class SetVoiceSub extends SetConfigSubCommand<UserConfig, "speakerOption"> {
   constructor(level: ConfigCommandLevel) {
     super(
       {
@@ -29,49 +36,26 @@ export class SetVoiceSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "speakerOption"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
-
-    const configKey = "speakerOption";
-
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<UserConfig["speakerOption"]> | undefined
+  ): UserConfig["speakerOption"] | undefined {
     const voiceName = options.getString("voicename");
-
-    const masterConfig = await configManager.getMasterConfig();
-    if (voiceName && !masterConfig.speakerBuildOptions[voiceName]) {
-      await context.reply("warn", "登録されていないボイス名を指定しています.");
+    if (!voiceName) {
+      return undefined;
     }
 
-    const speakerOption = voiceName
-      ? {
-          speakerName: voiceName,
-          voiceParam: {
-            pitch: options.getNumber("pitch") ?? 1,
-            intonation: options.getNumber("intonation") ?? 1,
-          },
-        }
-      : undefined;
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(
-          configKey,
-          speakerOption ?? masterConfigDefault[configKey]
-        );
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, speakerOption);
-        break;
-      case "USER":
-        await configManager.setUserConfig(context.member.id, configKey, speakerOption);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+    return {
+      speakerName: voiceName,
+      voiceParam: {
+        pitch: options.getNumber("pitch") ?? 1,
+        intonation: options.getNumber("intonation") ?? 1,
+      },
+    };
   }
 }

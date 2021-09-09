@@ -1,48 +1,37 @@
-import {
-  ApplicationCommandSubCommandData,
-  CommandInteractionOptionResolver,
-  MessageEmbed,
-} from "discord.js";
-import { ValueOf } from "type-fest";
+import { ApplicationCommandSubCommandData } from "discord.js";
 
-import { CommandContextSlash } from "../../commandContextSlash";
-import { ConfigManager, GuildConfig, MasterConfig, UnifiedConfig } from "../../configManager";
+import { CommandContext } from "../../commandContext";
+import { ConfigAccessor } from "../../config/configAccessor";
+import { GuildConfig, MasterConfig, UserConfig } from "../../config/configManager";
 import { SubCommandBase } from "../subCommandBase";
+import { LevelConfigMap } from "./setConfigSubCommand";
 
-export type ConfigCommandLevel = "MASTER" | "GUILD" | "USER";
-
-const levelString: Record<ConfigCommandLevel, string> = {
-  MASTER: "Yosugaインスタンス",
-  GUILD: "サーバ",
-  USER: "ユーザ",
-};
-
-export abstract class ConfigSubCommand extends SubCommandBase {
-  readonly level: ConfigCommandLevel;
+export abstract class ConfigSubCommand<
+  TConfig extends MasterConfig | GuildConfig | UserConfig
+> extends SubCommandBase {
+  protected readonly level: LevelConfigMap<TConfig>;
 
   protected constructor(
     data: Omit<ApplicationCommandSubCommandData, "type">,
-    level: ConfigCommandLevel
+    level: LevelConfigMap<TConfig>
   ) {
     super(data);
     this.level = level;
   }
 
-  constructReplyEmbed(
-    oldValue: ValueOf<UnifiedConfig> | undefined,
-    newValue: ValueOf<UnifiedConfig> | undefined
-  ): MessageEmbed {
-    console.log(oldValue);
-    console.log(newValue);
-    const embed = new MessageEmbed();
-    embed.setDescription(`${levelString[this.level]}の設定を変更しました.`);
-    embed.addField(this.data.name, this.data.description, true);
-    embed.addField("変更前", oldValue ? String(oldValue) : "[デフォルト値]", true);
-    embed.addField("変更後", newValue ? String(newValue) : "[デフォルト値]", true);
-    return embed;
+  protected getConfigAccessor(context: CommandContext): ConfigAccessor<TConfig> {
+    switch (this.level) {
+      case "MASTER":
+        return context.configManager.getMasterConfigAccessor() as unknown as ConfigAccessor<TConfig>;
+      case "GUILD":
+        return context.configManager.getGuildConfigAccessor(
+          context.guild.id
+        ) as unknown as ConfigAccessor<TConfig>;
+      case "USER":
+        return context.configManager.getUserConfigAccessor(
+          context.member.id
+        ) as unknown as ConfigAccessor<TConfig>;
+    }
+    throw Error();
   }
 }
-
-export const isRequiredOption = (level: ConfigCommandLevel): boolean => {
-  return false;
-};

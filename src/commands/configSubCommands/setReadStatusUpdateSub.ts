@@ -1,10 +1,15 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { CommandGroup } from "../commandGroup";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetReadStatusUpdateSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+import { GuildConfig } from "../../config/configManager";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+} from "./setConfigSubCommand";
+
+export class SetReadStatusUpdateSub extends SetConfigSubCommand<GuildConfig, "readStatusUpdate"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "read-status-update",
@@ -18,27 +23,15 @@ export class SetReadStatusUpdateSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "readStatusUpdate"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
-
-    const configKey = "readStatusUpdate";
-    const value = options.getBoolean("enable") || undefined;
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, value ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, value);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+  getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<GuildConfig["readStatusUpdate"]> | undefined
+  ): GuildConfig["readStatusUpdate"] | undefined {
+    return options.getBoolean("enable") || undefined;
   }
 }

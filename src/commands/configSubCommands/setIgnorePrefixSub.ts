@@ -1,10 +1,15 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { CommandGroup } from "../commandGroup";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetIgnorePrefixSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+import { GuildConfig } from "../../config/configManager";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+} from "./setConfigSubCommand";
+
+export class SetIgnorePrefixSub extends SetConfigSubCommand<GuildConfig, "ignorePrefix"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "ignore-prefix",
@@ -18,27 +23,15 @@ export class SetIgnorePrefixSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "ignorePrefix"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
-
-    const configKey = "ignorePrefix";
-    const prefix = options.getString("prefix") || undefined;
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, prefix ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, prefix);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<GuildConfig["ignorePrefix"]> | undefined
+  ): GuildConfig["ignorePrefix"] | undefined {
+    return options.getString("prefix") || undefined;
   }
 }

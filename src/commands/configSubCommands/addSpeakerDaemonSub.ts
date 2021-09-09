@@ -1,42 +1,46 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { SubCommandBase } from "../subCommandBase";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class AddSpeakerDaemonSub extends SubCommandBase {
-  constructor() {
-    super({
-      name: "add-speaker-daemon",
-      description: "VoiceroidDaemonによるボイスの追加",
-      options: [
-        {
-          name: "name",
-          description: "ボイスの登録名",
-          required: true,
-          type: "STRING",
-        },
-        {
-          name: "url",
-          description: "VoiceroidDaemonのURLBase",
-          required: true,
-          type: "STRING",
-        },
-      ],
-    });
+import { MasterConfig } from "../../config/configManager";
+import { SetConfigSubCommand, MasterLevel } from "./setConfigSubCommand";
+
+export class AddSpeakerDaemonSub extends SetConfigSubCommand<MasterConfig, "speakerBuildOptions"> {
+  constructor(level: MasterLevel) {
+    super(
+      {
+        name: "add-speaker-daemon",
+        description: "VoiceroidDaemonによるボイスの追加",
+        options: [
+          {
+            name: "name",
+            description: "ボイスの登録名",
+            type: "STRING",
+            required: true,
+          },
+          {
+            name: "url",
+            description: "VoiceroidDaemonのURLBase",
+            type: "STRING",
+            required: true,
+          },
+        ],
+      },
+      level,
+      "speakerBuildOptions"
+    );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
-
+  override getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<MasterConfig["speakerBuildOptions"]> | undefined
+  ): MasterConfig["speakerBuildOptions"] | undefined {
     const voiceName = options.getString("name", true);
-    await configManager.setMasterConfig("speakerBuildOptions", (oldValue) => ({
+    return {
       ...oldValue,
       [voiceName]: {
         type: "voiceroidDaemon",
         voiceName: options.getString("name", true),
         urlBase: options.getString("url", true),
       },
-    }));
-
-    await context.reply("plain", "設定しました.");
+    };
   }
 }

@@ -1,11 +1,18 @@
-import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
-import { isInRange } from "../../util";
-import { CommandGroup } from "../commandGroup";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import { CommandInteractionOptionResolver } from "discord.js";
 
-export class SetSpeedSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+import { CommandContextSlash } from "../../commandContextSlash";
+import { GuildConfig } from "../../config/configManager";
+import { isInRange } from "../../util";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+  ValidationResult,
+} from "./setConfigSubCommand";
+
+export class SetSpeedSub extends SetConfigSubCommand<GuildConfig, "masterSpeed"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "speed",
@@ -19,32 +26,28 @@ export class SetSpeedSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "masterSpeed"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
+  getValueFromOptions(
+    options: CommandInteractionOptionResolver,
+    oldValue: Readonly<GuildConfig["masterSpeed"]> | undefined
+  ): GuildConfig["masterSpeed"] | undefined {
+    return options.getNumber("value") || undefined;
+  }
 
-    const configKey = "masterSpeed";
-    const speed = options.getNumber("value") || undefined;
-
-    if (speed && !isInRange(speed, 0, 2)) {
-      await context.reply("error", "設定する値は0 ~ 2の範囲内である必要があります.");
-      return;
+  override async validateValue(
+    value: GuildConfig["masterSpeed"] | undefined,
+    context: CommandContextSlash
+  ): Promise<ValidationResult> {
+    if (value && !isInRange(value, 0, 2)) {
+      return {
+        status: "error",
+        message: "設定する値は0 ~ 2の範囲内である必要があります.",
+      };
     }
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, speed ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, speed);
-        break;
-    }
-
-    await context.reply("plain", "設定しました.");
+    return super.validateValue(value, context);
   }
 }

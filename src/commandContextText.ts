@@ -1,7 +1,7 @@
 import { Guild, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 
 import { CommandContext, ReplyType } from "./commandContext";
-import { ConfigManager } from "./configManager";
+import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
 import { YosugaClient } from "./yosugaClient";
 

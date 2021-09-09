@@ -1,12 +1,18 @@
-import { Snowflake } from "discord.js";
+import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault } from "../../configManager";
+import { GuildConfig } from "../../config/configManager";
 import { isInRange } from "../../util";
-import { ConfigCommandLevel, ConfigSubCommand, isRequiredOption } from "./configSubCommand";
+import {
+  SetConfigSubCommand,
+  GuildLevel,
+  isRequiredOption,
+  MasterLevel,
+  ValidationResult,
+} from "./setConfigSubCommand";
 
-export class SetVolumeSub extends ConfigSubCommand {
-  constructor(level: ConfigCommandLevel) {
+export class SetVolumeSub extends SetConfigSubCommand<GuildConfig, "masterVolume"> {
+  constructor(level: MasterLevel | GuildLevel) {
     super(
       {
         name: "volume",
@@ -20,56 +26,25 @@ export class SetVolumeSub extends ConfigSubCommand {
           },
         ],
       },
-      level
+      level,
+      "masterVolume"
     );
   }
 
-  override async execute(context: CommandContextSlash): Promise<void> {
-    const options = context.getOptions();
-    const configManager = context.configManager;
+  getValueFromOptions(options: CommandInteractionOptionResolver): number | undefined {
+    return options.getNumber("value") || undefined;
+  }
 
-    const configKey = "masterVolume";
-    const volume = options.getNumber("value") || undefined;
-
-    if (volume && !isInRange(volume, 0, 2)) {
-      await context.reply("error", "設定する値は0 ~ 2の範囲内である必要があります.");
-      return;
+  override async validateValue(
+    value: GuildConfig["masterVolume"] | undefined,
+    context: CommandContextSlash
+  ): Promise<ValidationResult> {
+    if (value && !isInRange(value, 0, 2)) {
+      return {
+        status: "error",
+        message: "設定する値は0 ~ 2の範囲内である必要があります.",
+      };
     }
-
-    const oldVolume = (await configManager.getMasterConfig())[configKey];
-
-    const accessor:
-      | { level: "MASTER" }
-      | { level: "GUILD"; guildId: Snowflake }
-      | { level: "USER"; userId: Snowflake } =
-      this.level === "MASTER"
-        ? {
-            level: "MASTER",
-          }
-        : this.level === "GUILD"
-        ? {
-            level: "GUILD",
-            guildId: context.guild.id,
-          }
-        : {
-            level: "USER",
-            userId: context.member.id,
-          };
-
-    await configManager.setConfig(accessor, configKey, volume);
-
-    //この辺あんまり良くないけどしょうがない感じもする
-    switch (this.level) {
-      case "MASTER":
-        await configManager.setMasterConfig(configKey, volume ?? masterConfigDefault[configKey]);
-        break;
-      case "GUILD":
-        await configManager.setGuildConfig(context.guild.id, configKey, volume);
-        break;
-    }
-
-    const newVolume = (await configManager.getMasterConfig())[configKey];
-
-    await context.reply("plain", this.constructReplyEmbed(oldVolume, newVolume));
+    return super.validateValue(value, context);
   }
 }
