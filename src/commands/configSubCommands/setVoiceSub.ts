@@ -1,13 +1,12 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { masterConfigDefault, UserConfig } from "../../config/configManager";
-import { CommandGroup } from "../commandGroup";
-import { SubCommandBase } from "../subCommandBase";
+import { UserConfig } from "../../config/configManager";
+import { isInRange } from "../../util";
 import {
   ConfigCommandLevel,
-  SetConfigSubCommand,
   isRequiredOption,
+  SetConfigSubCommand,
   ValidationResult,
 } from "./setConfigSubCommand";
 
@@ -65,11 +64,26 @@ export class SetVoiceSub extends SetConfigSubCommand<UserConfig, "speakerOption"
   ): Promise<ValidationResult> {
     const buildOptions = await context.getUnifiedConfigAccessor().get("speakerBuildOptions");
 
-    if (value && !buildOptions[value.speakerName]) {
-      return {
-        status: "warn",
-        message: "登録されていないボイス名を指定しています.",
-      };
+    if (value) {
+      if (!buildOptions[value.speakerName]) {
+        return {
+          status: "warn",
+          message: "登録されていないボイス名を指定しています.",
+        };
+      }
+
+      if (!isInRange(value.voiceParam.pitch, 0, 2)) {
+        return {
+          status: "error",
+          message: "pitchに設定する値は0 ~ 2の範囲内である必要があります.",
+        };
+      }
+      if (!isInRange(value.voiceParam.intonation, 0, 2)) {
+        return {
+          status: "error",
+          message: "intonationに設定する値は0 ~ 2の範囲内である必要があります.",
+        };
+      }
     }
 
     return super.validateValue(value, context);
