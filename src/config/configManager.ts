@@ -43,7 +43,6 @@ export type MasterConfig = UnifiedConfig;
 export type GuildConfig = Partial<GuildLevelConfig & UserLevelConfig>;
 export type UserConfig = Partial<UserLevelConfig>;
 
-//DISCORD_APP_ID: ConfigUnity
 export type MasterConfigRecord = Record<string, MasterConfig>;
 export type GuildConfigRecord = Record<string, GuildConfig>;
 export type UserConfigRecord = Record<string, UserConfig>;

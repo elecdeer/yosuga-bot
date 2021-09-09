@@ -117,7 +117,6 @@ export class YosugaClient extends (EventEmitter as { new (): TypedEventEmitter<E
     this.commandManager.assign(new ClearCommand());
     this.commandManager.assign(new HelpCommand());
     this.commandManager.assign(new VersionCommand());
-    // this.commandManager.assign(new ReloadCommand());
     this.commandManager.assign(new DeployGlobalCommand());
     this.commandManager.assign(new DeployGuildCommand());
     this.commandManager.assign(new UndeployGlobalCommand());
