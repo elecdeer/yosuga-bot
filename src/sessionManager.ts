@@ -2,7 +2,6 @@ import { VoiceConnection } from "@discordjs/voice";
 import { Collection, Snowflake, TextChannel } from "discord.js";
 import log4js from "log4js";
 
-import { yosuga } from "./index";
 import { Session } from "./session";
 import { VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
@@ -28,7 +27,7 @@ export class SessionManager {
     textChannel: TextChannel,
     voiceChannel: VoiceOrStageChannel
   ): Session {
-    const session = new Session(yosuga, connection, textChannel, voiceChannel);
+    const session = new Session(this.yosuga, connection, textChannel, voiceChannel);
 
     const guildId = textChannel.guild.id;
 

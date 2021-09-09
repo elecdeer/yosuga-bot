@@ -85,7 +85,7 @@ export class YosugaClient {
     this.commandManager.assign(new StartCommand());
     this.commandManager.assign(new EndCommand());
     this.commandManager.assign(new ClearCommand());
-    this.commandManager.assign(new HelpCommand());
+    this.commandManager.assign(new HelpCommand(this.commandManager));
     this.commandManager.assign(new VersionCommand());
     this.commandManager.assign(new DeployGlobalCommand());
     this.commandManager.assign(new DeployGuildCommand());

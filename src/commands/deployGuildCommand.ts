@@ -1,7 +1,6 @@
 import log4js from "log4js";
 
 import { CommandContext } from "../commandContext";
-import { yosuga } from "../index";
 import { CommandPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
 
@@ -20,7 +19,7 @@ export class DeployGuildCommand extends CommandBase {
   async execute(context: CommandContext): Promise<void> {
     commandLogger.debug("deploy-guild");
     try {
-      await yosuga.commandManager.registerSlashCommands(context.guild);
+      await context.yosuga.commandManager.registerSlashCommands(context.guild);
       await context.reply("plain", "正常に登録が完了しました.");
     } catch (e) {
       commandLogger.error(e);

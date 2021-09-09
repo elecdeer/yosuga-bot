@@ -3,7 +3,6 @@ import log4js from "log4js";
 
 import { CommandContext } from "../commandContext";
 import { CommandManager } from "../commandManager";
-import { yosuga } from "../index";
 import { CommandPermission, fetchPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
 
@@ -12,7 +11,7 @@ const commandLogger = log4js.getLogger("command");
 const OPTION_NAME = "filter";
 
 export class HelpCommand extends CommandBase {
-  constructor() {
+  constructor(commandManager: CommandManager) {
     super({
       name: "help",
       description: "Yosugaのコマンド一覧を表示する.",
@@ -24,7 +23,7 @@ export class HelpCommand extends CommandBase {
             name: OPTION_NAME,
             type: "STRING",
             description: "フィルタ",
-            choices: getCommandOptions(yosuga.commandManager),
+            choices: getCommandOptions(commandManager),
             required: false,
           },
         ],
@@ -37,7 +36,7 @@ export class HelpCommand extends CommandBase {
 
     const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
     const permission = await fetchPermission(context.member);
-    const commands = yosuga.commandManager.getCommandList(permission, option);
+    const commands = context.yosuga.commandManager.getCommandList(permission, option);
     commandLogger.debug(option);
     commandLogger.debug(commands);
 

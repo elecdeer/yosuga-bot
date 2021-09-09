@@ -5,7 +5,6 @@ import { getLogger } from "log4js";
 import { CommandContext } from "./commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
 import { CommandContextText, isValidMessage } from "./commandContextText";
-import { yosuga } from "./index";
 import { hasAdminPermission } from "./permissionUtil";
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
@@ -39,7 +38,7 @@ export class YosugaEvent extends (EventEmitter as { new (): TypedEventEmitter<Ev
   }
 
   attachEvents(): void {
-    const client = yosuga.client;
+    const client = this.yosuga.client;
 
     client.once("ready", () => {
       logger.info("bot ready");
