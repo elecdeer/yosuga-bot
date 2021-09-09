@@ -20,7 +20,7 @@ export class CommandManager {
   }
 
   private attachHandler() {
-    this.yosuga.on("command", async (cmd, context) => {
+    this.yosuga.event.on("command", async (cmd, context) => {
       commandLogger.debug(`cmd: ${cmd}`);
 
       const command = this.getCommand(cmd);
