@@ -38,6 +38,9 @@ export class YosugaClient {
   constructor(discordClient: Client) {
     this.client = discordClient;
 
+    //一番最初
+    this.event = new YosugaEvent(this);
+
     this.commandManager = new CommandManager(this);
     this.sessionManager = new SessionManager(this);
     this.configManager = new ConfigManager(this, {
@@ -54,8 +57,6 @@ export class YosugaClient {
         storeFilePath: path.join(yosugaEnv.configPath, "userConfig"),
       }),
     });
-
-    this.event = new YosugaEvent(this);
   }
 
   async initClient(): Promise<void> {
