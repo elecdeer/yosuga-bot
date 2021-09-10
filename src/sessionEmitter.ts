@@ -3,6 +3,7 @@ import EventEmitter from "events";
 
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
+import { YosugaEvent } from "./yosugaEvent";
 
 // const logger = getLogger("session");
 
@@ -16,8 +17,6 @@ interface Events extends EventsBase {
   turnOffGoLive: [member: GuildMember];
   disconnect: [];
 }
-
-// type Events = {};
 
 export class SessionEmitter extends (EventEmitter as { new (): TypedEventEmitter<Events> }) {
   readonly yosuga: YosugaClient;
@@ -33,13 +32,17 @@ export class SessionEmitter extends (EventEmitter as { new (): TypedEventEmitter
     this.textChannel = textChannel;
     this.guild = voiceChannel.guild;
 
-    yosuga.on("message", (guildId, message) => {
+    this.attachEvents(yosuga.event);
+  }
+
+  private attachEvents(event: YosugaEvent) {
+    event.on("message", (guildId, message) => {
       if (guildId !== this.guild.id) return;
       if (message.channel.id !== this.textChannel.id) return;
       this.emit("message", message);
     });
 
-    yosuga.on("moveChannel", (guildId, member, from, to) => {
+    event.on("moveChannel", (guildId, member, from, to) => {
       if (guildId !== this.guild.id) return;
       if (from?.id !== this.voiceChannel.id && to?.id === this.voiceChannel.id) {
         this.emit("enterChannel", member);
@@ -49,25 +52,25 @@ export class SessionEmitter extends (EventEmitter as { new (): TypedEventEmitter
       }
     });
 
-    yosuga.on("turnOnVideo", (guildId, member) => {
+    event.on("turnOnVideo", (guildId, member) => {
       if (guildId !== this.guild.id) return;
       if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOnVideo", member);
     });
 
-    yosuga.on("turnOffVideo", (guildId, member) => {
+    event.on("turnOffVideo", (guildId, member) => {
       if (guildId !== this.guild.id) return;
       if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOffVideo", member);
     });
 
-    yosuga.on("turnOnGoLive", (guildId, member) => {
+    event.on("turnOnGoLive", (guildId, member) => {
       if (guildId !== this.guild.id) return;
       if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOnGoLive", member);
     });
 
-    yosuga.on("turnOffGoLive", (guildId, member) => {
+    event.on("turnOffGoLive", (guildId, member) => {
       if (guildId !== this.guild.id) return;
       if (member.voice.channel?.id !== this.voiceChannel.id) return;
       this.emit("turnOffGoLive", member);

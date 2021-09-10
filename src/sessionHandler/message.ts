@@ -111,7 +111,7 @@ export const registerMessageHandler: SessionEventHandlerRegistrant = (session) =
       message.stickers
         .map((sticker) => ({
           ...speechTextBase,
-          text: sticker.name ?? "スンプ",
+          text: sticker.name ?? "スタンプ",
         }))
         .forEach((item) => {
           speechTexts.push(item);

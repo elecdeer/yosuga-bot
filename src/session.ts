@@ -9,7 +9,6 @@ import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
 import { UnifiedConfig } from "./config/configManager";
-import { yosuga } from "./index";
 import { SessionEmitter } from "./sessionEmitter";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
 import { registerMessageHandler } from "./sessionHandler/message";

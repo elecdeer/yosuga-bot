@@ -3,7 +3,6 @@ import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import log4js from "log4js";
 
 import { CommandContext } from "../commandContext";
-import { yosuga } from "../index";
 import { CommandPermission } from "../permissionUtil";
 import { VoiceOrStageChannel } from "../types";
 import { CommandBase } from "./commandBase";
@@ -69,7 +68,7 @@ export class StartCommand extends CommandBase {
         }
       } else {
         try {
-          const sessionManager = yosuga.sessionManager;
+          const sessionManager = context.yosuga.sessionManager;
 
           const connection = await connectToChannel(voiceChannel);
           const session = sessionManager.startSession(connection, textChannel, voiceChannel);
