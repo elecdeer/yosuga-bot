@@ -75,9 +75,8 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
     logger.debug("checkInitialActiveness");
 
     try {
-      await axios({
-        method: "GET",
-        url: this.checkUrl,
+      await axios.get(this.checkUrl, {
+        timeout: 1000,
       });
 
       logger.debug(`${this.urlBase} active`);
