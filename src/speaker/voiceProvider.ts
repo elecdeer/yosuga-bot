@@ -2,8 +2,9 @@ import { AudioResource } from "@discordjs/voice";
 import { Collection, Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 
+import { failure, Result } from "../result";
 import { Session } from "../session";
-import { SpeechText, SpeakerOption } from "../types";
+import { SpeakerOption, SpeechText } from "../types";
 import { allSerial } from "../util";
 import { Speaker } from "./speaker";
 import { TtsControllerSpeaker, TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
@@ -33,16 +34,21 @@ export class VoiceProvider {
     return (await accessor.get("speakerOption")) ?? null;
   }
 
-  async synthesis(speechText: SpeechText, voiceOption: SpeakerOption): Promise<AudioResource> {
+  async synthesis(
+    speechText: SpeechText,
+    voiceOption: SpeakerOption
+  ): Promise<Result<AudioResource, Error>> {
     const collection = await this.speakerCollection;
     const activeSpeakerCollection = collection.filter((value) => value.status == "active");
 
     const speaker = activeSpeakerCollection.get(voiceOption.speakerName);
     if (!speaker) throw new Error("使用できない話者名が指定されています");
     const result = await speaker.synthesis(speechText, voiceOption.voiceParam);
-    if (!result) {
-      throw new Error("合成に失敗");
+    if (result.isFailure()) {
+      logger.error(result.value);
+      return failure(new Error("合成に失敗"));
     }
+
     return result;
   }
 

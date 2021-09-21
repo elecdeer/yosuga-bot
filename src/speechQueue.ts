@@ -10,22 +10,21 @@ const logger = getLogger("speechQueue");
 export type SpeechQueue = async.QueueObject<SpeechTask>;
 export const createSpeechQueue = (session: Session): SpeechQueue => {
   const worker = async (task: SpeechTask): Promise<void> => {
-    const config = await session.getConfig();
-
     const voiceProvider = session.getVoiceProvider();
 
-    const resource = await voiceProvider
+    const synthesisResult = await voiceProvider
       .synthesis(task.speechText, task.voiceOption)
       .catch((err) => {
         logger.error(err);
       });
-    if (!resource) {
+
+    if (!synthesisResult || synthesisResult.isFailure()) {
       logger.debug("synthesis failed");
       return;
     }
 
     const player = session.player;
-    player.play(resource);
+    player.play(synthesisResult.value);
     logger.debug("Play start");
     await entersState(player, AudioPlayerStatus.Playing, 100);
 
@@ -38,9 +37,12 @@ export const createSpeechQueue = (session: Session): SpeechQueue => {
   return async.queue<SpeechTask, Error>((task, callback) => {
     worker(task)
       .then(() => {
+        logger.debug("complete work");
         callback(null);
       })
       .catch((err) => {
+        logger.debug("thrown error");
+        logger.error(err);
         callback(err);
       });
   });

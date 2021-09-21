@@ -3,10 +3,10 @@ import axios from "axios";
 import { getLogger } from "log4js";
 import { opus } from "prism-media";
 import { Readable } from "stream";
-import { URLSearchParams } from "url";
 
+import { Result, success } from "../result";
 import { Session } from "../session";
-import { AdditionalVoiceParam, PauseParam, SpeechText, VoiceParam } from "../types";
+import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
 import { wait } from "../util";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker, SpeakerState } from "./speaker";
@@ -43,15 +43,43 @@ export class TtsControllerSpeaker extends Speaker {
     this.recorder = new SIOAudioRecorder(this.option.wsUrl);
   }
 
+  async checkValidConnection(): Promise<boolean> {
+    if (!this.recorder.isActiveConnection()) {
+      return false;
+    }
+
+    try {
+      //name=""にすると接続確認だけできる
+      await axios.get(this.option.urlBase, {
+        params: {
+          text: "",
+          name: "",
+        },
+        timeout: 3000,
+        validateStatus: (status) => status === 200,
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   override async checkInitialActiveness(): Promise<SpeakerState> {
+    logger.debug("checkInitialActiveness");
+
     if (!ttsControllerOccupier.canUse(this.session)) {
       return "inactive";
     }
 
-    logger.debug("checkInitialActiveness");
+    if (!(await this.checkValidConnection())) {
+      return "inactive";
+    }
 
-    const config = await this.session.getConfig();
-    const stream = await this.synthesisStream(
+    const timeout: Promise<SpeakerState> = wait(3000).then(() => {
+      return "inactive";
+    });
+
+    const testSynthesis = this.synthesisStream(
       {
         text: "テスト",
         speed: 2,
@@ -61,60 +89,51 @@ export class TtsControllerSpeaker extends Speaker {
         intonation: 1,
         pitch: 1,
       }
+    ).then(
+      (result) =>
+        new Promise<SpeakerState>((resolve) => {
+          if (result.isFailure()) {
+            return "inactive";
+          }
+          const stream = result.value;
+          stream.once("data", () => {
+            resolve("active");
+          });
+        })
     );
 
-    if (!stream) {
-      return "inactive";
-    }
-
-    const timeout: Promise<SpeakerState> = wait(3000).then(() => {
-      return "inactive";
-    });
-
-    const active: Promise<SpeakerState> = new Promise((resolve) => {
-      stream.once("data", (chunk) => {
-        resolve("active");
-      });
-    });
-
-    return Promise.race([timeout, active]).then((value) => {
+    return Promise.race([timeout, testSynthesis]).then((value) => {
       logger.debug(`${value}`);
-      if (value === "active") {
+      if (value === "active" && ttsControllerOccupier.canUse(this.session)) {
         ttsControllerOccupier.use(this.session);
+        return "active";
       }
-      return value;
+      return "inactive";
     });
   }
 
   override async synthesis(
     speechText: SpeechText,
     voiceParam: VoiceParam<AdditionalVoiceParam>
-  ): Promise<AudioResource | null> {
-    const stream = await this.synthesisStream(speechText, voiceParam);
+  ): Promise<Result<AudioResource, Error>> {
+    const streamResult = await this.synthesisStream(speechText, voiceParam);
 
-    if (!stream) return null;
+    if (streamResult.isFailure()) return streamResult;
 
-    return createAudioResource(stream, {
+    const resource = createAudioResource(streamResult.value, {
       inputType: StreamType.Opus,
       silencePaddingFrames: 0,
       inlineVolume: false,
     });
+
+    return success(resource);
   }
 
   protected async synthesisStream(
     speechText: SpeechText,
     voiceParam: VoiceParam<AdditionalVoiceParam>
-  ): Promise<Readable | null> {
+  ): Promise<Result<Readable, Error>> {
     logger.debug(this.option);
-    //
-    // const urlParams = new URLSearchParams();
-    // urlParams.append("text", speechText.text);
-    // urlParams.append("name", this.option.callName);
-    // urlParams.append("speaker", this.option.outputDevice);
-    // urlParams.append("volume", String(speechText.volume));
-    // urlParams.append("speed", String(speechText.speed));
-    // urlParams.append("pitch", String(voiceParam.pitch));
-    // urlParams.append("range", String(voiceParam.intonation));
 
     // const url = `${this.option.urlBase}/?${urlParams.toString()}`;
     // logger.debug(`url: ${url}`);
@@ -133,17 +152,20 @@ export class TtsControllerSpeaker extends Speaker {
         params: params,
       });
 
-    try {
-      const stream = await this.recorder.recordAudioStream(start);
-      return stream.pipe(
-        new opus.Encoder({
-          channels: 1,
-          rate: 48000,
-          frameSize: 960,
-        })
-      );
-    } catch (e) {
-      return null;
+    const streamResult = await this.recorder.recordAudioStream(start);
+
+    if (streamResult.isFailure()) {
+      return streamResult;
     }
+
+    const opusStream = streamResult.value.pipe(
+      new opus.Encoder({
+        channels: 1,
+        rate: 48000,
+        frameSize: 960,
+      })
+    );
+
+    return success(opusStream);
   }
 }
