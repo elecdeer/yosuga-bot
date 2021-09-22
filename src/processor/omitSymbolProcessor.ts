@@ -1,4 +1,4 @@
-import { escapeRegexp } from "../util";
+import { escapeRegexp } from "../util/util";
 import { ProcessorProvider } from "./processorChain";
 
 export const omitSymbolProcessor: ProcessorProvider<string> = (symbol) => {

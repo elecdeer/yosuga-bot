@@ -2,10 +2,10 @@ import { AudioResource } from "@discordjs/voice";
 import { Collection, Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 
-import { failure, Result } from "../result";
 import { Session } from "../session";
 import { SpeakerOption, SpeechText } from "../types";
-import { allSerial } from "../util";
+import { failure, Result } from "../util/result";
+import { allSerial } from "../util/util";
 import { Speaker } from "./speaker";
 import { TtsControllerSpeaker, TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
 import { DaemonSpeakerBuildOption, VoiceroidDaemonSpeaker } from "./voiceroidDaemonSpeaker";

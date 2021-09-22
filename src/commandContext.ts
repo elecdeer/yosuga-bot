@@ -7,10 +7,10 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { ConfigManager, UnifiedConfig } from "./config/configManager";
+import { ConfigManager } from "./config/configManager";
 import { UnifiedConfigAccessor } from "./config/unifiedConfigAccessor";
 import { Session } from "./session";
-import { createYosugaEmbed } from "./util";
+import { createYosugaEmbed } from "./util/util";
 import { YosugaClient } from "./yosugaClient";
 
 export type ReplyType = "plain" | "warn" | "error" | "prohibit";

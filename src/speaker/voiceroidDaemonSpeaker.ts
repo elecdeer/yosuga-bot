@@ -3,9 +3,9 @@ import axios from "axios";
 import { getLogger } from "log4js";
 import { Readable } from "stream";
 
-import { failure, Result, success } from "../result";
 import { Session } from "../session";
 import { SpeechText, VoiceParam } from "../types";
+import { failure, Result, success } from "../util/result";
 import { Speaker, SpeakerState } from "./speaker";
 
 export type DaemonSpeakerBuildOption = {

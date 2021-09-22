@@ -4,10 +4,10 @@ import { getLogger } from "log4js";
 import { opus } from "prism-media";
 import { Readable } from "stream";
 
-import { Result, success } from "../result";
 import { Session } from "../session";
 import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
-import { wait } from "../util";
+import { Result, success } from "../util/result";
+import { wait } from "../util/util";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker, SpeakerState } from "./speaker";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
