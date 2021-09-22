@@ -1,5 +1,5 @@
 export class Deferred<T> {
-  private readonly promise: Promise<T>;
+  readonly promise: Promise<T>;
   private _resolve!: (value: T | PromiseLike<T>) => void;
   private _reject!: (reason?: unknown) => void;
 
