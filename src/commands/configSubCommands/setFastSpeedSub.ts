@@ -1,13 +1,13 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { GuildConfig, masterConfigDefault } from "../../config/configManager";
-import { isInRange } from "../../util";
+import { GuildConfig } from "../../config/configManager";
+import { isInRange } from "../../util/util";
 import {
-  SetConfigSubCommand,
   GuildLevel,
   isRequiredOption,
   MasterLevel,
+  SetConfigSubCommand,
   ValidationResult,
 } from "./setConfigSubCommand";
 

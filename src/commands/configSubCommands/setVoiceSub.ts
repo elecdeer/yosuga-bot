@@ -2,7 +2,7 @@ import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
 import { UserConfig } from "../../config/configManager";
-import { isInRange } from "../../util";
+import { isInRange } from "../../util/util";
 import {
   ConfigCommandLevel,
   isRequiredOption,

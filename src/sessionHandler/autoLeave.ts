@@ -3,7 +3,7 @@ import { getLogger } from "log4js";
 
 import { Session } from "../session";
 import { SessionEventHandlerRegistrant } from "../types";
-import { createYosugaEmbed } from "../util";
+import { createYosugaEmbed } from "../util/util";
 
 const logger = getLogger("sessionEvent");
 export const registerAutoLeave: SessionEventHandlerRegistrant = async (session) => {

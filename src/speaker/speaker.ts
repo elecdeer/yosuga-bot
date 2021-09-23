@@ -2,7 +2,8 @@ import { AudioResource } from "@discordjs/voice";
 import { getLogger } from "log4js";
 
 import { Session } from "../session";
-import { AdditionalVoiceParam, PauseParam, SpeechText, VoiceParam } from "../types";
+import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
+import { Result } from "../util/result";
 
 export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 
@@ -23,6 +24,7 @@ export abstract class Speaker<T extends AdditionalVoiceParam = AdditionalVoicePa
     try {
       this.status = await this.checkInitialActiveness();
     } catch (e) {
+      this.status = "inactive";
       logger.error(e);
     }
     return this;
@@ -31,7 +33,7 @@ export abstract class Speaker<T extends AdditionalVoiceParam = AdditionalVoicePa
   abstract synthesis(
     speechText: SpeechText,
     voiceParam: VoiceParam<T>
-  ): Promise<AudioResource | null>;
+  ): Promise<Result<AudioResource, Error>>;
 
   protected abstract checkInitialActiveness(): Promise<SpeakerState>;
 }

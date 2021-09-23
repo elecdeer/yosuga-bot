@@ -5,6 +5,7 @@ import { Readable } from "stream";
 
 import { Session } from "../session";
 import { SpeechText, VoiceParam } from "../types";
+import { failure, Result, success } from "../util/result";
 import { Speaker, SpeakerState } from "./speaker";
 
 export type DaemonSpeakerBuildOption = {
@@ -30,6 +31,8 @@ export type VoiceroidDaemonSpeakerParam = Partial<{
 
 const logger = getLogger("voiceroidDaemonSpeaker");
 
+const TIMEOUT_MS = 3000;
+
 export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
   protected urlBase: string;
   private checkUrl: string;
@@ -46,7 +49,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
   override async synthesis(
     speechText: SpeechText,
     voiceParam: VoiceParam<Record<string, never>>
-  ): Promise<AudioResource | null> {
+  ): Promise<Result<AudioResource, Error>> {
     const query: VoiceroidDaemonQuery = {
       Text: speechText.text,
       Speaker: {
@@ -56,19 +59,25 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
         Emphasis: voiceParam.intonation,
       },
     };
-    // logger.debug(this.speechTextUrl);
-    // logger.debug(query);
-    const res = await axios.post<Readable>(this.speechTextUrl, query, {
-      responseType: "stream",
-    });
 
-    if (res.status === 200) {
-      return createAudioResource(res.data, {
-        inputType: StreamType.Arbitrary,
+    try {
+      const res = await axios.post<Readable>(this.speechTextUrl, query, {
+        responseType: "stream",
+        timeout: TIMEOUT_MS,
       });
-    }
 
-    return null;
+      if (res.status === 200) {
+        const resource = createAudioResource(res.data, {
+          inputType: StreamType.Arbitrary,
+        });
+
+        return success(resource);
+      }
+    } catch (e) {
+      logger.error(e);
+      return failure(new Error("synthesis request failed"));
+    }
+    return failure(new Error("synthesis request failed"));
   }
 
   override async checkInitialActiveness(): Promise<SpeakerState> {
@@ -76,7 +85,7 @@ export class VoiceroidDaemonSpeaker extends Speaker<Record<string, never>> {
 
     try {
       await axios.get(this.checkUrl, {
-        timeout: 1000,
+        timeout: TIMEOUT_MS,
       });
 
       logger.debug(`${this.urlBase} active`);

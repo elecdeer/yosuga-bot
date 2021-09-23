@@ -74,7 +74,7 @@ export class StartCommand extends CommandBase {
           const session = sessionManager.startSession(connection, textChannel, voiceChannel);
           const message = await context.reply("plain", `接続しました!\nボイスの初期化中...`);
 
-          await session.getVoiceProvider().getSpeakersStatus();
+          await session.getVoiceProvider().getSpeakersStatus(true);
           await message.edit({
             embeds: [context.constructEmbed("plain", "接続しました!\nボイスの初期化完了.")],
           });
