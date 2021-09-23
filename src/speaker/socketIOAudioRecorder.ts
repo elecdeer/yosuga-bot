@@ -5,8 +5,8 @@ import { getLogger } from "log4js";
 import { io, Socket as SIOSocket } from "socket.io-client";
 import { Readable } from "stream";
 
+import { wait } from "../util/promiseUtil";
 import { failure, Result, success } from "../util/result";
-import { wait } from "../util/util";
 
 const logger = getLogger("SIOAudioRecorder");
 
