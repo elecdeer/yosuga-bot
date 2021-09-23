@@ -4,6 +4,7 @@ import { getLogger } from "log4js";
 
 import { Session } from "../session";
 import { SpeakerOption, SpeechText } from "../types";
+import { Deferred } from "../util/deferred";
 import { failure, Result } from "../util/result";
 import { allSerial } from "../util/util";
 import { Speaker } from "./speaker";
@@ -16,11 +17,14 @@ const logger = getLogger("voiceProvider");
 
 export class VoiceProvider {
   protected session: Session;
-  protected speakerCollection: Promise<Collection<string, Speaker>>;
+  protected readonly speakerCollection: Promise<Collection<string, Speaker>>;
+  protected readonly speakerCollectionAllLoaded: Promise<Collection<string, Speaker>>;
 
   constructor(session: Session) {
     this.session = session;
-    this.speakerCollection = constructSpeakerCollection(session);
+    const constructed = constructSpeakerCollection(session);
+    this.speakerCollection = constructed.minimum;
+    this.speakerCollectionAllLoaded = constructed.all;
   }
 
   async getValidVoiceOption(
@@ -52,8 +56,10 @@ export class VoiceProvider {
     return result;
   }
 
-  async getSpeakersStatus(): Promise<{ name: string; status: string }[]> {
-    const collection = await this.speakerCollection;
+  async getSpeakersStatus(waitAllLoaded?: boolean): Promise<{ name: string; status: string }[]> {
+    const collection = waitAllLoaded
+      ? await this.speakerCollectionAllLoaded
+      : await this.speakerCollection;
     return collection.map((speaker, key) => {
       return {
         name: `${key} [${speaker.engineType}]`,
@@ -63,27 +69,49 @@ export class VoiceProvider {
   }
 }
 
-const constructSpeakerCollection = async (
+const constructSpeakerCollection = (
   session: Session
-): Promise<Collection<string, Speaker>> => {
-  const collection = new Collection<string, Speaker>();
+): {
+  minimum: Promise<Collection<string, Speaker>>;
+  all: Promise<Collection<string, Speaker>>;
+} => {
+  const minimum = new Deferred<Collection<string, Speaker>>();
+  const all = new Deferred<Collection<string, Speaker>>();
 
-  const config = await session.getConfig();
-  logger.debug("constructSpeakerCollection");
-  logger.debug(config.speakerBuildOptions);
+  void (async () => {
+    const collection = new Collection<string, Speaker>();
 
-  Object.values(config.speakerBuildOptions).forEach((speakerOption) => {
-    if (speakerOption.type === "voiceroidDaemon") {
-      collection.set(speakerOption.voiceName, new VoiceroidDaemonSpeaker(session, speakerOption));
-      return;
-    }
-    if (speakerOption.type === "ttsController") {
-      collection.set(speakerOption.voiceName, new TtsControllerSpeaker(session, speakerOption));
-      return;
-    }
-  });
+    const config = await session.getConfig();
+    logger.debug("constructSpeakerCollection");
+    logger.debug(config.speakerBuildOptions);
 
-  await allSerial(collection.map((speaker) => () => speaker.initialize()));
-  logger.debug(collection);
-  return collection;
+    Object.values(config.speakerBuildOptions).forEach((speakerOption) => {
+      if (speakerOption.type === "voiceroidDaemon") {
+        collection.set(speakerOption.voiceName, new VoiceroidDaemonSpeaker(session, speakerOption));
+        return;
+      }
+      if (speakerOption.type === "ttsController") {
+        collection.set(speakerOption.voiceName, new TtsControllerSpeaker(session, speakerOption));
+        return;
+      }
+    });
+
+    const initializeTask = async (speaker: Speaker) => {
+      await speaker.initialize();
+      if (speaker.status === "active") {
+        minimum.resolve(collection);
+      }
+    };
+
+    await allSerial(collection.map((speaker) => () => initializeTask(speaker)));
+
+    logger.debug(collection);
+    all.resolve(collection);
+    // collection.some(speaker => speaker.status === "active");
+  })();
+
+  return {
+    minimum: minimum.promise,
+    all: all.promise,
+  };
 };
