@@ -113,11 +113,10 @@ export class Session extends SessionEmitter {
     userId?: Snowflake,
     timestamp?: number
   ): Promise<void> {
-    // logger.debug("push speeech queue", param.Text);
-
-    // logger.debug(this.speakerMap);
-
-    //check状態のことを考えるべきかも
+    //全員botなら読み上げない
+    if (this.voiceChannel.members.every((mem) => mem.user.bot)) {
+      return;
+    }
 
     const voiceOption = await this.voiceProvider.getValidVoiceOption(this.guild.id, userId);
     logger.debug(voiceOption);
