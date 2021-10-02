@@ -41,6 +41,10 @@ export class TtsControllerSpeaker extends Speaker {
     super(session, "ttsController");
     this.option = option;
     this.recorder = new SIOAudioRecorder(this.option.wsUrl);
+
+    this.session.on("disconnect", () => {
+      this.recorder.destroy();
+    });
   }
 
   async checkValidConnection(): Promise<boolean> {
