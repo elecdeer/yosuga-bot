@@ -26,13 +26,17 @@ export class SIOAudioRecorder {
   async recordAudioStream(
     startPlayingRemoteAudio: () => Promise<unknown>
   ): Promise<Result<Readable, Error>> {
-    // logger.debug("emit start");
-
     try {
       this.socketIO.emit("start");
-      const stream = this.receiveStream();
+      const streamPromise = this.receiveStream();
+
+      //Unhandled Rejectionで落ちないために必要
+      streamPromise.catch((e) => {
+        logger.error(e);
+      });
+
       await startPlayingRemoteAudio();
-      return success(await stream);
+      return success(await streamPromise);
     } catch (e) {
       return failure(e as Error);
     }
