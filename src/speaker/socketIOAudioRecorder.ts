@@ -20,7 +20,7 @@ export class SIOAudioRecorder {
   }
 
   isActiveConnection(): boolean {
-    return this.socketIO.active;
+    return this.socketIO.active && !this.socketIO.disconnected;
   }
 
   async recordAudioStream(
@@ -72,5 +72,9 @@ export class SIOAudioRecorder {
     });
 
     return Promise.race([timeout, receive]);
+  }
+
+  destroy(): void {
+    this.socketIO.disconnect();
   }
 }
