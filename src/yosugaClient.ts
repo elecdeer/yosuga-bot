@@ -1,4 +1,4 @@
-import { Client, ClientApplication } from "discord.js";
+import Discord, { Client, ClientApplication } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
 
@@ -62,7 +62,7 @@ export class YosugaClient {
   async initClient(): Promise<void> {
     try {
       const token = await this.client.login(yosugaEnv.discordToken);
-      this.client.application = new ClientApplication(this.client, {});
+      // this.client.application = new ClientApplication(this.client, {});
 
       await this.client.application.fetch();
       await this.client.application.commands.fetch();
