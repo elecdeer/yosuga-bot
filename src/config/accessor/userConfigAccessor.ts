@@ -1,21 +1,21 @@
-import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 import { ReadonlyDeep } from "type-fest";
 
+import { UserId } from "../../util/types";
 import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "../configManager";
 import { UserConfigStore } from "../store/userConfigStore";
 import { ConfigAccessor } from "./configAccessor";
 
 export type UserConfigAccessorProps = {
   store: UserConfigStore;
-  userId: Snowflake;
+  userId: UserId;
 };
 
 const logger = getLogger("userConfigAccessor");
 
 export class UserConfigAccessor extends ConfigAccessor<UserConfig> {
   private readonly store: UserConfigStore;
-  private readonly userId: Snowflake;
+  private readonly userId: UserId;
 
   constructor({ store, userId }: UserConfigAccessorProps) {
     super();

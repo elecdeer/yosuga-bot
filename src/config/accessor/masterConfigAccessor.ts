@@ -1,18 +1,18 @@
-import { Snowflake } from "discord.js";
 import { ReadonlyDeep } from "type-fest";
 
+import { AppId } from "../../util/types";
 import { MasterConfig, ValueResolvableOptional } from "../configManager";
 import { MasterConfigStore } from "../store/masterConfigStore";
 import { ConfigAccessor } from "./configAccessor";
 
 export type MasterConfigAccessorProps = {
   store: MasterConfigStore;
-  appId: Snowflake;
+  appId: AppId;
 };
 
 export class MasterConfigAccessor extends ConfigAccessor<MasterConfig> {
   private readonly store: MasterConfigStore;
-  private readonly appId: Snowflake;
+  private readonly appId: AppId;
 
   constructor({ store, appId }: MasterConfigAccessorProps) {
     super();

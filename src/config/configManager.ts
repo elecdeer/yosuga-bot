@@ -1,10 +1,11 @@
 import assert from "assert";
-import { Collection, Snowflake } from "discord.js";
+import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
 import { Speaker } from "../speaker/speaker";
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
 import { SpeakerOption } from "../types";
+import { GuildId, UserId } from "../util/types";
 import { YosugaClient } from "../yosugaClient";
 import { ConfigAccessor } from "./accessor/configAccessor";
 import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";
@@ -86,21 +87,21 @@ export class ConfigManager {
     });
   }
 
-  getGuildConfigAccessor(guildId: Snowflake): ConfigAccessor<GuildConfig> {
+  getGuildConfigAccessor(guildId: GuildId): ConfigAccessor<GuildConfig> {
     return new GuildConfigAccessor({
       store: this.guildConfigStore,
       guildId: guildId,
     });
   }
 
-  getUserConfigAccessor(userId: Snowflake): ConfigAccessor<UserConfig> {
+  getUserConfigAccessor(userId: UserId): ConfigAccessor<UserConfig> {
     return new UserConfigAccessor({
       store: this.userConfigStore,
       userId: userId,
     });
   }
 
-  getUnifiedConfigAccessor(guildId?: Snowflake, userId?: Snowflake): UnifiedConfigAccessor {
+  getUnifiedConfigAccessor(guildId?: GuildId, userId?: UserId): UnifiedConfigAccessor {
     return new UnifiedConfigAccessor({
       master: {
         store: this.masterConfigStore,
@@ -120,8 +121,8 @@ export class ConfigManager {
 
   getValidVoiceConfigAccessor(
     speakerCollection: Collection<string, Speaker>,
-    guildId?: Snowflake,
-    userId?: Snowflake
+    guildId?: GuildId,
+    userId?: UserId
   ): ValidVoiceConfigAccessor {
     return new ValidVoiceConfigAccessor(
       {

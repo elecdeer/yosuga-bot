@@ -1,5 +1,4 @@
-import { Snowflake } from "discord.js";
-
+import { AppId } from "../../util/types";
 import { MasterConfig, MasterConfigRecord } from "../configManager";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
 import { MasterConfigStore } from "./masterConfigStore";
@@ -12,11 +11,11 @@ export class KvsMasterConfigStore
     super(props, 1);
   }
 
-  async read(appId: Snowflake): Promise<Readonly<MasterConfig>> {
+  async read(appId: AppId): Promise<Readonly<MasterConfig>> {
     return this.get(appId);
   }
 
-  async save(appId: Snowflake, value: Partial<MasterConfig>): Promise<Readonly<MasterConfig>> {
+  async save(appId: AppId, value: Partial<MasterConfig>): Promise<Readonly<MasterConfig>> {
     await this.set(appId, value);
     return this.read(appId);
   }

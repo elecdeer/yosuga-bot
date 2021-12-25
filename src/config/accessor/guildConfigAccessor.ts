@@ -1,18 +1,18 @@
-import { Snowflake } from "discord.js";
 import { ReadonlyDeep } from "type-fest";
 
+import { GuildId } from "../../util/types";
 import { GuildConfig, ValueResolvableOptional } from "../configManager";
 import { GuildConfigStore } from "../store/guildConfigStore";
 import { ConfigAccessor } from "./configAccessor";
 
 export type GuildConfigAccessorProps = {
   store: GuildConfigStore;
-  guildId: Snowflake;
+  guildId: GuildId;
 };
 
 export class GuildConfigAccessor extends ConfigAccessor<GuildConfig> {
   private readonly store: GuildConfigStore;
-  private readonly guildId: Snowflake;
+  private readonly guildId: GuildId;
 
   constructor({ store, guildId }: GuildConfigAccessorProps) {
     super();

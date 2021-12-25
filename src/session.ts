@@ -4,7 +4,7 @@ import {
   NoSubscriberBehavior,
   VoiceConnection,
 } from "@discordjs/voice";
-import { GuildMember, Snowflake, TextChannel } from "discord.js";
+import { GuildMember, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
@@ -19,6 +19,7 @@ import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
 import { VoiceProvider } from "./speaker/voiceProvider";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
 import { SessionEventHandlerRegistrant, SpeechText, VoiceOrStageChannel } from "./types";
+import { GuildId, UserId } from "./util/types";
 import { createYosugaEmbed } from "./util/util";
 import { YosugaClient } from "./yosugaClient";
 
@@ -26,7 +27,7 @@ const logger = getLogger("session");
 
 type SpeechRecordAuthorMember = {
   type: "member";
-  memberId: Snowflake;
+  memberId: UserId;
 };
 type SpeechRecordAuthorSystem = {
   type: "yosuga";
@@ -110,7 +111,7 @@ export class Session extends SessionEmitter {
 
   async pushSpeech(
     param: SetOptional<SpeechText, "speed" | "volume">,
-    userId?: Snowflake,
+    userId?: UserId,
     timestamp?: number
   ): Promise<void> {
     //全員botなら読み上げない
@@ -180,7 +181,7 @@ export class Session extends SessionEmitter {
     return this.yosuga.configManager.getUnifiedConfigAccessor(this.guild.id).getAllValue();
   }
 
-  getGuildId(): Snowflake {
+  getGuildId(): GuildId {
     return this.guild.id;
   }
 
@@ -188,7 +189,7 @@ export class Session extends SessionEmitter {
     return this.voiceProvider;
   }
 
-  getYosugaUserId(): Snowflake {
+  getYosugaUserId(): UserId {
     return this.guild.me!.id;
   }
 

@@ -1,8 +1,7 @@
-import { Snowflake } from "discord.js";
-
+import { UserId } from "../../util/types";
 import { UserConfig } from "../configManager";
 
 export interface UserConfigStore {
-  save(userId: Snowflake, value: UserConfig): Promise<Readonly<UserConfig>>;
-  read(userId: Snowflake): Promise<Readonly<UserConfig>>;
+  save(userId: UserId, value: UserConfig): Promise<Readonly<UserConfig>>;
+  read(userId: UserId): Promise<Readonly<UserConfig>>;
 }

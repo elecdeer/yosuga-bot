@@ -1,5 +1,4 @@
-import { Snowflake } from "discord.js";
-
+import { GuildId } from "../../util/types";
 import { GuildConfig, GuildConfigRecord } from "../configManager";
 import { GuildConfigStore } from "./guildConfigStore";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
@@ -12,11 +11,11 @@ export class KvsGuildConfigStore
     super(props, 1);
   }
 
-  read(guildId: Snowflake): Promise<Readonly<GuildConfig>> {
+  read(guildId: GuildId): Promise<Readonly<GuildConfig>> {
     return this.get(guildId);
   }
 
-  save(guildId: Snowflake, value: GuildConfig): Promise<Readonly<GuildConfig>> {
+  save(guildId: GuildId, value: GuildConfig): Promise<Readonly<GuildConfig>> {
     return this.set(guildId, value);
   }
 

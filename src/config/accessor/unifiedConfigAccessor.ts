@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
-import { Snowflake } from "discord.js";
 import { ReadonlyDeep, SetOptional } from "type-fest";
 
+import { AppId, GuildId, UserId } from "../../util/types";
 import { UnifiedConfig } from "../configManager";
 import { GuildConfigStore } from "../store/guildConfigStore";
 import { MasterConfigStore } from "../store/masterConfigStore";
@@ -21,9 +21,9 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig>
   private readonly masterStore: MasterConfigStore;
   private readonly guildStore: GuildConfigStore;
   private readonly userStore: UserConfigStore;
-  private readonly appId: Snowflake;
-  private readonly guildId?: Snowflake;
-  private readonly userId?: Snowflake;
+  private readonly appId: AppId;
+  private readonly guildId?: GuildId;
+  private readonly userId?: UserId;
 
   constructor({ master, guild, user }: UnifiedConfigAccessorProps) {
     super();

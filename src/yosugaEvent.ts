@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember, Message, Role, Snowflake, VoiceState } from "discord.js";
+import { CommandInteraction, GuildMember, Message, Role, VoiceState } from "discord.js";
 import EventEmitter from "events";
 import { getLogger } from "log4js";
 
@@ -7,21 +7,22 @@ import { CommandContextSlash, isValidCommandInteraction } from "./commandContext
 import { CommandContextText, isValidMessage } from "./commandContextText";
 import { hasAdminPermission } from "./permissionUtil";
 import { EventsBase, TypedEventEmitter, VoiceOrStageChannel } from "./types";
+import { GuildId } from "./util/types";
 import { YosugaClient } from "./yosugaClient";
 
 interface Events extends EventsBase {
   command: [cmd: string, context: CommandContext];
-  message: [guildId: Snowflake, message: Message];
+  message: [guildId: GuildId, message: Message];
   moveChannel: [
-    guildId: Snowflake,
+    guildId: GuildId,
     member: GuildMember,
     from: VoiceOrStageChannel | null,
     to: VoiceOrStageChannel | null
   ];
-  turnOnVideo: [guildId: Snowflake, member: GuildMember];
-  turnOffVideo: [guildId: Snowflake, member: GuildMember];
-  turnOnGoLive: [guildId: Snowflake, member: GuildMember];
-  turnOffGoLive: [guildId: Snowflake, member: GuildMember];
+  turnOnVideo: [guildId: GuildId, member: GuildMember];
+  turnOffVideo: [guildId: GuildId, member: GuildMember];
+  turnOnGoLive: [guildId: GuildId, member: GuildMember];
+  turnOffGoLive: [guildId: GuildId, member: GuildMember];
   addAdminRole: [role: Role];
   removeAdminRole: [role: Role];
   destroy: [];
