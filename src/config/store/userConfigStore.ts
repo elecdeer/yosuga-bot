@@ -1,5 +1,5 @@
 import { UserId } from "../../types";
-import { UserConfig } from "../configManager";
+import { UserConfig } from "../typesConfig";
 
 export interface UserConfigStore {
   save(userId: UserId, value: UserConfig): Promise<Readonly<UserConfig>>;

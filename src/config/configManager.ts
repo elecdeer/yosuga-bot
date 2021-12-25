@@ -3,8 +3,7 @@ import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
 import { Speaker } from "../speaker/speaker";
-import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { GuildId, SpeakerOption, UserId } from "../types";
+import { GuildId, UserId } from "../types";
 import { YosugaClient } from "../yosugaClient";
 import { ConfigAccessor } from "./accessor/configAccessor";
 import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";
@@ -15,40 +14,7 @@ import { ValidVoiceConfigAccessor } from "./accessor/validVoiceConfigAccessor";
 import { GuildConfigStore } from "./store/guildConfigStore";
 import { MasterConfigStore } from "./store/masterConfigStore";
 import { UserConfigStore } from "./store/userConfigStore";
-
-export type MasterLevelConfig = {
-  speakerBuildOptions: Record<string, SpeakerBuildOption>;
-};
-
-export type GuildLevelConfig = {
-  commandPrefix: string;
-  ignorePrefix: string;
-  masterVolume: number;
-  masterSpeed: number;
-  fastSpeedScale: number;
-  readStatusUpdate: boolean;
-  readTimeSignal: boolean;
-  timeToAutoLeaveSec: number;
-  timeToReadMemberNameSec: number;
-  maxStringLength: number;
-};
-
-export type UserLevelConfig = {
-  speakerOption: SpeakerOption;
-};
-
-export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
-
-export type MasterConfig = UnifiedConfig;
-export type GuildConfig = Partial<GuildLevelConfig & UserLevelConfig>;
-export type UserConfig = Partial<UserLevelConfig>;
-
-export type MasterConfigRecord = Record<string, MasterConfig>;
-export type GuildConfigRecord = Record<string, GuildConfig>;
-export type UserConfigRecord = Record<string, UserConfig>;
-
-type ValueResolvable<T> = T | ((value: T) => T);
-export type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
+import { GuildConfig, MasterConfig, UserConfig } from "./typesConfig";
 
 const logger = getLogger("configManager");
 

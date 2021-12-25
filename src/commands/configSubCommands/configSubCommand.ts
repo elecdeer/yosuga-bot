@@ -2,9 +2,8 @@ import { ApplicationCommandSubCommandData } from "discord.js";
 
 import { CommandContext } from "../../commandContext";
 import { ConfigAccessor } from "../../config/accessor/configAccessor";
-import { GuildConfig, MasterConfig, UserConfig } from "../../config/configManager";
+import { GuildConfig, LevelConfigMap, MasterConfig, UserConfig } from "../../config/typesConfig";
 import { SubCommandBase } from "../subCommandBase";
-import { LevelConfigMap } from "./setConfigSubCommand";
 
 export abstract class ConfigSubCommand<
   TConfig extends MasterConfig | GuildConfig | UserConfig

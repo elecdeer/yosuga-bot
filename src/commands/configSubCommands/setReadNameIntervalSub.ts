@@ -1,14 +1,8 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { GuildConfig } from "../../config/configManager";
-import {
-  SetConfigSubCommand,
-  GuildLevel,
-  isRequiredOption,
-  MasterLevel,
-  ValidationResult,
-} from "./setConfigSubCommand";
+import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
+import { SetConfigSubCommand, isRequiredOption, ValidationResult } from "./setConfigSubCommand";
 
 export class SetReadNameIntervalSub extends SetConfigSubCommand<
   GuildConfig,

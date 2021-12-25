@@ -1,5 +1,5 @@
 import { AppId } from "../../types";
-import { MasterConfig, MasterConfigRecord } from "../configManager";
+import { MasterConfig, MasterConfigRecord } from "../typesConfig";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
 import { MasterConfigStore } from "./masterConfigStore";
 

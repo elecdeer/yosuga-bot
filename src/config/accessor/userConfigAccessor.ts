@@ -2,8 +2,8 @@ import { getLogger } from "log4js";
 import { ReadonlyDeep } from "type-fest";
 
 import { UserId } from "../../types";
-import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "../configManager";
 import { UserConfigStore } from "../store/userConfigStore";
+import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "../typesConfig";
 import { ConfigAccessor } from "./configAccessor";
 
 export type UserConfigAccessorProps = {

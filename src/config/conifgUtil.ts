@@ -3,7 +3,7 @@ import { ValueOf } from "type-fest";
 
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
 import { SpeakerOption } from "../types";
-import { UnifiedConfig } from "./configManager";
+import { UnifiedConfig } from "./typesConfig";
 
 export const stringifyConfigEntry = (
   configKey: string,

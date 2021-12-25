@@ -1,5 +1,5 @@
 import { UserId } from "../../types";
-import { UserConfig, UserConfigRecord } from "../configManager";
+import { UserConfig, UserConfigRecord } from "../typesConfig";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
 import { UserConfigStore } from "./userConfigStore";
 

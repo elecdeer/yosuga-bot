@@ -2,10 +2,9 @@ import { MessageEmbed } from "discord.js";
 import { getLogger } from "log4js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { UserConfig } from "../../config/configManager";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
+import { ConfigCommandLevel, UserConfig } from "../../config/typesConfig";
 import { ConfigSubCommand } from "./configSubCommand";
-import { ConfigCommandLevel } from "./setConfigSubCommand";
 
 const logger = getLogger("command");
 

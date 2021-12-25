@@ -1,4 +1,4 @@
-import { ValueResolvableOptional } from "../configManager";
+import { ValueResolvableOptional } from "../typesConfig";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
 
 export abstract class ConfigAccessor<

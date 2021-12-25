@@ -2,10 +2,10 @@ import deepmerge from "deepmerge";
 import { ReadonlyDeep, SetOptional } from "type-fest";
 
 import { AppId, GuildId, UserId } from "../../types";
-import { UnifiedConfig } from "../configManager";
 import { GuildConfigStore } from "../store/guildConfigStore";
 import { MasterConfigStore } from "../store/masterConfigStore";
 import { UserConfigStore } from "../store/userConfigStore";
+import { UnifiedConfig } from "../typesConfig";
 import { GuildConfigAccessorProps } from "./guildConfigAccessor";
 import { MasterConfigAccessorProps } from "./masterConfigAccessor";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";

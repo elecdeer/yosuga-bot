@@ -2,28 +2,22 @@ import { ApplicationCommandSubCommandData, CommandInteraction, MessageEmbed } fr
 import { ValueOf } from "type-fest";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { GuildConfig, MasterConfig, UnifiedConfig, UserConfig } from "../../config/configManager";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
+import {
+  ConfigCommandLevel,
+  GuildConfig,
+  LevelConfigMap,
+  MasterConfig,
+  UnifiedConfig,
+  UserConfig,
+} from "../../config/typesConfig";
 import { ConfigSubCommand } from "./configSubCommand";
-
-export type MasterLevel = "MASTER";
-export type GuildLevel = "GUILD";
-export type UserLevel = "USER";
-export type ConfigCommandLevel = MasterLevel | GuildLevel | UserLevel;
 
 const levelString: Record<ConfigCommandLevel, string> = {
   MASTER: "Yosugaインスタンス",
   GUILD: "サーバ",
   USER: "ユーザ",
 };
-
-export type LevelConfigMap<T> = Required<T> extends Required<MasterConfig>
-  ? MasterLevel
-  : Required<T> extends Required<GuildConfig>
-  ? MasterLevel | GuildLevel
-  : Required<T> extends Required<UserConfig>
-  ? MasterLevel | GuildLevel | UserLevel
-  : never;
 
 export type ValidationResult =
   | { status: "valid" }

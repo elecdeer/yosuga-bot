@@ -8,7 +8,7 @@ import { GuildMember, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
-import { UnifiedConfig } from "./config/configManager";
+import { UnifiedConfig } from "./config/typesConfig";
 import { SessionEmitter } from "./sessionEmitter";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
 import { registerMessageHandler } from "./sessionHandler/message";

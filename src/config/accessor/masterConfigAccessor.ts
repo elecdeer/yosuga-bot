@@ -1,8 +1,8 @@
 import { ReadonlyDeep } from "type-fest";
 
 import { AppId } from "../../types";
-import { MasterConfig, ValueResolvableOptional } from "../configManager";
 import { MasterConfigStore } from "../store/masterConfigStore";
+import { MasterConfig, ValueResolvableOptional } from "../typesConfig";
 import { ConfigAccessor } from "./configAccessor";
 
 export type MasterConfigAccessorProps = {
