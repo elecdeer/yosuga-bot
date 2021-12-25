@@ -45,6 +45,7 @@ export const createSpeechQueue = (session: Session): SpeechQueue => {
       .catch((err) => {
         logger.debug("thrown error");
         logger.error(err);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         callback(err);
       });
   });

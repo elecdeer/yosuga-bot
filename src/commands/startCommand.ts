@@ -1,4 +1,9 @@
-import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
+import {
+  DiscordGatewayAdapterCreator,
+  entersState,
+  joinVoiceChannel,
+  VoiceConnectionStatus,
+} from "@discordjs/voice";
 import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import log4js from "log4js";
 
@@ -92,7 +97,7 @@ const connectToChannel = async (voiceChannel: VoiceOrStageChannel) => {
   const connection = joinVoiceChannel({
     guildId: voiceChannel.guild.id,
     channelId: voiceChannel.id,
-    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+    adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
     selfMute: false,
   });
 

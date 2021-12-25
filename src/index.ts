@@ -2,6 +2,7 @@ import { generateDependencyReport } from "@discordjs/voice";
 import Discord, { Client, Intents } from "discord.js";
 import log4js from "log4js";
 
+import { yosugaEnv } from "./environment";
 import { YosugaClient } from "./yosugaClient";
 
 //最初にconfigureしないとenvironmentのログが出ない
@@ -29,8 +30,12 @@ const client: Client = new Discord.Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
 });
 
-const yosuga = new YosugaClient(client);
-void yosuga.initClient();
+client.once("ready", (readyClient) => {
+  const yosuga = new YosugaClient(readyClient);
+  void yosuga.initClient();
+});
+
+void client.login(yosugaEnv.discordToken);
 
 process.on("exit", (code) => {
   logger.info(`Exit... ${code}`);

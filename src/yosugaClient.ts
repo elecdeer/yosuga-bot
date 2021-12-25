@@ -1,4 +1,4 @@
-import { Client, ClientApplication } from "discord.js";
+import { Client } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
 
@@ -27,7 +27,7 @@ import { YosugaEvent } from "./yosugaEvent";
 const logger = getLogger("yosugaClient");
 
 export class YosugaClient {
-  readonly client: Client;
+  readonly client: Client<true>;
 
   readonly event: YosugaEvent;
 
@@ -35,7 +35,7 @@ export class YosugaClient {
   readonly sessionManager: SessionManager;
   readonly configManager: ConfigManager;
 
-  constructor(discordClient: Client) {
+  constructor(discordClient: Client<true>) {
     this.client = discordClient;
 
     //一番最初
@@ -61,16 +61,16 @@ export class YosugaClient {
 
   async initClient(): Promise<void> {
     try {
-      const token = await this.client.login(yosugaEnv.discordToken);
-      this.client.application = new ClientApplication(this.client, {});
+      // const token = await this.client.login(yosugaEnv.discordToken);
+      // this.client.application = new ClientApplication(this.client, {});
 
       await this.client.application.fetch();
       await this.client.application.commands.fetch();
       logger.debug(this.client.application.commands.cache.toJSON());
 
       logger.info("bot login");
-      logger.info(`token: ${token}`);
-      logger.info(`applicationOwner: ${this.client.application?.owner}`);
+      // logger.info(`token: ${token}`);
+      logger.info(`applicationOwner: ${this.client.application.owner}`);
 
       this.assignCommands();
 

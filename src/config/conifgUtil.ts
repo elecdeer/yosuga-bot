@@ -7,7 +7,7 @@ import { UnifiedConfig } from "./configManager";
 
 export const stringifyConfigEntry = (
   configKey: string,
-  configValue: ValueOf<UnifiedConfig>
+  configValue: Readonly<ValueOf<UnifiedConfig>>
 ): { name: string; value: string } => {
   if (configKey === "speakerBuildOptions") {
     const collection = new Collection<string, SpeakerBuildOption>(Object.entries(configValue));
