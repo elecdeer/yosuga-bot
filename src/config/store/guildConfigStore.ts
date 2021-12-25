@@ -1,4 +1,4 @@
-import { GuildId } from "../../util/types";
+import { GuildId } from "../../types";
 import { GuildConfig } from "../configManager";
 
 export interface GuildConfigStore {

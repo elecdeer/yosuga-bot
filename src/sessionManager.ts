@@ -3,8 +3,7 @@ import { Collection, TextChannel } from "discord.js";
 import log4js from "log4js";
 
 import { Session } from "./session";
-import { VoiceOrStageChannel } from "./types";
-import { GuildId } from "./util/types";
+import { GuildId, VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
 
 const logger = log4js.getLogger("sessionManager");

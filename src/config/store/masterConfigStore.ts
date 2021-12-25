@@ -1,4 +1,4 @@
-import { AppId } from "../../util/types";
+import { AppId } from "../../types";
 import { MasterConfig } from "../configManager";
 
 export interface MasterConfigStore {

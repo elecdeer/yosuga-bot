@@ -1,7 +1,7 @@
 import { getLogger } from "log4js";
 import { ReadonlyDeep } from "type-fest";
 
-import { UserId } from "../../util/types";
+import { UserId } from "../../types";
 import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "../configManager";
 import { UserConfigStore } from "../store/userConfigStore";
 import { ConfigAccessor } from "./configAccessor";

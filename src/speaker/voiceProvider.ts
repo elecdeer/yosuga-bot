@@ -3,11 +3,10 @@ import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
 import { Session } from "../session";
-import { SpeakerOption, SpeechText } from "../types";
+import { GuildId, SpeakerOption, SpeechText, UserId } from "../types";
 import { Deferred } from "../util/deferred";
 import { allSerial } from "../util/promiseUtil";
 import { failure, Result } from "../util/result";
-import { GuildId, UserId } from "../util/types";
 import { Speaker } from "./speaker";
 import { TtsControllerSpeaker, TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
 import { DaemonSpeakerBuildOption, VoiceroidDaemonSpeaker } from "./voiceroidDaemonSpeaker";

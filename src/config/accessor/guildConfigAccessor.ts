@@ -1,6 +1,6 @@
 import { ReadonlyDeep } from "type-fest";
 
-import { GuildId } from "../../util/types";
+import { GuildId } from "../../types";
 import { GuildConfig, ValueResolvableOptional } from "../configManager";
 import { GuildConfigStore } from "../store/guildConfigStore";
 import { ConfigAccessor } from "./configAccessor";

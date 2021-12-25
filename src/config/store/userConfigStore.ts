@@ -1,4 +1,4 @@
-import { UserId } from "../../util/types";
+import { UserId } from "../../types";
 import { UserConfig } from "../configManager";
 
 export interface UserConfigStore {

@@ -1,4 +1,4 @@
-import { GuildId } from "../../util/types";
+import { GuildId } from "../../types";
 import { GuildConfig, GuildConfigRecord } from "../configManager";
 import { GuildConfigStore } from "./guildConfigStore";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";

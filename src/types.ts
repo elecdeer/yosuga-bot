@@ -1,10 +1,14 @@
-import { StageChannel, VoiceChannel } from "discord.js";
+import { Snowflake, StageChannel, VoiceChannel } from "discord.js";
 
 import { Session } from "./session";
 
 // ====================
 // General
 // ====================
+
+export type UserId = Snowflake;
+export type GuildId = Snowflake;
+export type AppId = Snowflake;
 
 export type VoiceOrStageChannel = VoiceChannel | StageChannel;
 
@@ -17,6 +21,8 @@ export interface TypedEventEmitter<TEvents extends EventsBase> {
   off<K extends keyof TEvents>(event: K, listener: (...args: TEvents[K]) => Awaited): this;
   removeAllListeners<K extends keyof TEvents>(event?: K): this;
 }
+
+export type SessionEventHandlerRegistrant = (session: Session) => Awaited;
 
 // ====================
 // Voice
@@ -58,5 +64,3 @@ export type SpeechTask = {
 //   word: string;
 //   read: string;
 // };
-
-export type SessionEventHandlerRegistrant = (session: Session) => Awaited;

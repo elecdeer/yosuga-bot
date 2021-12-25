@@ -1,6 +1,6 @@
 import { ReadonlyDeep } from "type-fest";
 
-import { AppId } from "../../util/types";
+import { AppId } from "../../types";
 import { MasterConfig, ValueResolvableOptional } from "../configManager";
 import { MasterConfigStore } from "../store/masterConfigStore";
 import { ConfigAccessor } from "./configAccessor";

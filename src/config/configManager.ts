@@ -4,8 +4,7 @@ import { getLogger } from "log4js";
 
 import { Speaker } from "../speaker/speaker";
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { SpeakerOption } from "../types";
-import { GuildId, UserId } from "../util/types";
+import { GuildId, SpeakerOption, UserId } from "../types";
 import { YosugaClient } from "../yosugaClient";
 import { ConfigAccessor } from "./accessor/configAccessor";
 import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";

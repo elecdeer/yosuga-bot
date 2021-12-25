@@ -4,7 +4,7 @@ import log4js from "log4js";
 
 import { CommandBase } from "./commands/commandBase";
 import { CommandPermission, fetchPermission } from "./permissionUtil";
-import { GuildId } from "./util/types";
+import { GuildId } from "./types";
 import { YosugaClient } from "./yosugaClient";
 
 const commandLogger = log4js.getLogger("command");

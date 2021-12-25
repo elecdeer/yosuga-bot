@@ -18,8 +18,13 @@ import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
 import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
 import { VoiceProvider } from "./speaker/voiceProvider";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import { SessionEventHandlerRegistrant, SpeechText, VoiceOrStageChannel } from "./types";
-import { GuildId, UserId } from "./util/types";
+import {
+  GuildId,
+  SessionEventHandlerRegistrant,
+  SpeechText,
+  UserId,
+  VoiceOrStageChannel,
+} from "./types";
 import { createYosugaEmbed } from "./util/util";
 import { YosugaClient } from "./yosugaClient";
 
