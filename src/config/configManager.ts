@@ -143,26 +143,3 @@ export class ConfigManager {
     );
   }
 }
-
-export const masterConfigDefault: Readonly<UnifiedConfig> = {
-  speakerBuildOptions: {},
-
-  commandPrefix: "yosuga",
-  ignorePrefix: "!!",
-  masterVolume: 1,
-  masterSpeed: 1.1,
-  fastSpeedScale: 1.5,
-  readStatusUpdate: true,
-  readTimeSignal: false,
-  timeToAutoLeaveSec: 10,
-  timeToReadMemberNameSec: 30,
-  maxStringLength: 80,
-
-  speakerOption: {
-    speakerName: "null",
-    voiceParam: {
-      pitch: 1,
-      intonation: 1,
-    },
-  },
-};
