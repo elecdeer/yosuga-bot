@@ -1,7 +1,7 @@
 import { ApplicationCommandSubCommandData } from "discord.js";
 
 import { CommandContext } from "../../commandContext";
-import { ConfigAccessor } from "../../config/configAccessor";
+import { ConfigAccessor } from "../../config/accessor/configAccessor";
 import { GuildConfig, MasterConfig, UserConfig } from "../../config/configManager";
 import { SubCommandBase } from "../subCommandBase";
 import { LevelConfigMap } from "./setConfigSubCommand";

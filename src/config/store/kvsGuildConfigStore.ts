@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
 
-import { GuildConfig, GuildConfigRecord } from "./configManager";
+import { GuildConfig, GuildConfigRecord } from "../configManager";
 import { GuildConfigStore } from "./guildConfigStore";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
 

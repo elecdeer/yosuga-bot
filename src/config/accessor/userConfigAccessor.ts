@@ -2,9 +2,9 @@ import { Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 import { ReadonlyDeep } from "type-fest";
 
+import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "../configManager";
+import { UserConfigStore } from "../store/userConfigStore";
 import { ConfigAccessor } from "./configAccessor";
-import { UserConfig, UserLevelConfig, ValueResolvableOptional } from "./configManager";
-import { UserConfigStore } from "./userConfigStore";
 
 export type UserConfigAccessorProps = {
   store: UserConfigStore;

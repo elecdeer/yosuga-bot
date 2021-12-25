@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
 
-import { UserConfig, UserConfigRecord } from "./configManager";
+import { UserConfig, UserConfigRecord } from "../configManager";
 import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
 import { UserConfigStore } from "./userConfigStore";
 

@@ -6,15 +6,15 @@ import { Speaker } from "../speaker/speaker";
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
 import { SpeakerOption } from "../types";
 import { YosugaClient } from "../yosugaClient";
-import { ConfigAccessor } from "./configAccessor";
-import { GuildConfigAccessor } from "./guildConfigAccessor";
-import { GuildConfigStore } from "./guildConfigStore";
-import { MasterConfigAccessor } from "./masterConfigAccessor";
-import { MasterConfigStore } from "./masterConfigStore";
-import { UnifiedConfigAccessor } from "./unifiedConfigAccessor";
-import { UserConfigAccessor } from "./userConfigAccessor";
-import { UserConfigStore } from "./userConfigStore";
-import { ValidVoiceConfigAccessor } from "./validVoiceConfigAccessor";
+import { ConfigAccessor } from "./accessor/configAccessor";
+import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";
+import { MasterConfigAccessor } from "./accessor/masterConfigAccessor";
+import { UnifiedConfigAccessor } from "./accessor/unifiedConfigAccessor";
+import { UserConfigAccessor } from "./accessor/userConfigAccessor";
+import { ValidVoiceConfigAccessor } from "./accessor/validVoiceConfigAccessor";
+import { GuildConfigStore } from "./store/guildConfigStore";
+import { MasterConfigStore } from "./store/masterConfigStore";
+import { UserConfigStore } from "./store/userConfigStore";
 
 export type MasterLevelConfig = {
   speakerBuildOptions: Record<string, SpeakerBuildOption>;

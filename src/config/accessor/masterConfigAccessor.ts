@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { ReadonlyDeep } from "type-fest";
 
+import { MasterConfig, ValueResolvableOptional } from "../configManager";
+import { MasterConfigStore } from "../store/masterConfigStore";
 import { ConfigAccessor } from "./configAccessor";
-import { MasterConfig, ValueResolvableOptional } from "./configManager";
-import { MasterConfigStore } from "./masterConfigStore";
 
 export type MasterConfigAccessorProps = {
   store: MasterConfigStore;

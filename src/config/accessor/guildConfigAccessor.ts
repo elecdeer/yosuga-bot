@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { ReadonlyDeep } from "type-fest";
 
+import { GuildConfig, ValueResolvableOptional } from "../configManager";
+import { GuildConfigStore } from "../store/guildConfigStore";
 import { ConfigAccessor } from "./configAccessor";
-import { GuildConfig, ValueResolvableOptional } from "./configManager";
-import { GuildConfigStore } from "./guildConfigStore";
 
 export type GuildConfigAccessorProps = {
   store: GuildConfigStore;

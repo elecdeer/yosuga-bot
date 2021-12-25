@@ -1,17 +1,15 @@
 import { Collection, Snowflake } from "discord.js";
 import { ReadonlyDeep, SetOptional } from "type-fest";
 
-import { Speaker } from "../speaker/speaker";
-import { SpeakerOption } from "../types";
-import { UnifiedConfig } from "./configManager";
+import { Speaker } from "../../speaker/speaker";
+import { UnifiedConfig } from "../configManager";
+import { GuildConfigStore } from "../store/guildConfigStore";
+import { MasterConfigStore } from "../store/masterConfigStore";
+import { UserConfigStore } from "../store/userConfigStore";
 import { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import { GuildConfigStore } from "./guildConfigStore";
 import { MasterConfigAccessorProps } from "./masterConfigAccessor";
-import { MasterConfigStore } from "./masterConfigStore";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
-import { UnifiedConfigAccessorProps } from "./unifiedConfigAccessor";
 import { UserConfigAccessorProps } from "./userConfigAccessor";
-import { UserConfigStore } from "./userConfigStore";
 
 export type ValidVoiceConfigAccessorProps = {
   master: MasterConfigAccessorProps;
