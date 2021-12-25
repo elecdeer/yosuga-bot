@@ -1,8 +1,4 @@
-import {
-  ApplicationCommandSubCommandData,
-  CommandInteractionOptionResolver,
-  MessageEmbed,
-} from "discord.js";
+import { ApplicationCommandSubCommandData, CommandInteraction, MessageEmbed } from "discord.js";
 import { ValueOf } from "type-fest";
 
 import { CommandContextSlash } from "../../commandContextSlash";
@@ -50,7 +46,7 @@ export abstract class SetConfigSubCommand<
   }
 
   protected abstract getValueFromOptions(
-    options: CommandInteractionOptionResolver,
+    options: CommandInteraction["options"],
     oldValue: Readonly<TConfig[TKey]> | undefined
   ): TConfig[TKey] | undefined;
 

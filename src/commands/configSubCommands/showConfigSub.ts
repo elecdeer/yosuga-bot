@@ -1,12 +1,9 @@
-import { EmbedFieldData, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
 import { getLogger } from "log4js";
-import { ValueOf } from "type-fest";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { MasterConfig, UserConfig } from "../../config/configManager";
+import { UserConfig } from "../../config/configManager";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
-import { SpeakerBuildOption } from "../../speaker/voiceProvider";
-import { SpeakerOption } from "../../types";
 import { ConfigSubCommand } from "./configSubCommand";
 import { ConfigCommandLevel } from "./setConfigSubCommand";
 
@@ -32,7 +29,11 @@ export class ShowConfigSub extends ConfigSubCommand<UserConfig> {
     embed.setDescription(`現在の設定（${this.level}）`);
 
     //最大25
-    embed.addFields(configEntries.map(([key, value]) => stringifyConfigEntry(key, value)));
+    embed.addFields(
+      configEntries
+        .map(([key, value]) => stringifyConfigEntry(key, value))
+        .filter((item) => !!item && item.value.length > 0)
+    );
 
     await context.reply("plain", embed);
   }

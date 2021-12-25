@@ -48,7 +48,7 @@ export abstract class CommandBase {
   getTriggers(): string[] {
     const trigger = [this.data.name];
     if (this.isMessageCommand() && this.data.messageCommand?.alias) {
-      trigger.push(...this.data.messageCommand?.alias);
+      trigger.push(...this.data.messageCommand.alias);
     }
     return trigger;
   }

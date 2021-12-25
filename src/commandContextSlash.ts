@@ -1,6 +1,5 @@
 import {
   CommandInteraction,
-  CommandInteractionOptionResolver,
   Guild,
   GuildMember,
   Message,
@@ -92,7 +91,7 @@ export class CommandContextSlash extends CommandContext {
     }
   }
 
-  override getOptions(): CommandInteractionOptionResolver {
+  override getOptions(): CommandInteraction["options"] {
     return this.interaction.options;
   }
 }

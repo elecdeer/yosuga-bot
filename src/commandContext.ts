@@ -1,5 +1,5 @@
 import {
-  CommandInteractionOptionResolver,
+  CommandInteraction,
   Guild,
   GuildMember,
   Message,
@@ -35,7 +35,7 @@ export abstract class CommandContext {
     channel?: Readonly<TextChannel>
   ): Promise<Message>;
 
-  abstract getOptions(): CommandInteractionOptionResolver | undefined;
+  abstract getOptions(): CommandInteraction["options"] | undefined;
 
   getUnifiedConfigAccessor(): UnifiedConfigAccessor {
     return this.configManager.getUnifiedConfigAccessor(this.guild.id, this.member.id);
