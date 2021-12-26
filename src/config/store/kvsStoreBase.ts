@@ -17,8 +17,6 @@ export abstract class KvsStoreBase<T extends KvsLocalStorageSchema> {
     });
   }
 
-  protected abstract defaultValue(): StoreValue<T, StoreNames<T>>;
-
   protected async upgrade({
     kvs,
     oldVersion,
@@ -31,22 +29,20 @@ export abstract class KvsStoreBase<T extends KvsLocalStorageSchema> {
     //something
   }
 
-  protected async get(keyId: StoreNames<T>): Promise<Readonly<StoreValue<T, StoreNames<T>>>> {
+  protected async get(
+    keyId: StoreNames<T>
+  ): Promise<Readonly<StoreValue<T, StoreNames<T>> | undefined>> {
     const store = await this.storePromise;
-    const value = await store.get(keyId);
-    return value ?? this.defaultValue();
+    return await store.get(keyId);
   }
 
   protected async set(
     keyId: StoreNames<T>,
-    value: Partial<StoreValue<T, StoreNames<T>>> | undefined
-  ): Promise<Readonly<StoreValue<T, StoreNames<T>>>> {
+    value: StoreValue<T, StoreNames<T>>
+  ): Promise<Readonly<StoreValue<T, StoreNames<T>> | undefined>> {
     const store = await this.storePromise;
-    const defaultValue = this.defaultValue();
 
-    const setValue = Object.assign(defaultValue, value);
-
-    const result = await store.set(keyId, setValue);
-    return (await result.get(keyId)) ?? this.defaultValue();
+    const result = await store.set(keyId, value);
+    return await result.get(keyId);
   }
 }

@@ -1,8 +1,9 @@
 import { ReadonlyDeep } from "type-fest";
 
 import { AppId } from "../../types";
+import { resolveValue, ValueResolvable } from "../../util/resolvable";
 import { MasterConfigStore } from "../store/masterConfigStore";
-import { MasterConfig, ValueResolvableOptional } from "../typesConfig";
+import { MasterConfig } from "../typesConfig";
 import { ConfigAccessor } from "./configAccessor";
 
 export type MasterConfigAccessorProps = {
@@ -22,26 +23,26 @@ export class MasterConfigAccessor extends ConfigAccessor<MasterConfig> {
 
   async set<T extends keyof MasterConfig>(
     key: T,
-    value: ValueResolvableOptional<MasterConfig[T]>
-  ): Promise<Readonly<MasterConfig[T]>> {
+    value: ValueResolvable<MasterConfig[T] | undefined>
+  ): Promise<Readonly<MasterConfig[T] | undefined>> {
     const base = await this.store.read(this.appId);
 
-    const valueResolved = typeof value === "function" ? value(base[key]) : value;
+    const valueResolved = resolveValue(value, base[key] as MasterConfig[T] | undefined);
 
     const savedConfig = await this.store.save(this.appId, {
       ...base,
       [key]: valueResolved,
     });
 
-    return savedConfig[key];
+    return savedConfig[key] as MasterConfig[T] | undefined;
   }
 
-  async get<T extends keyof MasterConfig>(key: T): Promise<Readonly<MasterConfig[T]>> {
+  async get<T extends keyof MasterConfig>(key: T): Promise<Readonly<MasterConfig[T] | undefined>> {
     const config = await this.store.read(this.appId);
-    return config[key];
+    return config[key] as MasterConfig[T] | undefined;
   }
 
-  async getAllValue(): Promise<ReadonlyDeep<MasterConfig>> {
+  async getAllValue(): Promise<ReadonlyDeep<Partial<MasterConfig>>> {
     return await this.store.read(this.appId);
   }
 }

@@ -2,6 +2,6 @@ import { GuildId } from "../../types";
 import { GuildConfig } from "../typesConfig";
 
 export interface GuildConfigStore {
-  save(guildId: GuildId, value: GuildConfig): Promise<Readonly<GuildConfig>>;
-  read(guildId: GuildId): Promise<Readonly<GuildConfig>>;
+  save(guildId: GuildId, value: Partial<GuildConfig>): Promise<Readonly<Partial<GuildConfig>>>;
+  read(guildId: GuildId): Promise<Readonly<Partial<GuildConfig>>>;
 }

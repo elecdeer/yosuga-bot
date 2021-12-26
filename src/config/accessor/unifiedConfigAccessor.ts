@@ -5,7 +5,7 @@ import { AppId, GuildId, UserId } from "../../types";
 import { GuildConfigStore } from "../store/guildConfigStore";
 import { MasterConfigStore } from "../store/masterConfigStore";
 import { UserConfigStore } from "../store/userConfigStore";
-import { UnifiedConfig } from "../typesConfig";
+import { MasterConfig, UnifiedConfig } from "../typesConfig";
 import { GuildConfigAccessorProps } from "./guildConfigAccessor";
 import { MasterConfigAccessorProps } from "./masterConfigAccessor";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
@@ -17,7 +17,7 @@ export type UnifiedConfigAccessorProps = {
   user: SetOptional<UserConfigAccessorProps, "userId">;
 };
 
-export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig> {
+export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig, false> {
   private readonly masterStore: MasterConfigStore;
   private readonly guildStore: GuildConfigStore;
   private readonly userStore: UserConfigStore;
@@ -41,7 +41,12 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig>
   }
 
   async getAllValue(): Promise<ReadonlyDeep<UnifiedConfig>> {
-    let unifiedConfig = await this.masterStore.read(this.appId);
+    let unifiedConfig: MasterConfig = {
+      ...defaultConfig,
+    };
+
+    const masterConfig = await this.masterStore.read(this.appId);
+    unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, masterConfig);
 
     if (this.guildId) {
       const guildConfig = await this.guildStore.read(this.guildId);
@@ -60,3 +65,26 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig>
     return unifiedConfig;
   }
 }
+
+const defaultConfig = {
+  speakerBuildOptions: {},
+
+  commandPrefix: "yosuga",
+  ignorePrefix: "!!",
+  masterVolume: 1,
+  masterSpeed: 1.1,
+  fastSpeedScale: 1.5,
+  readStatusUpdate: true,
+  readTimeSignal: false,
+  timeToAutoLeaveSec: 10,
+  timeToReadMemberNameSec: 30,
+  maxStringLength: 80,
+
+  speakerOption: {
+    speakerName: "null",
+    voiceParam: {
+      pitch: 1,
+      intonation: 1,
+    },
+  },
+} as const;

@@ -23,21 +23,21 @@ export type UserLevelConfig = {
 };
 
 export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
-export type MasterConfig = UnifiedConfig;
-export type GuildConfig = Partial<GuildLevelConfig & UserLevelConfig>;
-export type UserConfig = Partial<UserLevelConfig>;
+export type MasterConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
+export type GuildConfig = GuildLevelConfig & UserLevelConfig;
+export type UserConfig = UserLevelConfig;
 
 //Store用
-export type MasterConfigRecord = Record<string, MasterConfig>;
-export type GuildConfigRecord = Record<string, GuildConfig>;
-export type UserConfigRecord = Record<string, UserConfig>;
+export type MasterConfigRecord = Record<string, Partial<MasterConfig>>;
+export type GuildConfigRecord = Record<string, Partial<GuildConfig>>;
+export type UserConfigRecord = Record<string, Partial<UserConfig>>;
 
-type ValueResolvable<T> = T | ((value: T) => T);
-export type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
 export type MasterLevel = "MASTER";
 export type GuildLevel = "GUILD";
 export type UserLevel = "USER";
+
 export type ConfigCommandLevel = MasterLevel | GuildLevel | UserLevel;
+
 export type LevelConfigMap<T> = Required<T> extends Required<MasterConfig>
   ? MasterLevel
   : Required<T> extends Required<GuildConfig>

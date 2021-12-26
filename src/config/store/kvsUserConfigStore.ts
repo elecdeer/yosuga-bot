@@ -8,15 +8,11 @@ export class KvsUserConfigStore extends KvsStoreBase<UserConfigRecord> implement
     super(props, 1);
   }
 
-  read(guildId: UserId): Promise<Readonly<UserConfig>> {
-    return this.get(guildId);
+  async read(userId: UserId): Promise<Readonly<Partial<UserConfig>>> {
+    return (await this.get(userId)) ?? {};
   }
 
-  save(guildId: UserId, value: UserConfig): Promise<Readonly<UserConfig>> {
-    return this.set(guildId, value);
-  }
-
-  protected defaultValue(): UserConfig {
-    return {};
+  async save(userId: UserId, value: Partial<UserConfig>): Promise<Readonly<Partial<UserConfig>>> {
+    return (await this.set(userId, value)) ?? {};
   }
 }

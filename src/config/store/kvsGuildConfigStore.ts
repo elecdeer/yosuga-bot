@@ -11,15 +11,14 @@ export class KvsGuildConfigStore
     super(props, 1);
   }
 
-  read(guildId: GuildId): Promise<Readonly<GuildConfig>> {
-    return this.get(guildId);
+  async read(guildId: GuildId): Promise<Readonly<Partial<GuildConfig>>> {
+    return (await this.get(guildId)) ?? {};
   }
 
-  save(guildId: GuildId, value: GuildConfig): Promise<Readonly<GuildConfig>> {
-    return this.set(guildId, value);
-  }
-
-  protected defaultValue(): GuildConfig {
-    return {};
+  async save(
+    guildId: GuildId,
+    value: Partial<GuildConfig>
+  ): Promise<Readonly<Partial<GuildConfig>>> {
+    return (await this.set(guildId, value)) ?? {};
   }
 }
