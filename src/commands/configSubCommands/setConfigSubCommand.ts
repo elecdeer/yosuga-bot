@@ -1,16 +1,8 @@
 import { ApplicationCommandSubCommandData, CommandInteraction, MessageEmbed } from "discord.js";
-import { ValueOf } from "type-fest";
 
 import { CommandContextSlash } from "../../commandContextSlash";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
-import {
-  ConfigCommandLevel,
-  GuildConfig,
-  LevelConfigMap,
-  MasterConfig,
-  UnifiedConfig,
-  UserConfig,
-} from "../../config/typesConfig";
+import { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";
 import { ConfigSubCommand } from "./configSubCommand";
 
 const levelString: Record<ConfigCommandLevel, string> = {
@@ -25,14 +17,14 @@ export type ValidationResult =
   | { status: "error"; message: string };
 
 export abstract class SetConfigSubCommand<
-  TConfig extends MasterConfig | GuildConfig | UserConfig,
-  TKey extends keyof TConfig
-> extends ConfigSubCommand<TConfig> {
+  TConfigLevels extends ConfigCommandLevel,
+  TKey extends keyof ConfigEachLevel<TConfigLevels>
+> extends ConfigSubCommand<TConfigLevels> {
   protected readonly configKey: TKey;
 
   protected constructor(
     data: Omit<ApplicationCommandSubCommandData, "type">,
-    level: LevelConfigMap<TConfig>,
+    level: TConfigLevels,
     configKey: TKey
   ) {
     super(data, level);
@@ -41,11 +33,11 @@ export abstract class SetConfigSubCommand<
 
   protected abstract getValueFromOptions(
     options: CommandInteraction["options"],
-    oldValue: Readonly<TConfig[TKey]> | undefined
-  ): TConfig[TKey] | undefined;
+    oldValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey]> | undefined
+  ): ConfigEachLevel<TConfigLevels>[TKey] | undefined;
 
   protected async validateValue(
-    value: TConfig[TKey] | undefined,
+    value: ConfigEachLevel<TConfigLevels>[TKey] | undefined,
     context: Omit<CommandContextSlash, "reply">
   ): Promise<ValidationResult> {
     return {
@@ -75,22 +67,27 @@ export abstract class SetConfigSubCommand<
   }
 
   protected constructReplyEmbed(
-    oldValue: ValueOf<UnifiedConfig> | undefined,
-    newValue: ValueOf<UnifiedConfig> | undefined
+    oldValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey] | undefined>,
+    newValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey] | undefined>
   ): MessageEmbed {
     console.log(oldValue);
     console.log(newValue);
     const embed = new MessageEmbed();
     embed.setDescription(`${levelString[this.level]}の設定を変更しました.`);
     embed.addField(this.data.name, this.data.description, true);
+
     embed.addField(
       "変更前",
-      oldValue ? stringifyConfigEntry(this.configKey as string, oldValue).value : "[デフォルト値]",
+      oldValue
+        ? stringifyConfigEntry(this.configKey as keyof UnifiedConfig, oldValue).value
+        : "[デフォルト値]",
       true
     );
     embed.addField(
       "変更後",
-      newValue ? stringifyConfigEntry(this.configKey as string, newValue).value : "[デフォルト値]",
+      newValue
+        ? stringifyConfigEntry(this.configKey as keyof UnifiedConfig, newValue).value
+        : "[デフォルト値]",
       true
     );
     return embed;

@@ -5,7 +5,7 @@ import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
 import { SetConfigSubCommand, isRequiredOption, ValidationResult } from "./setConfigSubCommand";
 
 export class SetReadNameIntervalSub extends SetConfigSubCommand<
-  GuildConfig,
+  MasterLevel | GuildLevel,
   "timeToReadMemberNameSec"
 > {
   constructor(level: MasterLevel | GuildLevel) {

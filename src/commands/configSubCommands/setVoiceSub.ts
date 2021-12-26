@@ -1,11 +1,20 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { ConfigCommandLevel, UserConfig } from "../../config/typesConfig";
+import {
+  ConfigCommandLevel,
+  GuildLevel,
+  MasterLevel,
+  UserConfig,
+  UserLevel,
+} from "../../config/typesConfig";
 import { isInRange } from "../../util/util";
 import { isRequiredOption, SetConfigSubCommand, ValidationResult } from "./setConfigSubCommand";
 
-export class SetVoiceSub extends SetConfigSubCommand<UserConfig, "speakerOption"> {
+export class SetVoiceSub extends SetConfigSubCommand<
+  MasterLevel | GuildLevel | UserLevel,
+  "speakerOption"
+> {
   constructor(level: ConfigCommandLevel) {
     super(
       {

@@ -3,7 +3,7 @@ import { CommandInteractionOptionResolver } from "discord.js";
 import { MasterConfig, MasterLevel } from "../../config/typesConfig";
 import { SetConfigSubCommand } from "./setConfigSubCommand";
 
-export class AddSpeakerTtsSub extends SetConfigSubCommand<MasterConfig, "speakerBuildOptions"> {
+export class AddSpeakerTtsSub extends SetConfigSubCommand<MasterLevel, "speakerBuildOptions"> {
   constructor(level: MasterLevel) {
     super(
       {

@@ -5,7 +5,7 @@ import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
 import { isInRange } from "../../util/util";
 import { isRequiredOption, SetConfigSubCommand, ValidationResult } from "./setConfigSubCommand";
 
-export class SetSpeedSub extends SetConfigSubCommand<GuildConfig, "masterSpeed"> {
+export class SetSpeedSub extends SetConfigSubCommand<MasterLevel | GuildLevel, "masterSpeed"> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {

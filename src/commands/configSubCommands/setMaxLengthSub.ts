@@ -4,7 +4,10 @@ import { CommandContextSlash } from "../../commandContextSlash";
 import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
 import { SetConfigSubCommand, isRequiredOption, ValidationResult } from "./setConfigSubCommand";
 
-export class SetMaxLengthSub extends SetConfigSubCommand<GuildConfig, "maxStringLength"> {
+export class SetMaxLengthSub extends SetConfigSubCommand<
+  MasterLevel | GuildLevel,
+  "maxStringLength"
+> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {

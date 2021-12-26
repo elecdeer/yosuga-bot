@@ -5,7 +5,7 @@ import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
 import { isInRange } from "../../util/util";
 import { isRequiredOption, SetConfigSubCommand, ValidationResult } from "./setConfigSubCommand";
 
-export class SetVolumeSub extends SetConfigSubCommand<GuildConfig, "masterVolume"> {
+export class SetVolumeSub extends SetConfigSubCommand<MasterLevel | GuildLevel, "masterVolume"> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {

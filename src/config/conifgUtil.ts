@@ -1,13 +1,12 @@
 import { Collection } from "discord.js";
-import { ValueOf } from "type-fest";
 
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
 import { SpeakerOption } from "../types";
 import { UnifiedConfig } from "./typesConfig";
 
-export const stringifyConfigEntry = (
-  configKey: string,
-  configValue: Readonly<ValueOf<UnifiedConfig>>
+export const stringifyConfigEntry = <T extends keyof UnifiedConfig>(
+  configKey: T,
+  configValue: UnifiedConfig[T]
 ): { name: string; value: string } => {
   if (configKey === "speakerBuildOptions") {
     const collection = new Collection<string, SpeakerBuildOption>(Object.entries(configValue));

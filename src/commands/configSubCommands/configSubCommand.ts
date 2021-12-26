@@ -2,34 +2,38 @@ import { ApplicationCommandSubCommandData } from "discord.js";
 
 import { CommandContext } from "../../commandContext";
 import { ConfigAccessor } from "../../config/accessor/configAccessor";
-import { GuildConfig, LevelConfigMap, MasterConfig, UserConfig } from "../../config/typesConfig";
+import { ConfigCommandLevel, ConfigEachLevel } from "../../config/typesConfig";
 import { SubCommandBase } from "../subCommandBase";
 
 export abstract class ConfigSubCommand<
-  TConfig extends MasterConfig | GuildConfig | UserConfig
+  TConfigLevels extends ConfigCommandLevel
 > extends SubCommandBase {
-  protected readonly level: LevelConfigMap<TConfig>;
+  protected readonly level: TConfigLevels;
 
   protected constructor(
     data: Omit<ApplicationCommandSubCommandData, "type">,
-    level: LevelConfigMap<TConfig>
+    level: TConfigLevels
   ) {
     super(data);
     this.level = level;
   }
 
-  protected getConfigAccessor(context: CommandContext): ConfigAccessor<TConfig> {
+  protected getConfigAccessor(
+    context: CommandContext
+  ): ConfigAccessor<ConfigEachLevel<TConfigLevels>> {
     switch (this.level) {
       case "MASTER":
-        return context.configManager.getMasterConfigAccessor() as unknown as ConfigAccessor<TConfig>;
+        return context.configManager.getMasterConfigAccessor() as ConfigAccessor<
+          ConfigEachLevel<TConfigLevels>
+        >;
       case "GUILD":
-        return context.configManager.getGuildConfigAccessor(
-          context.guild.id
-        ) as unknown as ConfigAccessor<TConfig>;
+        return context.configManager.getGuildConfigAccessor(context.guild.id) as ConfigAccessor<
+          ConfigEachLevel<TConfigLevels>
+        >;
       case "USER":
-        return context.configManager.getUserConfigAccessor(
-          context.member.id
-        ) as unknown as ConfigAccessor<TConfig>;
+        return context.configManager.getUserConfigAccessor(context.member.id) as ConfigAccessor<
+          ConfigEachLevel<TConfigLevels>
+        >;
     }
     throw Error();
   }
