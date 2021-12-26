@@ -38,8 +38,8 @@ export type UserLevel = "USER";
 
 export type ConfigCommandLevel = MasterLevel | GuildLevel | UserLevel;
 
-export type ConfigEachLevel<TLevels extends ConfigCommandLevel> = {
-  MASTER: MasterConfig;
-  GUILD: GuildConfig;
-  USER: UserConfig;
-}[TLevels];
+// prettier-ignore
+export type ConfigEachLevel<TLevels extends ConfigCommandLevel> = Record<string, never> &
+  (MasterLevel extends TLevels ? MasterLevelConfig : unknown) &
+  (GuildLevel extends TLevels ? GuildLevelConfig : unknown) &
+  (UserLevel extends TLevels ? UserLevelConfig : unknown);
