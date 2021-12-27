@@ -1,17 +1,16 @@
-import { Collection, Snowflake } from "discord.js";
+import { Collection } from "discord.js";
 import { ReadonlyDeep, SetOptional } from "type-fest";
 
-import { Speaker } from "../speaker/speaker";
-import { SpeakerOption } from "../types";
-import { UnifiedConfig } from "./configManager";
+import { Speaker } from "../../speaker/speaker";
+import { AppId, GuildId, UserId } from "../../types";
+import { GuildConfigStore } from "../store/guildConfigStore";
+import { MasterConfigStore } from "../store/masterConfigStore";
+import { UserConfigStore } from "../store/userConfigStore";
+import { UnifiedConfig } from "../typesConfig";
 import { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import { GuildConfigStore } from "./guildConfigStore";
 import { MasterConfigAccessorProps } from "./masterConfigAccessor";
-import { MasterConfigStore } from "./masterConfigStore";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
-import { UnifiedConfigAccessorProps } from "./unifiedConfigAccessor";
 import { UserConfigAccessorProps } from "./userConfigAccessor";
-import { UserConfigStore } from "./userConfigStore";
 
 export type ValidVoiceConfigAccessorProps = {
   master: MasterConfigAccessorProps;
@@ -25,9 +24,9 @@ export class ValidVoiceConfigAccessor extends ReadOnlyConfigAccessor<
   private readonly masterStore: MasterConfigStore;
   private readonly guildStore: GuildConfigStore;
   private readonly userStore: UserConfigStore;
-  private readonly appId: Snowflake;
-  private readonly guildId?: Snowflake;
-  private readonly userId?: Snowflake;
+  private readonly appId: AppId;
+  private readonly guildId?: GuildId;
+  private readonly userId?: UserId;
   private readonly speakerCollection: Collection<string, Speaker>;
 
   constructor(

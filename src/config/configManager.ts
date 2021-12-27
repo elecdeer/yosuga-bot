@@ -1,54 +1,20 @@
 import assert from "assert";
-import { Collection, Snowflake } from "discord.js";
+import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
 import { Speaker } from "../speaker/speaker";
-import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { SpeakerOption } from "../types";
+import { GuildId, UserId } from "../types";
 import { YosugaClient } from "../yosugaClient";
-import { ConfigAccessor } from "./configAccessor";
-import { GuildConfigAccessor } from "./guildConfigAccessor";
-import { GuildConfigStore } from "./guildConfigStore";
-import { MasterConfigAccessor } from "./masterConfigAccessor";
-import { MasterConfigStore } from "./masterConfigStore";
-import { UnifiedConfigAccessor } from "./unifiedConfigAccessor";
-import { UserConfigAccessor } from "./userConfigAccessor";
-import { UserConfigStore } from "./userConfigStore";
-import { ValidVoiceConfigAccessor } from "./validVoiceConfigAccessor";
-
-export type MasterLevelConfig = {
-  speakerBuildOptions: Record<string, SpeakerBuildOption>;
-};
-
-export type GuildLevelConfig = {
-  commandPrefix: string;
-  ignorePrefix: string;
-  masterVolume: number;
-  masterSpeed: number;
-  fastSpeedScale: number;
-  readStatusUpdate: boolean;
-  readTimeSignal: boolean;
-  timeToAutoLeaveSec: number;
-  timeToReadMemberNameSec: number;
-  maxStringLength: number;
-};
-
-export type UserLevelConfig = {
-  speakerOption: SpeakerOption;
-};
-
-export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
-
-export type MasterConfig = UnifiedConfig;
-export type GuildConfig = Partial<GuildLevelConfig & UserLevelConfig>;
-export type UserConfig = Partial<UserLevelConfig>;
-
-export type MasterConfigRecord = Record<string, MasterConfig>;
-export type GuildConfigRecord = Record<string, GuildConfig>;
-export type UserConfigRecord = Record<string, UserConfig>;
-
-type ValueResolvable<T> = T | ((value: T) => T);
-export type ValueResolvableOptional<T> = T | undefined | ((value: T | undefined) => T | undefined);
+import { ConfigAccessor } from "./accessor/configAccessor";
+import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";
+import { MasterConfigAccessor } from "./accessor/masterConfigAccessor";
+import { UnifiedConfigAccessor } from "./accessor/unifiedConfigAccessor";
+import { UserConfigAccessor } from "./accessor/userConfigAccessor";
+import { ValidVoiceConfigAccessor } from "./accessor/validVoiceConfigAccessor";
+import { GuildConfigStore } from "./store/guildConfigStore";
+import { MasterConfigStore } from "./store/masterConfigStore";
+import { UserConfigStore } from "./store/userConfigStore";
+import { GuildConfig, MasterConfig, UserConfig } from "./typesConfig";
 
 const logger = getLogger("configManager");
 
@@ -86,21 +52,21 @@ export class ConfigManager {
     });
   }
 
-  getGuildConfigAccessor(guildId: Snowflake): ConfigAccessor<GuildConfig> {
+  getGuildConfigAccessor(guildId: GuildId): ConfigAccessor<GuildConfig> {
     return new GuildConfigAccessor({
       store: this.guildConfigStore,
       guildId: guildId,
     });
   }
 
-  getUserConfigAccessor(userId: Snowflake): ConfigAccessor<UserConfig> {
+  getUserConfigAccessor(userId: UserId): ConfigAccessor<UserConfig> {
     return new UserConfigAccessor({
       store: this.userConfigStore,
       userId: userId,
     });
   }
 
-  getUnifiedConfigAccessor(guildId?: Snowflake, userId?: Snowflake): UnifiedConfigAccessor {
+  getUnifiedConfigAccessor(guildId?: GuildId, userId?: UserId): UnifiedConfigAccessor {
     return new UnifiedConfigAccessor({
       master: {
         store: this.masterConfigStore,
@@ -120,8 +86,8 @@ export class ConfigManager {
 
   getValidVoiceConfigAccessor(
     speakerCollection: Collection<string, Speaker>,
-    guildId?: Snowflake,
-    userId?: Snowflake
+    guildId?: GuildId,
+    userId?: UserId
   ): ValidVoiceConfigAccessor {
     return new ValidVoiceConfigAccessor(
       {
@@ -142,26 +108,3 @@ export class ConfigManager {
     );
   }
 }
-
-export const masterConfigDefault: Readonly<UnifiedConfig> = {
-  speakerBuildOptions: {},
-
-  commandPrefix: "yosuga",
-  ignorePrefix: "!!",
-  masterVolume: 1,
-  masterSpeed: 1.1,
-  fastSpeedScale: 1.5,
-  readStatusUpdate: true,
-  readTimeSignal: false,
-  timeToAutoLeaveSec: 10,
-  timeToReadMemberNameSec: 30,
-  maxStringLength: 80,
-
-  speakerOption: {
-    speakerName: "null",
-    voiceParam: {
-      pitch: 1,
-      intonation: 1,
-    },
-  },
-};

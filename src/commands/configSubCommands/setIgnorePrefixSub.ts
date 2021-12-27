@@ -1,14 +1,12 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
-import { GuildConfig } from "../../config/configManager";
-import {
-  SetConfigSubCommand,
-  GuildLevel,
-  isRequiredOption,
-  MasterLevel,
-} from "./setConfigSubCommand";
+import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
+import { SetConfigSubCommand, isRequiredOption } from "./setConfigSubCommand";
 
-export class SetIgnorePrefixSub extends SetConfigSubCommand<GuildConfig, "ignorePrefix"> {
+export class SetIgnorePrefixSub extends SetConfigSubCommand<
+  MasterLevel | GuildLevel,
+  "ignorePrefix"
+> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {

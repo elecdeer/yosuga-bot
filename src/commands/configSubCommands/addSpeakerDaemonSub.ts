@@ -1,9 +1,9 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
-import { MasterConfig } from "../../config/configManager";
-import { SetConfigSubCommand, MasterLevel } from "./setConfigSubCommand";
+import { MasterConfig, MasterLevel } from "../../config/typesConfig";
+import { SetConfigSubCommand } from "./setConfigSubCommand";
 
-export class AddSpeakerDaemonSub extends SetConfigSubCommand<MasterConfig, "speakerBuildOptions"> {
+export class AddSpeakerDaemonSub extends SetConfigSubCommand<MasterLevel, "speakerBuildOptions"> {
   constructor(level: MasterLevel) {
     super(
       {

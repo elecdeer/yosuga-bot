@@ -1,16 +1,13 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { GuildConfig } from "../../config/configManager";
-import {
-  SetConfigSubCommand,
-  GuildLevel,
-  isRequiredOption,
-  MasterLevel,
-  ValidationResult,
-} from "./setConfigSubCommand";
+import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
+import { SetConfigSubCommand, isRequiredOption, ValidationResult } from "./setConfigSubCommand";
 
-export class SetAutoLeaveSecSub extends SetConfigSubCommand<GuildConfig, "timeToAutoLeaveSec"> {
+export class SetAutoLeaveSecSub extends SetConfigSubCommand<
+  MasterLevel | GuildLevel,
+  "timeToAutoLeaveSec"
+> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {

@@ -1,15 +1,15 @@
 import deepmerge from "deepmerge";
-import { Snowflake } from "discord.js";
 import { ReadonlyDeep, SetOptional } from "type-fest";
 
-import { UnifiedConfig } from "./configManager";
+import { AppId, GuildId, UserId } from "../../types";
+import { GuildConfigStore } from "../store/guildConfigStore";
+import { MasterConfigStore } from "../store/masterConfigStore";
+import { UserConfigStore } from "../store/userConfigStore";
+import { MasterConfig, UnifiedConfig } from "../typesConfig";
 import { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import { GuildConfigStore } from "./guildConfigStore";
 import { MasterConfigAccessorProps } from "./masterConfigAccessor";
-import { MasterConfigStore } from "./masterConfigStore";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
 import { UserConfigAccessorProps } from "./userConfigAccessor";
-import { UserConfigStore } from "./userConfigStore";
 
 export type UnifiedConfigAccessorProps = {
   master: MasterConfigAccessorProps;
@@ -17,13 +17,13 @@ export type UnifiedConfigAccessorProps = {
   user: SetOptional<UserConfigAccessorProps, "userId">;
 };
 
-export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig> {
+export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig, false> {
   private readonly masterStore: MasterConfigStore;
   private readonly guildStore: GuildConfigStore;
   private readonly userStore: UserConfigStore;
-  private readonly appId: Snowflake;
-  private readonly guildId?: Snowflake;
-  private readonly userId?: Snowflake;
+  private readonly appId: AppId;
+  private readonly guildId?: GuildId;
+  private readonly userId?: UserId;
 
   constructor({ master, guild, user }: UnifiedConfigAccessorProps) {
     super();
@@ -41,7 +41,12 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig>
   }
 
   async getAllValue(): Promise<ReadonlyDeep<UnifiedConfig>> {
-    let unifiedConfig = await this.masterStore.read(this.appId);
+    let unifiedConfig: MasterConfig = {
+      ...defaultConfig,
+    };
+
+    const masterConfig = await this.masterStore.read(this.appId);
+    unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, masterConfig);
 
     if (this.guildId) {
       const guildConfig = await this.guildStore.read(this.guildId);
@@ -60,3 +65,26 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig>
     return unifiedConfig;
   }
 }
+
+const defaultConfig = {
+  speakerBuildOptions: {},
+
+  commandPrefix: "yosuga",
+  ignorePrefix: "!!",
+  masterVolume: 1,
+  masterSpeed: 1.1,
+  fastSpeedScale: 1.5,
+  readStatusUpdate: true,
+  readTimeSignal: false,
+  timeToAutoLeaveSec: 10,
+  timeToReadMemberNameSec: 30,
+  maxStringLength: 80,
+
+  speakerOption: {
+    speakerName: "null",
+    voiceParam: {
+      pitch: 1,
+      intonation: 1,
+    },
+  },
+} as const;

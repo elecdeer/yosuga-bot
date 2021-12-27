@@ -1,9 +1,10 @@
 import assert from "assert";
-import { Collection, Guild, Snowflake } from "discord.js";
+import { Collection, Guild } from "discord.js";
 import log4js from "log4js";
 
 import { CommandBase } from "./commands/commandBase";
 import { CommandPermission, fetchPermission } from "./permissionUtil";
+import { GuildId } from "./types";
 import { YosugaClient } from "./yosugaClient";
 
 const commandLogger = log4js.getLogger("command");
@@ -90,7 +91,7 @@ export class CommandManager {
     }
   }
 
-  async unregisterGuildSlashCommands(guildId: Snowflake): Promise<void> {
+  async unregisterGuildSlashCommands(guildId: GuildId): Promise<void> {
     const application = this.yosuga.client.application;
     assert(application);
 

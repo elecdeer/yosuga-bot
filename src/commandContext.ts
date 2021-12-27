@@ -7,8 +7,8 @@ import {
   TextChannel,
 } from "discord.js";
 
+import { UnifiedConfigAccessor } from "./config/accessor/unifiedConfigAccessor";
 import { ConfigManager } from "./config/configManager";
-import { UnifiedConfigAccessor } from "./config/unifiedConfigAccessor";
 import { Session } from "./session";
 import { createYosugaEmbed } from "./util/util";
 import { YosugaClient } from "./yosugaClient";

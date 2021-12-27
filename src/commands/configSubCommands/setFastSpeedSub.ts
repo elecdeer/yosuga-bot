@@ -1,17 +1,14 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import { GuildConfig } from "../../config/configManager";
+import { GuildConfig, GuildLevel, MasterLevel } from "../../config/typesConfig";
 import { isInRange } from "../../util/util";
-import {
-  GuildLevel,
-  isRequiredOption,
-  MasterLevel,
-  SetConfigSubCommand,
-  ValidationResult,
-} from "./setConfigSubCommand";
+import { isRequiredOption, SetConfigSubCommand, ValidationResult } from "./setConfigSubCommand";
 
-export class SetFastSpeedSub extends SetConfigSubCommand<GuildConfig, "fastSpeedScale"> {
+export class SetFastSpeedSub extends SetConfigSubCommand<
+  MasterLevel | GuildLevel,
+  "fastSpeedScale"
+> {
   constructor(level: MasterLevel | GuildLevel) {
     super(
       {
