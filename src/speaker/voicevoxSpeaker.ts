@@ -4,6 +4,7 @@ import { getLogger } from "log4js";
 import { Session } from "../session";
 import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
 import { failure, Result, success } from "../util/result";
+import { remap } from "../util/util";
 import { Speaker, SpeakerState } from "./speaker";
 import { createVoicevoxClient } from "./voicevoxApi";
 
@@ -84,12 +85,15 @@ export class VoicevoxSpeaker extends Speaker {
         },
       });
 
+      //yosuga側のパラメータは全て0-2で1が標準
+      //voicevox側は音高のみ-0.15~0.15
+
       const query: typeof audioQueryBase = {
         ...audioQueryBase,
-        // volumeScale: speechText.volume,
-        // speedScale: speechText.speed,
-        // pitchScale: voiceParam.pitch,
-        // intonationScale: voiceParam.intonation,
+        volumeScale: speechText.volume,
+        speedScale: speechText.speed,
+        pitchScale: remap(voiceParam.pitch, 0, 2, -0.15, 0.15),
+        intonationScale: voiceParam.intonation,
       };
 
       const resWav = await this.voicevoxClient.synthesis.$post({
