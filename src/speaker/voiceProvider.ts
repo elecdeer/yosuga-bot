@@ -10,8 +10,11 @@ import { failure, Result } from "../util/result";
 import { Speaker } from "./speaker";
 import { TtsControllerSpeaker, TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
 import { DaemonSpeakerBuildOption, VoiceroidDaemonSpeaker } from "./voiceroidDaemonSpeaker";
+import { VoicevoxSpeaker, VoicevoxSpeakerBuildOption } from "./voicevoxSpeaker";
 
-export type SpeakerBuildOption = DaemonSpeakerBuildOption | TtsSpeakerBuildOption;
+export type SpeakerBuildOption = {
+  voiceName: string;
+} & (DaemonSpeakerBuildOption | TtsSpeakerBuildOption | VoicevoxSpeakerBuildOption);
 
 const logger = getLogger("voiceProvider");
 
@@ -112,5 +115,7 @@ const createSpeaker = (speakerOption: SpeakerBuildOption, session: Session) => {
       return new VoiceroidDaemonSpeaker(session, speakerOption);
     case "ttsController":
       return new TtsControllerSpeaker(session, speakerOption);
+    case "voicevox":
+      return new VoicevoxSpeaker(session, speakerOption);
   }
 };

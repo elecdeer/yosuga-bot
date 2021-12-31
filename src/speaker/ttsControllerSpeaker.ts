@@ -15,7 +15,6 @@ import { ttsControllerOccupier } from "./ttsControllerOccupier";
 export type TtsSpeakerBuildOption = {
   type: "ttsController";
   urlBase: string;
-  voiceName: string;
   outputDevice: string;
   wsUrl: string;
   callName: string;
