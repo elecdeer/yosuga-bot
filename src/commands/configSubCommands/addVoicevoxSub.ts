@@ -13,7 +13,7 @@ export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBui
         description: "VOICEVOXによるボイスの追加",
         options: [
           {
-            name: "stylename",
+            name: "name",
             description: "ボイスの登録名",
             type: "STRING",
             required: true,
@@ -43,7 +43,7 @@ export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBui
   ): Promise<ConfigEachLevel<MasterLevel>["speakerBuildOptions"] | undefined> {
     const voiceName = options.getString("name", true);
     const urlBase = options.getString("url", true);
-    const styleId = options.getNumber("styleId", true);
+    const styleId = options.getNumber("styleid", true);
 
     const option: SpeakerBuildOption = {
       type: "voicevox",
