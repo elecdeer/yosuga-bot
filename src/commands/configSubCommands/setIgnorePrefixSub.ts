@@ -26,10 +26,10 @@ export class SetIgnorePrefixSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["ignorePrefix"]> | undefined
-  ): GuildConfig["ignorePrefix"] | undefined {
+  ): Promise<GuildConfig["ignorePrefix"] | undefined> {
     return options.getString("prefix") || undefined;
   }
 }

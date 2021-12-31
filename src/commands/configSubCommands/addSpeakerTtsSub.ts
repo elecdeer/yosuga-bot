@@ -47,10 +47,10 @@ export class AddSpeakerTtsSub extends SetConfigSubCommand<MasterLevel, "speakerB
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<MasterConfig["speakerBuildOptions"]> | undefined
-  ): MasterConfig["speakerBuildOptions"] | undefined {
+  ): Promise<MasterConfig["speakerBuildOptions"] | undefined> {
     const voiceName = options.getString("name", true);
     return {
       ...oldValue,

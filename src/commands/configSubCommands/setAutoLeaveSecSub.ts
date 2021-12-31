@@ -27,10 +27,10 @@ export class SetAutoLeaveSecSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["timeToAutoLeaveSec"]> | undefined
-  ): GuildConfig["timeToAutoLeaveSec"] | undefined {
+  ): Promise<GuildConfig["timeToAutoLeaveSec"] | undefined> {
     return options.getNumber("value") || undefined;
   }
 

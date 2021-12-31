@@ -27,10 +27,10 @@ export class SetMaxLengthSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["maxStringLength"]> | undefined
-  ): GuildConfig["maxStringLength"] | undefined {
+  ): Promise<GuildConfig["maxStringLength"] | undefined> {
     return options.getNumber("value") || undefined;
   }
 

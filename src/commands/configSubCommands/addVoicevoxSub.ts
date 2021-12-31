@@ -35,10 +35,10 @@ export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBui
     );
   }
 
-  protected getValueFromOptions(
+  protected async getValueFromOptions(
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<MasterLevel>["speakerBuildOptions"]> | undefined
-  ): ConfigEachLevel<MasterLevel>["speakerBuildOptions"] | undefined {
+  ): Promise<ConfigEachLevel<MasterLevel>["speakerBuildOptions"] | undefined> {
     return undefined;
   }
 }

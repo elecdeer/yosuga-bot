@@ -34,7 +34,7 @@ export abstract class SetConfigSubCommand<
   protected abstract getValueFromOptions(
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey]> | undefined
-  ): ConfigEachLevel<TConfigLevels>[TKey] | undefined;
+  ): Promise<ConfigEachLevel<TConfigLevels>[TKey] | undefined>;
 
   protected async validateValue(
     value: ConfigEachLevel<TConfigLevels>[TKey] | undefined,
@@ -50,7 +50,7 @@ export abstract class SetConfigSubCommand<
     const oldValue = await accessor.get(this.configKey);
 
     const options = context.getOptions();
-    const optionValue = this.getValueFromOptions(options, oldValue);
+    const optionValue = await this.getValueFromOptions(options, oldValue);
 
     const validateResult = await this.validateValue(optionValue, context);
     if (validateResult.status === "warn") {

@@ -25,7 +25,9 @@ export class SetVolumeSub extends SetConfigSubCommand<MasterLevel | GuildLevel, 
     );
   }
 
-  getValueFromOptions(options: CommandInteractionOptionResolver): number | undefined {
+  override async getValueFromOptions(
+    options: CommandInteractionOptionResolver
+  ): Promise<number | undefined> {
     return options.getNumber("value") || undefined;
   }
 

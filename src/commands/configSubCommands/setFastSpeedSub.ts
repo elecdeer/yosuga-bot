@@ -28,10 +28,10 @@ export class SetFastSpeedSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["fastSpeedScale"]> | undefined
-  ): GuildConfig["fastSpeedScale"] | undefined {
+  ): Promise<GuildConfig["fastSpeedScale"] | undefined> {
     return options.getNumber("value") || undefined;
   }
 

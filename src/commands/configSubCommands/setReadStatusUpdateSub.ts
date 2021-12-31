@@ -26,10 +26,10 @@ export class SetReadStatusUpdateSub extends SetConfigSubCommand<
     );
   }
 
-  getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["readStatusUpdate"]> | undefined
-  ): GuildConfig["readStatusUpdate"] | undefined {
+  ): Promise<GuildConfig["readStatusUpdate"] | undefined> {
     return options.getBoolean("enable") || undefined;
   }
 }
