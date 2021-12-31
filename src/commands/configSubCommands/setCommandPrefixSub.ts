@@ -26,10 +26,10 @@ export class SetCommandPrefixSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["commandPrefix"]> | undefined
-  ): GuildConfig["commandPrefix"] | undefined {
+  ): Promise<GuildConfig["commandPrefix"] | undefined> {
     return options.getString("prefix") || undefined;
   }
 }

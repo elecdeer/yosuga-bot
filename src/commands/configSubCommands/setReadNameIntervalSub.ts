@@ -27,10 +27,10 @@ export class SetReadNameIntervalSub extends SetConfigSubCommand<
     );
   }
 
-  getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["timeToReadMemberNameSec"]> | undefined
-  ): GuildConfig["timeToReadMemberNameSec"] | undefined {
+  ): Promise<GuildConfig["timeToReadMemberNameSec"] | undefined> {
     return options.getNumber("value") || undefined;
   }
 

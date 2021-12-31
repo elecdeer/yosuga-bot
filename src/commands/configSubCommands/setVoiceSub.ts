@@ -44,10 +44,10 @@ export class SetVoiceSub extends SetConfigSubCommand<
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<UserConfig["speakerOption"]> | undefined
-  ): UserConfig["speakerOption"] | undefined {
+  ): Promise<UserConfig["speakerOption"] | undefined> {
     const voiceName = options.getString("voicename");
     if (!voiceName) {
       return undefined;

@@ -25,10 +25,10 @@ export class SetSpeedSub extends SetConfigSubCommand<MasterLevel | GuildLevel, "
     );
   }
 
-  getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<GuildConfig["masterSpeed"]> | undefined
-  ): GuildConfig["masterSpeed"] | undefined {
+  ): Promise<GuildConfig["masterSpeed"] | undefined> {
     return options.getNumber("value") || undefined;
   }
 

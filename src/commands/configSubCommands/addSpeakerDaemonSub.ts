@@ -29,10 +29,10 @@ export class AddSpeakerDaemonSub extends SetConfigSubCommand<MasterLevel, "speak
     );
   }
 
-  override getValueFromOptions(
+  override async getValueFromOptions(
     options: CommandInteractionOptionResolver,
     oldValue: Readonly<MasterConfig["speakerBuildOptions"]> | undefined
-  ): MasterConfig["speakerBuildOptions"] | undefined {
+  ): Promise<MasterConfig["speakerBuildOptions"] | undefined> {
     const voiceName = options.getString("name", true);
     return {
       ...oldValue,

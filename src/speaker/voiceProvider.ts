@@ -10,8 +10,11 @@ import { failure, Result } from "../util/result";
 import { Speaker } from "./speaker";
 import { TtsControllerSpeaker, TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
 import { DaemonSpeakerBuildOption, VoiceroidDaemonSpeaker } from "./voiceroidDaemonSpeaker";
+import { VoicevoxSpeaker, VoicevoxSpeakerBuildOption } from "./voicevoxSpeaker";
 
-export type SpeakerBuildOption = DaemonSpeakerBuildOption | TtsSpeakerBuildOption;
+export type SpeakerBuildOption = {
+  voiceName: string;
+} & (DaemonSpeakerBuildOption | TtsSpeakerBuildOption | VoicevoxSpeakerBuildOption);
 
 const logger = getLogger("voiceProvider");
 
@@ -83,14 +86,7 @@ const constructSpeakerCollection = (
     logger.debug(config.speakerBuildOptions);
 
     Object.values(config.speakerBuildOptions).forEach((speakerOption) => {
-      if (speakerOption.type === "voiceroidDaemon") {
-        collection.set(speakerOption.voiceName, new VoiceroidDaemonSpeaker(session, speakerOption));
-        return;
-      }
-      if (speakerOption.type === "ttsController") {
-        collection.set(speakerOption.voiceName, new TtsControllerSpeaker(session, speakerOption));
-        return;
-      }
+      collection.set(speakerOption.voiceName, createSpeaker(speakerOption, session));
     });
 
     const initializeTask = async (speaker: Speaker) => {
@@ -111,4 +107,15 @@ const constructSpeakerCollection = (
     minimum: minimum.promise,
     all: all.promise,
   };
+};
+
+const createSpeaker = (speakerOption: SpeakerBuildOption, session: Session) => {
+  switch (speakerOption.type) {
+    case "voiceroidDaemon":
+      return new VoiceroidDaemonSpeaker(session, speakerOption);
+    case "ttsController":
+      return new TtsControllerSpeaker(session, speakerOption);
+    case "voicevox":
+      return new VoicevoxSpeaker(session, speakerOption);
+  }
 };

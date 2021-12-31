@@ -10,7 +10,6 @@ import { Speaker, SpeakerState } from "./speaker";
 
 export type DaemonSpeakerBuildOption = {
   type: "voiceroidDaemon";
-  voiceName: string;
   urlBase: string;
 };
 

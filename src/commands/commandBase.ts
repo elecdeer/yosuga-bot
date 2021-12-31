@@ -62,7 +62,7 @@ export abstract class CommandBase {
       name: this.data.name,
       description: this.data.description,
       type: "CHAT_INPUT",
-      options: options,
+      options: options ?? [],
       defaultPermission: true,
     };
   }
