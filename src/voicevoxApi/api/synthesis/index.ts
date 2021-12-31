@@ -1,5 +1,6 @@
 /* eslint-disable */
 import type * as Types from "../@types";
+import { Readable } from "stream";
 
 export type Methods = {
   post: {
@@ -9,5 +10,6 @@ export type Methods = {
 
     status: 200;
     reqBody: Types.AudioQuery;
+    resBody: Readable;
   };
 };

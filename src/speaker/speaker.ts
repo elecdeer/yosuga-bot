@@ -9,6 +9,9 @@ export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking
 
 const logger = getLogger("speakerLogger");
 
+/**
+ * Sessionごとに生成される音声合成用インタフェース
+ */
 export abstract class Speaker<T extends AdditionalVoiceParam = AdditionalVoiceParam> {
   protected readonly session: Session;
 

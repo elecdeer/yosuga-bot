@@ -255,9 +255,9 @@ const api = <T>({ baseURL, fetch }: AspidaClient<T>) => {
     },
     synthesis: {
       post: (option: { body: Methods12['post']['reqBody'], query: Methods12['post']['query'], config?: T }) =>
-        fetch<void, BasicHeaders, Methods12['post']['status']>(prefix, PATH12, POST, option).send(),
+        fetch<Methods12['post']['resBody'], BasicHeaders, Methods12['post']['status']>(prefix, PATH12, POST, option).json(),
       $post: (option: { body: Methods12['post']['reqBody'], query: Methods12['post']['query'], config?: T }) =>
-        fetch<void, BasicHeaders, Methods12['post']['status']>(prefix, PATH12, POST, option).send().then(r => r.body),
+        fetch<Methods12['post']['resBody'], BasicHeaders, Methods12['post']['status']>(prefix, PATH12, POST, option).json().then(r => r.body),
       $path: (option?: { method: 'post'; query: Methods12['post']['query'] }) =>
         `${prefix}${PATH12}${option && option.query ? `?${dataToURLString(option.query)}` : ''}`
     },
