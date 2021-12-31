@@ -5,7 +5,7 @@ import api from "../voicevoxApi/api/$api";
 
 export const createVoicevoxClient = (baseURL: string) => {
   const config: AxiosRequestConfig = {
-    timeout: 3000,
+    timeout: 10000,
     baseURL: baseURL,
   };
   return api(aspida(axios, config));

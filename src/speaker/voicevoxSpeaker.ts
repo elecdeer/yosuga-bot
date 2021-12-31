@@ -86,10 +86,10 @@ export class VoicevoxSpeaker extends Speaker {
 
       const query: typeof audioQueryBase = {
         ...audioQueryBase,
-        volumeScale: speechText.volume,
-        speedScale: speechText.speed,
-        pitchScale: voiceParam.pitch,
-        intonationScale: voiceParam.intonation,
+        // volumeScale: speechText.volume,
+        // speedScale: speechText.speed,
+        // pitchScale: voiceParam.pitch,
+        // intonationScale: voiceParam.intonation,
       };
 
       const resWav = await this.voicevoxClient.synthesis.$post({
@@ -103,7 +103,7 @@ export class VoicevoxSpeaker extends Speaker {
       });
 
       const resource = createAudioResource(resWav, {
-        inputType: StreamType.Raw,
+        inputType: StreamType.Arbitrary,
       });
 
       return success(resource);
