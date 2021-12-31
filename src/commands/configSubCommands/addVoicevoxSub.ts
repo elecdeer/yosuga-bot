@@ -13,7 +13,7 @@ export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBui
         description: "VOICEVOXによるボイスの追加",
         options: [
           {
-            name: "styleName",
+            name: "stylename",
             description: "ボイスの登録名",
             type: "STRING",
             required: true,
@@ -25,7 +25,7 @@ export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBui
             required: true,
           },
           {
-            name: "styleId",
+            name: "styleid",
             description: "追加したいspeakerのstyleのId",
             type: "NUMBER",
             required: true,

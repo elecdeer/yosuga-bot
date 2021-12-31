@@ -72,8 +72,6 @@ export class CommandManager {
       commandLogger.debug(cmd);
     });
 
-    await application.commands.set(registerCommands);
-
     if (guild) {
       const appCommands = await application.commands.set(registerCommands, guild.id);
 
