@@ -4,6 +4,7 @@ import { CommandPermission } from "../permissionUtil";
 import { CommandGroup } from "./commandGroup";
 import { AddSpeakerDaemonSub } from "./configSubCommands/addSpeakerDaemonSub";
 import { AddSpeakerTtsSub } from "./configSubCommands/addSpeakerTtsSub";
+import { AddVoicevoxSub } from "./configSubCommands/addVoicevoxSub";
 import { SetAutoLeaveSecSub } from "./configSubCommands/setAutoLeaveSecSub";
 import { SetCommandPrefixSub } from "./configSubCommands/setCommandPrefixSub";
 import { SetFastSpeedSub } from "./configSubCommands/setFastSpeedSub";
@@ -28,6 +29,7 @@ export class MasterConfigCommand extends CommandGroup {
 
     this.addSubCommand(new AddSpeakerDaemonSub("MASTER"));
     this.addSubCommand(new AddSpeakerTtsSub("MASTER"));
+    this.addSubCommand(new AddVoicevoxSub("MASTER"));
     this.addSubCommand(new SetVoiceSub("MASTER"));
     this.addSubCommand(new SetVolumeSub("MASTER"));
     this.addSubCommand(new SetSpeedSub("MASTER"));
