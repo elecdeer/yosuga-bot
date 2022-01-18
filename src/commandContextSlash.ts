@@ -7,9 +7,10 @@ import {
   TextChannel,
 } from "discord.js";
 
-import { CommandContext, ReplyType } from "./commandContext";
+import { CommandContext } from "./commandContext";
 import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
+import { constructEmbeds, ReplyType } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
 
 export type ValidCommandInteraction = CommandInteraction & {
@@ -66,28 +67,28 @@ export class CommandContextSlash extends CommandContext {
 
   override async reply(
     type: ReplyType,
-    content: string | MessageEmbed,
+    content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
   ): Promise<Message> {
-    const embed = this.constructEmbed(type, content);
+    const embeds = constructEmbeds(type, content);
 
     if (channel) {
-      return channel.send({ embeds: [embed] });
+      return channel.send({ embeds: embeds });
     }
 
     if (!this.interaction.replied) {
       if (!this.interaction.deferred) {
         clearTimeout(this.differTimer);
-        const message = await this.interaction.reply({ embeds: [embed], fetchReply: true });
+        const message = await this.interaction.reply({ embeds: embeds, fetchReply: true });
         //DMはそもそもない
         return message as Message;
       } else {
-        const message = await this.interaction.followUp({ embeds: [embed] });
+        const message = await this.interaction.followUp({ embeds: embeds });
         //DMはそもそもない
         return message as Message;
       }
     } else {
-      return this.textChannel.send({ embeds: [embed] });
+      return this.textChannel.send({ embeds: embeds });
     }
   }
 

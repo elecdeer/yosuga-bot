@@ -1,8 +1,9 @@
 import { Guild, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 
-import { CommandContext, ReplyType } from "./commandContext";
+import { CommandContext } from "./commandContext";
 import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
+import { constructEmbeds, ReplyType } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
 
 export type ValidMessage = Message & {
@@ -40,12 +41,12 @@ export class CommandContextText extends CommandContext {
 
   override reply(
     type: ReplyType,
-    content: string | MessageEmbed,
+    content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
   ): Promise<Message> {
-    const embed = this.constructEmbed(type, content);
+    const embed = constructEmbeds(type, content);
 
-    return (channel ?? this.textChannel).send({ embeds: [embed] });
+    return (channel ?? this.textChannel).send({ embeds: embed });
   }
 
   getOptions(): undefined {

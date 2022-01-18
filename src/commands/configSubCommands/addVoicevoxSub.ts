@@ -3,9 +3,9 @@ import { CommandInteraction } from "discord.js";
 import { ConfigEachLevel, MasterLevel } from "../../config/typesConfig";
 import { SpeakerBuildOption } from "../../speaker/voiceProvider";
 import { createVoicevoxClient } from "../../speaker/voicevoxApi";
-import { SetConfigSubCommand } from "./setConfigSubCommand";
+import { AddSpeakerSubBase } from "./addSpeakerSubBase";
 
-export class AddVoicevoxSub extends SetConfigSubCommand<MasterLevel, "speakerBuildOptions"> {
+export class AddVoicevoxSub extends AddSpeakerSubBase {
   constructor(level: MasterLevel) {
     super(
       {

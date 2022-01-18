@@ -25,7 +25,7 @@ import {
   UserId,
   VoiceOrStageChannel,
 } from "./types";
-import { createYosugaEmbed } from "./util/util";
+import { constructEmbeds } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
 
 const logger = getLogger("session");
@@ -130,8 +130,8 @@ export class Session extends SessionEmitter {
     if (!voiceOption) {
       logger.warn("音声合成システムが無効です");
 
-      const embed = createYosugaEmbed().setDescription("⚠ 音声合成システムが無効となっています");
-      await this.textChannel.send({ embeds: [embed] });
+      const embeds = constructEmbeds("warn", "音声合成システムが無効となっています");
+      await this.textChannel.send({ embeds: embeds });
       return;
     }
 

@@ -1,4 +1,4 @@
-import { Collection } from "discord.js";
+import { Collection, Formatters } from "discord.js";
 
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
 import { SpeakerOption } from "../types";
@@ -19,11 +19,11 @@ export const stringifyConfigEntry = <T extends keyof UnifiedConfig>(
             return key !== "voiceName";
           })
           .map(([key, value]) => {
-            return ` ${key}: ${value}`;
+            return `${key}: ${value}`;
           })
           .join("\n");
 
-        return `${value.voiceName}\n\`${entries}\``;
+        return `${value.voiceName}\n${Formatters.inlineCode(entries)}`;
       })
       .join("\n");
 

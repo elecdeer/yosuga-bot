@@ -5,7 +5,7 @@ import { stringifyConfigEntry } from "../../config/conifgUtil";
 import { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";
 import { ConfigSubCommand } from "./configSubCommand";
 
-const levelString: Record<ConfigCommandLevel, string> = {
+export const levelString: Record<ConfigCommandLevel, string> = {
   MASTER: "Yosugaインスタンス",
   GUILD: "サーバ",
   USER: "ユーザ",
@@ -70,8 +70,6 @@ export abstract class SetConfigSubCommand<
     oldValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey] | undefined>,
     newValue: Readonly<ConfigEachLevel<TConfigLevels>[TKey] | undefined>
   ): MessageEmbed {
-    console.log(oldValue);
-    console.log(newValue);
     const embed = new MessageEmbed();
     embed.setDescription(`${levelString[this.level]}の設定を変更しました.`);
     embed.addField(this.data.name, this.data.description, true);

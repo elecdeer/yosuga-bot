@@ -10,6 +10,7 @@ import log4js from "log4js";
 import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../permissionUtil";
 import { VoiceOrStageChannel } from "../types";
+import { constructEmbeds } from "../util/createEmbed";
 import { CommandBase } from "./commandBase";
 
 const commandLogger = log4js.getLogger("command");
@@ -81,7 +82,7 @@ export class StartCommand extends CommandBase {
 
           await session.getVoiceProvider().getSpeakersStatus(true);
           await message.edit({
-            embeds: [context.constructEmbed("plain", "接続しました!\nボイスの初期化完了.")],
+            embeds: constructEmbeds("plain", "接続しました!\nボイスの初期化完了."),
           });
         } catch (error) {
           await context.reply("error", "接続エラーが発生しました.");
