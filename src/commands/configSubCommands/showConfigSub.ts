@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { Collection, MessageEmbed } from "discord.js";
 import { getLogger } from "log4js";
 import { ValueOf } from "type-fest";
 
@@ -29,18 +29,45 @@ export class ShowConfigSub extends ConfigSubCommand<MasterLevel | GuildLevel | U
   async execute(context: CommandContextSlash): Promise<void> {
     const accessor = this.getConfigAccessor(context);
     const config = await accessor.getAllValue();
-    const configEntries = Object.entries(config) as [keyof UnifiedConfig, ValueOf<UnifiedConfig>][];
 
-    const embed = new MessageEmbed();
-    embed.setDescription(`現在の設定（${this.level}）`);
+    //as微妙かも
+    const configCollection = new Collection(
+      Object.entries(config) as [keyof UnifiedConfig, ValueOf<UnifiedConfig>][]
+    );
+
+    const configEmbed = new MessageEmbed();
+    configEmbed.setDescription(`現在の設定（${this.level}）`);
+
+    const configEntriesWithoutSpeaker = configCollection.filter(
+      (_, key) => key !== "speakerBuildOptions"
+    );
 
     //最大25
-    embed.addFields(
-      configEntries
-        .map(([key, value]) => stringifyConfigEntry(key, value))
+    configEmbed.addFields(
+      configEntriesWithoutSpeaker
+        .map((value, key) => stringifyConfigEntry(key, value))
         .filter((item) => !!item && item.value.length > 0)
     );
 
-    await context.reply("plain", embed);
+    const configSpeaker = config.speakerBuildOptions ?? {};
+    const configEntriesSpeaker = Object.entries(configSpeaker);
+
+    const speakerEmbeds = configEntriesSpeaker.map(([name, item], index) => {
+      const embed = new MessageEmbed();
+      embed.setTitle(`SpeakerBuildOption (${index + 1}/${configEntriesSpeaker.length})`);
+      embed.setDescription(name);
+
+      const optionEntries = Object.entries(item);
+      embed.addFields(
+        optionEntries.map(([key, value]) => ({
+          name: key,
+          value: value,
+          inline: true,
+        }))
+      );
+      return embed;
+    });
+
+    await context.reply("plain", [configEmbed, ...speakerEmbeds]);
   }
 }
