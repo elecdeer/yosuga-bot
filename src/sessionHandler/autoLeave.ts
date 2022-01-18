@@ -3,7 +3,7 @@ import { getLogger } from "log4js";
 
 import { Session } from "../session";
 import { SessionEventHandlerRegistrant } from "../types";
-import { createYosugaEmbed } from "../util/util";
+import { createYosugaEmbed } from "../util/createEmbed";
 
 const logger = getLogger("sessionEvent");
 export const registerAutoLeave: SessionEventHandlerRegistrant = async (session) => {
@@ -49,9 +49,9 @@ export const registerAutoLeave: SessionEventHandlerRegistrant = async (session) 
   });
 
   const leaveRoom = () => {
-    const embed = createYosugaEmbed().setDescription(
-      "一定時間ボイスチャンネルに誰もいなくなったため退出しました."
-    );
+    const embed = createYosugaEmbed({
+      message: "一定時間ボイスチャンネルに誰もいなくなったため退出しました.",
+    });
 
     void session
       .getTextChannel()

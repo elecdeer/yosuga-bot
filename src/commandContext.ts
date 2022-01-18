@@ -10,16 +10,8 @@ import {
 import { UnifiedConfigAccessor } from "./config/accessor/unifiedConfigAccessor";
 import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
-import { createYosugaEmbed } from "./util/util";
+import { ReplyType } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
-
-export type ReplyType = "plain" | "warn" | "error" | "prohibit";
-const REPLY_TYPE_EMOJI: Record<ReplyType, string> = {
-  plain: "",
-  error: "\u{2757}",
-  prohibit: "\u{1F6AB}",
-  warn: "\u{26A0}\u{FE0F}",
-};
 
 export abstract class CommandContext {
   abstract readonly yosuga: YosugaClient;
@@ -31,7 +23,7 @@ export abstract class CommandContext {
 
   abstract reply(
     type: ReplyType,
-    content: string | MessageEmbed,
+    content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
   ): Promise<Message>;
 
@@ -39,15 +31,5 @@ export abstract class CommandContext {
 
   getUnifiedConfigAccessor(): UnifiedConfigAccessor {
     return this.configManager.getUnifiedConfigAccessor(this.guild.id, this.member.id);
-  }
-
-  constructEmbed(type: ReplyType, content: string | MessageEmbed): MessageEmbed {
-    const prefix = REPLY_TYPE_EMOJI[type];
-    if (typeof content === "string") {
-      return createYosugaEmbed().setDescription(`${prefix} ${content}`);
-    } else {
-      const embed = createYosugaEmbed(content);
-      return embed.setDescription(`${prefix} ${embed.description}`);
-    }
   }
 }
