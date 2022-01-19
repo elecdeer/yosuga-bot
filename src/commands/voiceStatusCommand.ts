@@ -1,9 +1,12 @@
 import assert from "assert";
 import { MessageEmbed } from "discord.js";
+import { getLogger } from "log4js";
 
 import { CommandContext } from "../commandContext";
 import { CommandPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
+
+const logger = getLogger("VoiceStatusCommand");
 
 export class VoiceStatusCommand extends CommandBase {
   constructor() {
@@ -17,6 +20,14 @@ export class VoiceStatusCommand extends CommandBase {
   }
 
   async execute(context: CommandContext): Promise<void> {
+    const configManager = context.configManager;
+    const config = configManager.getMasterConfigAccessor();
+    const voices = await config.get("speakerBuildOptions");
+    if (!voices || Object.values(voices).length < 1) {
+      await context.reply("warn", "ボイスが登録されていません");
+      return;
+    }
+
     if (context.session) {
       const voiceProvider = context.session.getVoiceProvider();
       const status = await voiceProvider.getSpeakersStatus();
@@ -32,9 +43,6 @@ export class VoiceStatusCommand extends CommandBase {
 
       await context.reply("plain", embed);
     } else {
-      const configManager = context.configManager;
-      const config = configManager.getMasterConfigAccessor();
-      const voices = await config.get("speakerBuildOptions");
       assert(voices);
 
       const embed = new MessageEmbed();

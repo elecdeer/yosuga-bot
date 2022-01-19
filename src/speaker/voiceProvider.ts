@@ -85,7 +85,14 @@ const constructSpeakerCollection = (
     logger.debug("constructSpeakerCollection");
     logger.debug(config.speakerBuildOptions);
 
-    Object.values(config.speakerBuildOptions).forEach((speakerOption) => {
+    const speakers = Object.values(config.speakerBuildOptions);
+    if (speakers.length < 1) {
+      minimum.resolve(collection);
+      all.resolve(collection);
+      return;
+    }
+
+    speakers.forEach((speakerOption) => {
       collection.set(speakerOption.voiceName, createSpeaker(speakerOption, session));
     });
 
