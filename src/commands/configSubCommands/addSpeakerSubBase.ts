@@ -27,35 +27,11 @@ export abstract class AddSpeakerSubBase extends SetConfigSubCommand<
 
     const differenceOldOptions = !oldValue
       ? "[ボイス未登録]"
-      : hasDifferenceVoices
-          .map((key) => {
-            const option = oldValue[key];
-            if (!option) {
-              return "[未設定]";
-            }
-            const entries = Object.entries(option);
-            const entriesStr = entries
-              .map(([key, value]) => `${key}: ${Formatters.inlineCode(value)}`)
-              .join("\n");
-            return `${key}\n${entriesStr}`;
-          })
-          .join("\n\n");
+      : hasDifferenceVoices.map((key) => `${key}\n${voiceParamsToStr(oldValue[key])}`).join("\n\n");
 
     const differenceNewOptions = !newValue
       ? "[ボイス未登録]"
-      : hasDifferenceVoices
-          .map((key) => {
-            const option = newValue[key];
-            if (!option) {
-              return "[未設定]";
-            }
-            const entries = Object.entries(option);
-            const entriesStr = entries
-              .map(([key, value]) => `${key}: ${Formatters.inlineCode(value)}`)
-              .join("\n");
-            return `${key}\n${entriesStr}`;
-          })
-          .join("\n\n");
+      : hasDifferenceVoices.map((key) => `${key}\n${voiceParamsToStr(newValue[key])}`).join("\n\n");
 
     embed.addField("変更前", differenceOldOptions, true);
     embed.addField("変更後", differenceNewOptions, true);
@@ -110,4 +86,12 @@ const extractOptionDifference = (
   });
 
   return Array.from(new Set(differenceKeys));
+};
+
+const voiceParamsToStr = (paramRecord: SpeakerBuildOption | undefined): string => {
+  if (!paramRecord) {
+    return "[未設定]";
+  }
+  const entries = Object.entries(paramRecord);
+  return entries.map(([key, value]) => `${key}: ${Formatters.inlineCode(value)}`).join("\n");
 };
