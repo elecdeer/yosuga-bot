@@ -53,7 +53,7 @@
   "dependencies": {
     "@aspida/axios": "^1.7.1",
     "@discordjs/opus": "^0.7.0",
-    "@discordjs/rest": "^0.2.0-canary.0",
+    "@discordjs/rest": "^0.3.0",
     "@discordjs/voice": "0.7.5",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@kvs/node-localstorage": "^1.2.0",
