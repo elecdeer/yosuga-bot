@@ -83,8 +83,8 @@ const romajiMap: Record<string, string> = {
   xtsu: "っ",
   wi: "うぃ",   we: "うぇ",
   wwi: "っうぃ",   wwe: "っうぇ",
-  va: "ヴぁ",   vi: "ヴぃ",   vu: "ヴ",  ve: "ヴぇ",   vo: "ヴぉ",
-  vva: "っヴぁ",   vvi: "っヴぃ",   vvu: "っヴ",  vve: "っヴぇ",   vvo: "っヴぉ",
+  va: "ゔぁ",   vi: "ゔぃ",   vu: "ゔ",  ve: "ゔぇ",   vo: "ゔぉ",
+  vva: "っゔぁ",   vvi: "っゔぃ",   vvu: "っゔ",  vve: "っゔぇ",   vvo: "っゔぉ",
   "-": "ー"
 };
 //コードはシンプルになる
