@@ -3,6 +3,7 @@ import { getLogger } from "log4js";
 import { UnifiedConfig } from "../config/typesConfig";
 import { codeBlockProcessor } from "../processor/codeBlockProcessor";
 import { emojiProcessor } from "../processor/emojiProcessor";
+import { englishProcessor } from "../processor/englishProcessor";
 import { guildEmojiProcessor } from "../processor/guildEmojiProcessor";
 import { maxLengthProcessor } from "../processor/maxLengthProcessor";
 import { nlSplitProcessor } from "../processor/nlSplitProcessor";
@@ -29,17 +30,20 @@ const createProcessor = (config: UnifiedConfig) => {
   logger.debug(config);
 
   const processor = new ProcessorChain()
+    .use(maxLengthProcessor(config.maxStringLength))
     .use(codeBlockProcessor())
     .use(nlSplitProcessor())
     .use(urlProcessor(config.fastSpeedScale))
     .use(guildEmojiProcessor())
     .use(emojiProcessor())
+    .use(englishProcessor())
     .use(omitSymbolProcessor("!"))
     .use(omitSymbolProcessor("！"))
     .use(omitSymbolProcessor("?"))
     .use(omitSymbolProcessor("？"))
     .use(tildeReplaceProcessor())
     .use(maxLengthProcessor(config.maxStringLength));
+  //ReDoS防止のために頭にも文字数制限入れてる
 
   processorCache = {
     processor: processor,
