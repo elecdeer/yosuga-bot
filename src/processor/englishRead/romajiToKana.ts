@@ -44,6 +44,7 @@ const romajiMap: Record<string, string> = {
   sshe: "っしぇ",  ssyo: "っしょ",  ssho: "っしょ",
   tya: "ちゃ",  tyi: "ちぃ",  tyu: "ちゅ",  tye: "ちぇ",  tyo: "ちょ",
   ttya: "っちゃ",  ttyi: "っちぃ",  ttyu: "っちゅ",  ttye: "っちぇ",  ttyo: "っちょ",
+  tha: "ちゃ", thi: "てぃ", thu: "てゅ", the: "ちぇ", tho: "てょ",
   cha: "ちゃ",  chu: "ちゅ",  che: "ちぇ",  cho: "ちょ",
   ccha: "っちゃ",  cchu: "っちゅ",  cche: "っちぇ",  ccho: "っちょ",
   nya: "にゃ",  nyi: "にぃ",  nyu: "にゅ",  nye: "にぇ",  nyo: "にょ",

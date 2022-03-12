@@ -1,9 +1,8 @@
-import TinySegmenter from "tiny-segmenter";
-
 import { romajiToJpRead } from "./romajiToKana";
+import { splitJpEn } from "./splitJpEn";
 
 export const replaceEnglishRead = (input: string): string => {
-  const words = splitByWord(input);
+  const words = splitJpEn(input);
   return words
     .map((word) => {
       const { complete, kana } = romajiToJpRead(word);
@@ -14,11 +13,6 @@ export const replaceEnglishRead = (input: string): string => {
       }
     })
     .join("");
-};
-
-const segmenter = new TinySegmenter();
-const splitByWord = (input: string): string[] => {
-  return segmenter.segment(input);
 };
 
 // export const englishToJpRead = (englishStr: string): string => {
