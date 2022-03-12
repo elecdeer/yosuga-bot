@@ -1,3 +1,4 @@
+import { hiraganaToKatakana } from "./hiraganaToKatakana";
 import { romajiToJpRead } from "./romajiToKana";
 import { splitJpEn } from "./splitJpEn";
 
@@ -7,7 +8,7 @@ export const replaceEnglishRead = (input: string): string => {
     .map((word) => {
       const { complete, kana } = romajiToJpRead(word);
       if (complete) {
-        return kana;
+        return hiraganaToKatakana(kana);
       } else {
         return word;
       }
