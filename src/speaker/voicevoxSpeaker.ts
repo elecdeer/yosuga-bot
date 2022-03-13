@@ -48,23 +48,6 @@ export class VoicevoxSpeaker extends Speaker {
         this.speakerOption.styleName
       );
 
-      const audioQuery = await this.voicevoxClient.audio_query.$post({
-        query: {
-          text: "テスト",
-          speaker: this.speakerId,
-        },
-      });
-
-      const res = await this.voicevoxClient.synthesis.$post({
-        query: {
-          speaker: this.speakerId,
-        },
-        body: audioQuery,
-        config: {
-          responseType: "stream",
-        },
-      });
-
       return "active";
     } catch (e) {
       return "inactive";
