@@ -57,7 +57,7 @@
     "@discordjs/voice": "0.8.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@kvs/node-localstorage": "^1.2.0",
-    "@kvs/types": "^1.2.0",
+    "@kvs/types": "^2.1.1",
     "@sap_oss/node-socketio-stream": "^1.0.3",
     "async": "^3.2.3",
     "axios": "^0.26.1",
