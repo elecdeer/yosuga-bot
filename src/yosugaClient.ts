@@ -21,6 +21,7 @@ import { KvsGuildConfigStore } from "./config/store/kvsGuildConfigStore";
 import { KvsMasterConfigStore } from "./config/store/kvsMasterConfigStore";
 import { KvsUserConfigStore } from "./config/store/kvsUserConfigStore";
 import { yosugaEnv } from "./environment";
+import { hookHandlers, loadHandlers } from "./handler/handlerLoader";
 import { SessionManager } from "./sessionManager";
 import { YosugaEvent } from "./yosugaEvent";
 
@@ -72,9 +73,13 @@ export class YosugaClient {
       // logger.info(`token: ${token}`);
       logger.info(`applicationOwner: ${this.client.application.owner}`);
 
-      this.assignCommands();
+      const handlers = loadHandlers(this.client, this);
+      hookHandlers(handlers, this.client);
 
-      this.event.attachEvents();
+      //
+      // this.assignCommands();
+      //
+      // this.event.attachEvents();
     } catch (err) {
       logger.error("failed to login discord");
       logger.error(err);

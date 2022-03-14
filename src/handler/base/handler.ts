@@ -1,10 +1,14 @@
 import { Client, ClientEvents } from "discord.js";
 
+import { YosugaClient } from "../../yosugaClient";
+
 export abstract class Handler<TEvent extends keyof ClientEvents> {
+  protected readonly yosuga: YosugaClient;
   protected readonly listenEvents: TEvent[];
 
-  protected constructor(listenEvents: TEvent[]) {
+  protected constructor(listenEvents: TEvent[], yosuga: YosugaClient) {
     this.listenEvents = listenEvents;
+    this.yosuga = yosuga;
   }
 
   /**

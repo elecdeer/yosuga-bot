@@ -1,6 +1,7 @@
 import { Client, ClientEvents, Guild, Message } from "discord.js";
 
-import { Session } from "../session";
+import { Session } from "../../session";
+import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "./handler";
 
 export abstract class SessionContextHandler<
@@ -8,8 +9,8 @@ export abstract class SessionContextHandler<
 > extends Handler<TEvent> {
   protected readonly session: Session;
 
-  protected constructor(listenEvents: TEvent[], session: Session) {
-    super(listenEvents);
+  protected constructor(listenEvents: TEvent[], yosuga: YosugaClient, session: Session) {
+    super(listenEvents, yosuga);
     this.session = session;
   }
 
@@ -34,7 +35,6 @@ export abstract class SessionContextHandler<
   protected sessionFilterMessage(message: Message): boolean {
     if (!message.inGuild()) return false;
     if (message.guildId !== this.session.getGuildId()) return false;
-    if (message.channelId !== this.session.getTextChannel().id) return false;
-    return true;
+    return message.channelId === this.session.getTextChannel().id;
   }
 }
