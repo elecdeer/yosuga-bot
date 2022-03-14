@@ -15,7 +15,7 @@ import { YosugaClient } from "../../yosugaClient";
 import { EventArgs, EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
 
-export class ReadOutMessage extends SessionContextHandler<["messageCreate"]> {
+export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate"]> {
   protected processorCache: {
     processor: ProcessorChain;
     config: UnifiedConfig;
@@ -26,8 +26,8 @@ export class ReadOutMessage extends SessionContextHandler<["messageCreate"]> {
   }
 
   protected createProcessor(config: UnifiedConfig): ProcessorChain {
-    this.logger.debug("processor config");
-    this.logger.debug(config);
+    // this.logger.debug("processor config");
+    // this.logger.debug(config);
 
     //ReDoS防止のために頭にも文字数制限入れてる
 
@@ -143,7 +143,7 @@ export class ReadOutMessage extends SessionContextHandler<["messageCreate"]> {
 
     const processedTexts = await processor.process(speechTexts, true);
 
-    this.logger.debug(`processedTexts: ${processedTexts}`);
+    this.logger.debug(`processedTexts: ${processedTexts.join(" ")}`);
 
     processedTexts.forEach((item) => {
       void this.session.pushSpeech(item, message.author.id, message.createdTimestamp);
