@@ -36,6 +36,8 @@ export class DeployGlobalHandler extends Handler<["messageCreate"]> {
   ): Promise<void> {
     const [message] = args;
 
+    this.logger.debug("deployGlobal");
+
     try {
       const commandList = loadCommands(this.yosuga.client, this.yosuga);
       const commandDataList = constructApplicationCommandsData(commandList);

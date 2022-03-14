@@ -32,6 +32,8 @@ export class UndeployGlobalHandler extends Handler<["messageCreate"]> {
   ): Promise<void> {
     const [message] = args;
 
+    this.logger.debug("undeployGlobal");
+
     try {
       await unregisterApplicationCommand(this.yosuga.client);
 
