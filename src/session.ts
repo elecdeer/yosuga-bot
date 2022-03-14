@@ -9,6 +9,7 @@ import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
 import { UnifiedConfig } from "./config/typesConfig";
+import { hookSessionHandlers, loadSessionHandlers } from "./handler/sessionHandlerLoader";
 import { SessionEmitter } from "./sessionEmitter";
 import { registerAutoLeave } from "./sessionHandler/autoLeave";
 import { registerMessageHandler } from "./sessionHandler/message";
@@ -95,9 +96,12 @@ export class Session extends SessionEmitter {
       },
     };
 
-    handlerRegistrants.forEach((registrant) => {
-      void registrant(this);
-    });
+    const handlers = loadSessionHandlers(yosuga.client, yosuga, this);
+    hookSessionHandlers(handlers, yosuga.client);
+
+    // handlerRegistrants.forEach((registrant) => {
+    //   void registrant(this);
+    // });
   }
 
   initializeQueue(): SpeechQueue {

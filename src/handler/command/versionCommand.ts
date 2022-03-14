@@ -1,17 +1,19 @@
 import { CommandContext } from "../../commandContext";
 import { imageEnv } from "../../environment";
+import { CommandPermission } from "../../permissionUtil";
 import { YosugaClient } from "../../yosugaClient";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
 
 export class VersionCommand extends CommandHandler {
-  public constructor(yosuga: YosugaClient) {
+  constructor(yosuga: YosugaClient) {
     super(yosuga);
   }
 
-  protected commandProps(): CommandProps {
+  protected initCommandProps(): CommandProps {
     return {
       name: "version",
       description: "Yosugaのバージョン情報を表示する.",
+      permission: CommandPermission.GuildAdmin,
     };
   }
 

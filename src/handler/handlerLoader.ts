@@ -2,6 +2,7 @@ import { Client } from "discord.js";
 
 import { YosugaClient } from "../yosugaClient";
 import { Handler } from "./base/handler";
+import { StartCommand } from "./command/startCommand";
 import { VersionCommand } from "./command/versionCommand";
 import { DeployHandler } from "./global/deployHandler";
 
@@ -9,7 +10,7 @@ import { DeployHandler } from "./global/deployHandler";
 type HandlerList = Handler<any>[];
 
 export const loadHandlers = (client: Client, yosuga: YosugaClient): HandlerList => {
-  return [new VersionCommand(yosuga), new DeployHandler(yosuga)];
+  return [new VersionCommand(yosuga), new DeployHandler(yosuga), new StartCommand(yosuga)];
 };
 
 export const hookHandlers = (handlers: HandlerList, client: Client): void => {

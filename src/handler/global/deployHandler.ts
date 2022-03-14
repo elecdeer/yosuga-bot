@@ -10,14 +10,14 @@ export class DeployHandler extends Handler<["messageCreate"]> {
 
   protected override async filter(
     eventName: "messageCreate",
-    ...args: ClientEvents["messageCreate"]
+    args: ClientEvents["messageCreate"]
   ): Promise<boolean> {
     const [message] = args;
 
     if (!message.mentions.users.some((user) => user.id === this.yosuga.client.user.id))
       return false;
 
-    return super.filter(eventName, ...args);
+    return super.filter(eventName, args);
   }
 
   protected async onEvent(

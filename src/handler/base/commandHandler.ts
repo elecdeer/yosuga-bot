@@ -8,17 +8,23 @@ import {
 
 import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
+import { CommandPermission, fetchPermission } from "../../permissionUtil";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "./handler";
 
 export type CommandProps = Pick<
   ChatInputApplicationCommandData,
   "name" | "description" | "options"
->;
+> & {
+  permission: CommandPermission;
+};
 
 export abstract class CommandHandler extends Handler<["interactionCreate"]> {
-  protected constructor(yosuga: YosugaClient) {
+  protected commandProps: CommandProps;
+
+  public constructor(yosuga: YosugaClient) {
     super(["interactionCreate"], yosuga);
+    this.commandProps = this.initCommandProps();
   }
 
   /**
@@ -26,7 +32,7 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
    * 状態によって返す値を変えてはいけない
    * @protected
    */
-  protected abstract commandProps(): CommandProps;
+  protected abstract initCommandProps(): CommandProps;
 
   /**
    * コマンドの実行時に呼ばれる
@@ -36,13 +42,13 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
 
   protected override async filter(
     eventName: "interactionCreate",
-    ...args: [Interaction]
+    args: [Interaction]
   ): Promise<boolean> {
     const [interaction] = args;
 
     if (!interaction.isCommand()) return false;
-    if (interaction.commandName !== this.commandProps().name) return false;
-    return super.filter(eventName, ...args);
+    if (interaction.commandName !== this.commandProps.name) return false;
+    return super.filter(eventName, args);
   }
 
   protected override async onEvent(
@@ -54,7 +60,18 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
 
     if (!isValidCommandInteraction(interaction)) return;
     const context = new CommandContextSlash(interaction, this.yosuga);
-    await this.execute(context);
+
+    if ((await fetchPermission(context.member)) < this.commandProps.permission) {
+      await context.reply("prohibit", "このコマンドを実行する権限がありません.");
+      return;
+    }
+
+    try {
+      await this.execute(context);
+    } catch (err) {
+      await context.reply("warn", "エラーが発生しました.");
+      this.logger.error(err);
+    }
   }
 
   /**
@@ -62,12 +79,33 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
    * @protected
    */
   protected constructInteractionData(): ApplicationCommandData {
-    const baseProps = this.commandProps();
-
     //TODO パーミッション
     return {
-      ...baseProps,
+      ...this.commandProps,
       type: "CHAT_INPUT",
     };
   }
 }
+
+// import { CommandContext } from "../../commandContext";
+// import { CommandPermission } from "../../permissionUtil";
+// import { YosugaClient } from "../../yosugaClient";
+// import { CommandHandler, CommandProps } from "../base/commandHandler";
+//
+// export class StartCommand extends CommandHandler {
+//   constructor(yosuga: YosugaClient) {
+//     super(yosuga);
+//   }
+//
+//   protected initCommandProps(): CommandProps {
+//     return {
+//       name: "start",
+//       description: "",
+//       permission: CommandPermission.Everyone,
+//     };
+//   }
+//
+//   async execute(context: CommandContext): Promise<void> {
+//
+//   }
+// }

@@ -29,7 +29,7 @@ export abstract class Handler<TEventTuple extends EventKeysTuple> {
   }[] {
     const listeners = this.listenEvents.map((eventName: EventKeysUnion<TEventTuple>) => {
       const listener = async (...args: ClientEvents[typeof eventName]) => {
-        if (!(await this.filter(eventName, ...args))) return;
+        if (!(await this.filter(eventName, args))) return;
         await this.onEvent(eventName, args);
       };
       return {
@@ -53,7 +53,7 @@ export abstract class Handler<TEventTuple extends EventKeysTuple> {
    */
   protected async filter(
     eventName: EventKeysUnion<TEventTuple>,
-    ...args: EventArgs<TEventTuple>
+    args: EventArgs<TEventTuple>
   ): Promise<boolean> {
     return true;
   }
