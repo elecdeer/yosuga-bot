@@ -1,22 +1,22 @@
-import { Client, ClientEvents, Guild, Message } from "discord.js";
+import { Client, Guild, Message } from "discord.js";
 
 import { Session } from "../../session";
 import { YosugaClient } from "../../yosugaClient";
-import { Handler } from "./handler";
+import { EventArgs, EventKeysTuple, EventKeysUnion, Handler } from "./handler";
 
 export abstract class SessionContextHandler<
-  TEvent extends keyof ClientEvents
-> extends Handler<TEvent> {
+  TEventTuple extends EventKeysTuple
+> extends Handler<TEventTuple> {
   protected readonly session: Session;
 
-  protected constructor(listenEvents: TEvent[], yosuga: YosugaClient, session: Session) {
+  protected constructor(listenEvents: TEventTuple, yosuga: YosugaClient, session: Session) {
     super(listenEvents, yosuga);
     this.session = session;
   }
 
   override hookEvent(
     client: Client
-  ): { name: TEvent; listener: (...args: ClientEvents[TEvent]) => void }[] {
+  ): { name: EventKeysUnion<TEventTuple>; listener: (...args: EventArgs<TEventTuple>) => void }[] {
     const listeners = super.hookEvent(client);
 
     this.session.on("disconnect", () => {

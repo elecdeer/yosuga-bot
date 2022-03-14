@@ -16,7 +16,7 @@ export type CommandProps = Pick<
   "name" | "description" | "options"
 >;
 
-export abstract class CommandHandler extends Handler<"interactionCreate"> {
+export abstract class CommandHandler extends Handler<["interactionCreate"]> {
   protected constructor(yosuga: YosugaClient) {
     super(["interactionCreate"], yosuga);
   }
