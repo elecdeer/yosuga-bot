@@ -2,8 +2,8 @@ import assert from "assert";
 import { MessageEmbed } from "discord.js";
 import { getLogger } from "log4js";
 
+import { CommandPermission } from "../application/permissionUtil";
 import { CommandContext } from "../commandContext";
-import { CommandPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
 
 const logger = getLogger("VoiceStatusCommand");

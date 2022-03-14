@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionChoice, MessageEmbed } from "discord.js";
 import log4js from "log4js";
 
+import { CommandPermission, fetchPermission } from "../application/permissionUtil";
 import { CommandContext } from "../commandContext";
 import { CommandManager } from "../commandManager";
-import { CommandPermission, fetchPermission } from "../permissionUtil";
 import { CommandBase } from "./commandBase";
 
 const commandLogger = log4js.getLogger("command");

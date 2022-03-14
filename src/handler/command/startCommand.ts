@@ -7,8 +7,8 @@ import {
 } from "@discordjs/voice";
 import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
+import { CommandPermission } from "../../application/permissionUtil";
 import { CommandContext } from "../../commandContext";
-import { CommandPermission } from "../../permissionUtil";
 import { VoiceOrStageChannel } from "../../types";
 import { constructEmbeds } from "../../util/createEmbed";
 import { YosugaClient } from "../../yosugaClient";

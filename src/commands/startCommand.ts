@@ -7,8 +7,8 @@ import {
 import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import log4js from "log4js";
 
+import { CommandPermission } from "../application/permissionUtil";
 import { CommandContext } from "../commandContext";
-import { CommandPermission } from "../permissionUtil";
 import { VoiceOrStageChannel } from "../types";
 import { constructEmbeds } from "../util/createEmbed";
 import { CommandBase } from "./commandBase";

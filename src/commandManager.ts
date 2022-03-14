@@ -2,8 +2,8 @@ import assert from "assert";
 import { Collection, Guild } from "discord.js";
 import log4js from "log4js";
 
+import { CommandPermission, fetchPermission } from "./application/permissionUtil";
 import { CommandBase } from "./commands/commandBase";
-import { CommandPermission, fetchPermission } from "./permissionUtil";
 import { GuildId } from "./types";
 import { YosugaClient } from "./yosugaClient";
 

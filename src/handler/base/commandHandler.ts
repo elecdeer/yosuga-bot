@@ -6,9 +6,9 @@ import {
   Interaction,
 } from "discord.js";
 
+import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
 import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
-import { CommandPermission, fetchPermission } from "../../permissionUtil";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "./handler";
 
@@ -78,11 +78,12 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
    * アプリケーションコマンドとして登録する用のデータを返す
    * @protected
    */
-  protected constructInteractionData(): ApplicationCommandData {
+  public constructInteractionData(): ApplicationCommandData {
     //TODO パーミッション
     return {
       ...this.commandProps,
       type: "CHAT_INPUT",
+      // defaultPermission:
     };
   }
 }

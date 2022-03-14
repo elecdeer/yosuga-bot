@@ -1,6 +1,6 @@
 import log4js from "log4js";
 
-import { CommandPermission } from "../permissionUtil";
+import { CommandPermission } from "../application/permissionUtil";
 import { CommandGroup } from "./commandGroup";
 import { SetVoiceSub } from "./configSubCommands/setVoiceSub";
 import { ShowConfigSub } from "./configSubCommands/showConfigSub";

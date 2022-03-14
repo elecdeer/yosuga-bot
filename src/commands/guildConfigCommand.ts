@@ -1,6 +1,6 @@
 import log4js from "log4js";
 
-import { CommandPermission } from "../permissionUtil";
+import { CommandPermission } from "../application/permissionUtil";
 import { CommandGroup } from "./commandGroup";
 import { SetAutoLeaveSecSub } from "./configSubCommands/setAutoLeaveSecSub";
 import { SetCommandPrefixSub } from "./configSubCommands/setCommandPrefixSub";

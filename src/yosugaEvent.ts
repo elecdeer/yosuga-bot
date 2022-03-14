@@ -2,10 +2,10 @@ import { CommandInteraction, GuildMember, Message, Role, VoiceState } from "disc
 import EventEmitter from "events";
 import { getLogger } from "log4js";
 
+import { hasAdminPermission } from "./application/permissionUtil";
 import { CommandContext } from "./commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
 import { CommandContextText, isValidMessage } from "./commandContextText";
-import { hasAdminPermission } from "./permissionUtil";
 import { EventsBase, GuildId, TypedEventEmitter, VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
 
