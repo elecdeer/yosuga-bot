@@ -6,6 +6,7 @@ import {
 } from "../../application/commandRegister";
 import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
 import { constructEmbeds } from "../../util/createEmbed";
+import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "../base/handler";
 import { isMessageMentionedCall } from "../filter/messageMentionFilter";
@@ -22,10 +23,12 @@ export class DeployGuildHandler extends Handler<["messageCreate"]> {
   ): Promise<boolean> {
     const [message] = args;
 
-    if (!message.inGuild()) return false;
+    this.logger.debug("deployGuildFilter");
+    // if (!message.inGuild()) return false;
     if (!message.member) return false;
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
-    if (!message.cleanContent.startsWith("deploy guild")) return false;
+    this.logger.debug(removeMentionInMessageContent(message.content));
+    if (!removeMentionInMessageContent(message.content).startsWith("deploy guild")) return false;
     if ((await fetchPermission(message.member)) < CommandPermission.AppOwner) return false;
     return super.filter(eventName, args);
   }
@@ -35,6 +38,8 @@ export class DeployGuildHandler extends Handler<["messageCreate"]> {
     args: ClientEvents["messageCreate"]
   ): Promise<void> {
     const [message] = args;
+
+    this.logger.debug("deployGuild");
 
     //filterでチェック済み
     const guild = message.guild!;

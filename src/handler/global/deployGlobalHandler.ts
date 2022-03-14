@@ -6,6 +6,7 @@ import {
 } from "../../application/commandRegister";
 import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
 import { constructEmbeds } from "../../util/createEmbed";
+import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "../base/handler";
 import { isMessageMentionedCall } from "../filter/messageMentionFilter";
@@ -24,7 +25,7 @@ export class DeployGlobalHandler extends Handler<["messageCreate"]> {
 
     if (!message.member) return false;
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
-    if (!message.cleanContent.startsWith("deploy global")) return false;
+    if (!removeMentionInMessageContent(message.content).startsWith("deploy global")) return false;
     if ((await fetchPermission(message.member)) < CommandPermission.AppOwner) return false;
     return super.filter(eventName, args);
   }

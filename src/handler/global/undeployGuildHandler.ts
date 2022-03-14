@@ -3,6 +3,7 @@ import { ClientEvents } from "discord.js";
 import { unregisterApplicationCommand } from "../../application/commandRegister";
 import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
 import { constructEmbeds } from "../../util/createEmbed";
+import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "../base/handler";
 import { isMessageMentionedCall } from "../filter/messageMentionFilter";
@@ -21,7 +22,7 @@ export class UndeployGuildHandler extends Handler<["messageCreate"]> {
     if (!message.inGuild()) return false;
     if (!message.member) return false;
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
-    if (!message.cleanContent.startsWith("undeploy guild")) return false;
+    if (!removeMentionInMessageContent(message.content).startsWith("undeploy guild")) return false;
     if ((await fetchPermission(message.member)) < CommandPermission.AppOwner) return false;
     return super.filter(eventName, args);
   }
@@ -34,6 +35,8 @@ export class UndeployGuildHandler extends Handler<["messageCreate"]> {
 
     //filterでチェック済み
     const guild = message.guild!;
+
+    this.logger.debug("undeployGuild");
 
     try {
       await unregisterApplicationCommand(this.yosuga.client, guild);

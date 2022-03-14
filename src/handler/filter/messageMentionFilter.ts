@@ -2,8 +2,10 @@ import { User } from "discord.js";
 
 import { FilterChecker } from "./eventFilter";
 
-export const isMessageMentionedCall: FilterChecker<"messageCreate", Readonly<User>> = (user) => {
+export const isMessageMentionedCall: FilterChecker<"messageCreate", Readonly<User>> = (
+  targetUser
+) => {
   return (message) => {
-    return message.mentions.users.some((user) => user.id === user.id);
+    return message.mentions.users.some((user) => targetUser.id === user.id);
   };
 };

@@ -3,6 +3,7 @@ import { ClientEvents } from "discord.js";
 import { unregisterApplicationCommand } from "../../application/commandRegister";
 import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
 import { constructEmbeds } from "../../util/createEmbed";
+import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
 import { Handler } from "../base/handler";
 import { isMessageMentionedCall } from "../filter/messageMentionFilter";
@@ -20,7 +21,7 @@ export class UndeployGlobalHandler extends Handler<["messageCreate"]> {
 
     if (!message.member) return false;
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
-    if (!message.cleanContent.startsWith("undeploy global")) return false;
+    if (!removeMentionInMessageContent(message.content).startsWith("undeploy global")) return false;
     if ((await fetchPermission(message.member)) < CommandPermission.AppOwner) return false;
     return super.filter(eventName, args);
   }
