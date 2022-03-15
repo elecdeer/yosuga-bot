@@ -1,8 +1,10 @@
-import { ApplicationCommandOptionData, ChatInputApplicationCommandData } from "discord.js";
+import { ApplicationCommandOptionData, ChatInputApplicationCommandData, Client } from "discord.js";
 
+import { CommandContext } from "../../commandContext";
 import { YosugaClient } from "../../yosugaClient";
 import { isCommandCall } from "../filter/commandFilter";
 import { CommandHandler } from "./commandHandler";
+import { EventArgs, EventKeysUnion } from "./handler";
 import { SubCommandHandler } from "./subCommandHandler";
 
 export abstract class GroupCommandHandler extends CommandHandler {
@@ -16,7 +18,7 @@ export abstract class GroupCommandHandler extends CommandHandler {
     });
   }
 
-  protected override constructInteractionData(): ChatInputApplicationCommandData {
+  public override constructInteractionData(): ChatInputApplicationCommandData {
     const options: ApplicationCommandOptionData[] = this.subCommands.map((sub) => {
       return {
         type: "SUB_COMMAND",
@@ -32,7 +34,24 @@ export abstract class GroupCommandHandler extends CommandHandler {
     };
   }
 
+  override hookEvent(client: Client): {
+    name: EventKeysUnion<["interactionCreate"]>;
+    listener: (...args: EventArgs<["interactionCreate"]>) => void;
+  }[] {
+    const listeners = super.hookEvent(client);
+    this.subCommands.forEach((sub) => {
+      listeners.push(...sub.hookEvent(client));
+    });
+
+    return listeners;
+  }
+
   public getGroupFilter() {
     return isCommandCall(this);
+  }
+
+  override execute(context: CommandContext): Promise<void> {
+    //何もしない
+    return Promise.resolve(undefined);
   }
 }

@@ -76,7 +76,7 @@ export abstract class CommandHandler<TProp extends CommandProps = CommandProps> 
    * アプリケーションコマンドとして登録する用のデータを返す
    * @protected
    */
-  protected constructInteractionData(): ChatInputApplicationCommandData {
+  public constructInteractionData(): ChatInputApplicationCommandData {
     return {
       ...this.commandProps,
       type: "CHAT_INPUT",

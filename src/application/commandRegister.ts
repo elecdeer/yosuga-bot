@@ -1,4 +1,4 @@
-import { ApplicationCommandData, Client, Guild } from "discord.js";
+import { ApplicationCommandData, ChatInputApplicationCommandData, Client, Guild } from "discord.js";
 import { getLogger } from "log4js";
 
 import { CommandHandler } from "../handler/base/commandHandler";
@@ -49,6 +49,8 @@ export const unregisterApplicationCommand = async (
   }
 };
 
-export const constructApplicationCommandsData = (commands: CommandHandler[]) => {
-  return commands.map((com) => com.commandProps);
+export const constructApplicationCommandsData = (
+  commands: CommandHandler[]
+): ChatInputApplicationCommandData[] => {
+  return commands.map((com) => com.constructInteractionData());
 };

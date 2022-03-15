@@ -3,8 +3,10 @@ import { Client } from "discord.js";
 import { YosugaClient } from "../yosugaClient";
 import { CommandHandler } from "./base/commandHandler";
 import { Handler } from "./base/handler";
+import { ShowConfigSub } from "./command/configSub/showConfigSub";
 import { EndCommand } from "./command/endCommand";
 import { StartCommand } from "./command/startCommand";
+import { UserConfigCommand } from "./command/userConfigCommand";
 import { VersionCommand } from "./command/versionCommand";
 import { DeployGlobalHandler } from "./global/deployGlobalHandler";
 import { DeployGuildHandler } from "./global/deployGuildHandler";
@@ -30,7 +32,12 @@ export const loadHandlers = (client: Client, yosuga: YosugaClient): HandlerList 
 };
 
 export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandler[] => {
-  return [new VersionCommand(yosuga), new StartCommand(yosuga), new EndCommand(yosuga)];
+  return [
+    new VersionCommand(yosuga),
+    new StartCommand(yosuga),
+    new EndCommand(yosuga),
+    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga)]),
+  ];
 };
 
 export const hookHandlers = (handlers: HandlerList, client: Client): void => {
