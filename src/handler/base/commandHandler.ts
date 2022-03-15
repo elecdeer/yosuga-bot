@@ -1,5 +1,4 @@
 import {
-  ApplicationCommandData,
   ChatInputApplicationCommandData,
   ClientEvents,
   CommandInteraction,
@@ -10,17 +9,17 @@ import { CommandPermission, hasMemberPermission } from "../../application/permis
 import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
 import { YosugaClient } from "../../yosugaClient";
+import { isCommandCall } from "../filter/commandFilter";
 import { Handler } from "./handler";
 
-export type CommandProps = Pick<
-  ChatInputApplicationCommandData,
-  "name" | "description" | "options"
-> & {
+export type CommandProps = Omit<ChatInputApplicationCommandData, "type"> & {
   permission: CommandPermission;
 };
 
-export abstract class CommandHandler extends Handler<["interactionCreate"]> {
-  protected commandProps: CommandProps;
+export abstract class CommandHandler<TProp extends CommandProps = CommandProps> extends Handler<
+  ["interactionCreate"]
+> {
+  public commandProps: Readonly<TProp>;
 
   public constructor(yosuga: YosugaClient) {
     super(["interactionCreate"], yosuga);
@@ -32,7 +31,7 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
    * 状態によって返す値を変えてはいけない
    * @protected
    */
-  protected abstract initCommandProps(): CommandProps;
+  protected abstract initCommandProps(): TProp;
 
   /**
    * コマンドの実行時に呼ばれる
@@ -46,8 +45,7 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
   ): Promise<boolean> {
     const [interaction] = args;
 
-    if (!interaction.isCommand()) return false;
-    if (interaction.commandName !== this.commandProps.name) return false;
+    if (!isCommandCall(this)(interaction)) return false;
     return super.filter(eventName, args);
   }
 
@@ -78,18 +76,18 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
    * アプリケーションコマンドとして登録する用のデータを返す
    * @protected
    */
-  public constructInteractionData(): ApplicationCommandData {
-    //TODO パーミッション
+  protected constructInteractionData(): ChatInputApplicationCommandData {
     return {
       ...this.commandProps,
       type: "CHAT_INPUT",
-      // defaultPermission:
+      defaultPermission: true,
     };
   }
 }
 
+//
+// import { CommandPermission } from "../../application/permission";
 // import { CommandContext } from "../../commandContext";
-// import { CommandPermission } from "../../permissionUtil";
 // import { YosugaClient } from "../../yosugaClient";
 // import { CommandHandler, CommandProps } from "../base/commandHandler";
 //

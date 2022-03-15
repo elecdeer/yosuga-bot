@@ -23,8 +23,7 @@ export class DeployGuildHandler extends Handler<["messageCreate"]> {
   ): Promise<boolean> {
     const [message] = args;
 
-    this.logger.debug("deployGuildFilter");
-    // if (!message.inGuild()) return false;
+    if (!message.inGuild()) return false;
     if (!message.member) return false;
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
     this.logger.debug(removeMentionInMessageContent(message.content));

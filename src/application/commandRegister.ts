@@ -50,5 +50,5 @@ export const unregisterApplicationCommand = async (
 };
 
 export const constructApplicationCommandsData = (commands: CommandHandler[]) => {
-  return commands.map((com) => com.constructInteractionData());
+  return commands.map((com) => com.commandProps);
 };
