@@ -1,6 +1,6 @@
 import log4js from "log4js";
 
-import { CommandPermission } from "../application/permissionUtil";
+import { CommandPermission } from "../application/permission";
 import { CommandGroup } from "./commandGroup";
 import { AddSpeakerDaemonSub } from "./configSubCommands/addSpeakerDaemonSub";
 import { AddSpeakerTtsSub } from "./configSubCommands/addSpeakerTtsSub";

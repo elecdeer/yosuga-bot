@@ -1,4 +1,4 @@
-import { CommandPermission } from "../../application/permissionUtil";
+import { CommandPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { YosugaClient } from "../../yosugaClient";
 import { CommandHandler, CommandProps } from "../base/commandHandler";

@@ -1,7 +1,7 @@
 import { ApplicationCommandData, ApplicationCommandOptionData } from "discord.js";
 import { RequireAtLeastOne } from "type-fest";
 
-import { CommandPermission } from "../application/permissionUtil";
+import { CommandPermission } from "../application/permission";
 import { CommandContext } from "../commandContext";
 
 export type BasicCommandData = {

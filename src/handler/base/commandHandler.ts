@@ -6,7 +6,7 @@ import {
   Interaction,
 } from "discord.js";
 
-import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
+import { CommandPermission, hasMemberPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
 import { YosugaClient } from "../../yosugaClient";
@@ -61,7 +61,7 @@ export abstract class CommandHandler extends Handler<["interactionCreate"]> {
     if (!isValidCommandInteraction(interaction)) return;
     const context = new CommandContextSlash(interaction, this.yosuga);
 
-    if ((await fetchPermission(context.member)) < this.commandProps.permission) {
+    if (!(await hasMemberPermission(context.member, this.commandProps.permission))) {
       await context.reply("prohibit", "このコマンドを実行する権限がありません.");
       return;
     }

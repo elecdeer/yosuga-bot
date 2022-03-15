@@ -2,7 +2,7 @@ import assert from "assert";
 import { MessageEmbed } from "discord.js";
 import { getLogger } from "log4js";
 
-import { CommandPermission } from "../application/permissionUtil";
+import { CommandPermission } from "../application/permission";
 import { CommandContext } from "../commandContext";
 import { CommandBase } from "./commandBase";
 

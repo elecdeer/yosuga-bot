@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionChoice, MessageEmbed } from "discord.js";
 import log4js from "log4js";
 
-import { CommandPermission, fetchPermission } from "../application/permissionUtil";
+import { CommandPermission, getMemberPermission } from "../application/permission";
 import { CommandContext } from "../commandContext";
 import { CommandManager } from "../commandManager";
 import { CommandBase } from "./commandBase";
@@ -35,7 +35,7 @@ export class HelpCommand extends CommandBase {
     commandLogger.debug("handle help command");
 
     const option = context.getOptions()?.getString(OPTION_NAME) ?? undefined;
-    const permission = await fetchPermission(context.member);
+    const permission = await getMemberPermission(context.member);
     const commands = context.yosuga.commandManager.getCommandList(permission, option);
     commandLogger.debug(option);
     commandLogger.debug(commands);

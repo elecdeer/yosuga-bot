@@ -2,7 +2,7 @@ import assert from "assert";
 import { Collection, Guild } from "discord.js";
 import log4js from "log4js";
 
-import { CommandPermission, fetchPermission } from "./application/permissionUtil";
+import { CommandPermission, hasMemberPermission } from "./application/permission";
 import { CommandBase } from "./commands/commandBase";
 import { GuildId } from "./types";
 import { YosugaClient } from "./yosugaClient";
@@ -30,7 +30,7 @@ export class CommandManager {
         return;
       }
 
-      if ((await fetchPermission(context.member)) < command.data.permission) {
+      if (!(await hasMemberPermission(context.member, command.data.permission))) {
         await context.reply("prohibit", "このコマンドを実行する権限がありません.");
         return;
       }

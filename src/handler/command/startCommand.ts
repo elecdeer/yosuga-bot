@@ -7,7 +7,7 @@ import {
 } from "@discordjs/voice";
 import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
-import { CommandPermission } from "../../application/permissionUtil";
+import { CommandPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { VoiceOrStageChannel } from "../../types";
 import { constructEmbeds } from "../../util/createEmbed";

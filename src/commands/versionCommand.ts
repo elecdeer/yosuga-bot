@@ -1,6 +1,6 @@
 import log4js from "log4js";
 
-import { CommandPermission } from "../application/permissionUtil";
+import { CommandPermission } from "../application/permission";
 import { CommandContext } from "../commandContext";
 import { imageEnv } from "../environment";
 import { CommandBase } from "./commandBase";

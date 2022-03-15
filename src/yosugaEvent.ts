@@ -2,7 +2,6 @@ import { CommandInteraction, GuildMember, Message, Role, VoiceState } from "disc
 import EventEmitter from "events";
 import { getLogger } from "log4js";
 
-import { hasAdminPermission } from "./application/permissionUtil";
 import { CommandContext } from "./commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "./commandContextSlash";
 import { CommandContextText, isValidMessage } from "./commandContextText";
@@ -153,25 +152,25 @@ export class YosugaEvent extends (EventEmitter as { new (): TypedEventEmitter<Ev
   }
 
   private onRoleCreate(role: Role) {
-    if (hasAdminPermission(role)) {
-      this.emit("addAdminRole", role);
-    }
+    // if (hasAdminPermission(role)) {
+    //   this.emit("addAdminRole", role);
+    // }
   }
 
   private onRoleDelete(role: Role) {
-    if (hasAdminPermission(role)) {
-      this.emit("removeAdminRole", role);
-    }
+    // if (hasAdminPermission(role)) {
+    //   this.emit("removeAdminRole", role);
+    // }
   }
 
   private onRoleUpdate(oldRole: Role, newRole: Role) {
-    //失った
-    if (hasAdminPermission(oldRole) && !hasAdminPermission(newRole)) {
-      this.emit("removeAdminRole", oldRole);
-    }
-    //得た
-    if (!hasAdminPermission(oldRole) && hasAdminPermission(newRole)) {
-      this.emit("addAdminRole", newRole);
-    }
+    // //失った
+    // if (hasAdminPermission(oldRole) && !hasAdminPermission(newRole)) {
+    //   this.emit("removeAdminRole", oldRole);
+    // }
+    // //得た
+    // if (!hasAdminPermission(oldRole) && hasAdminPermission(newRole)) {
+    //   this.emit("addAdminRole", newRole);
+    // }
   }
 }

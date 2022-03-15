@@ -4,7 +4,7 @@ import {
   constructApplicationCommandsData,
   registerApplicationCommands,
 } from "../../application/commandRegister";
-import { CommandPermission, fetchPermission } from "../../application/permissionUtil";
+import { CommandPermission, hasMemberPermission } from "../../application/permission";
 import { constructEmbeds } from "../../util/createEmbed";
 import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
@@ -29,7 +29,7 @@ export class DeployGuildHandler extends Handler<["messageCreate"]> {
     if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
     this.logger.debug(removeMentionInMessageContent(message.content));
     if (!removeMentionInMessageContent(message.content).startsWith("deploy guild")) return false;
-    if ((await fetchPermission(message.member)) < CommandPermission.AppOwner) return false;
+    if (!(await hasMemberPermission(message.member, CommandPermission.AppOwner))) return false;
     return super.filter(eventName, args);
   }
 
