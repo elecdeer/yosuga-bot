@@ -7,6 +7,8 @@ import { ClearCommand } from "./command/clearCommand";
 import { SetAutoLeaveSecSub } from "./command/configSub/setAutoLeaveSecSub";
 import { ShowConfigSub } from "./command/configSub/showConfigSub";
 import { EndCommand } from "./command/endCommand";
+import { GuildConfigCommand } from "./command/guildConfigCommand";
+import { MasterConfigCommand } from "./command/masterConfigCommand";
 import { StartCommand } from "./command/startCommand";
 import { UserConfigCommand } from "./command/userConfigCommand";
 import { VersionCommand } from "./command/versionCommand";
@@ -40,10 +42,9 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new EndCommand(yosuga),
     new ClearCommand(yosuga),
     new VoiceStatusCommand(yosuga),
-    new UserConfigCommand(yosuga, [
-      new ShowConfigSub(yosuga),
-      new SetAutoLeaveSecSub(yosuga, "GUILD"),
-    ]),
+    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga)]),
+    new GuildConfigCommand(yosuga, [new SetAutoLeaveSecSub(yosuga, "GUILD")]),
+    new MasterConfigCommand(yosuga, [new SetAutoLeaveSecSub(yosuga, "MASTER")]),
   ];
 };
 
