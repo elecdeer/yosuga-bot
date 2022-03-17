@@ -14,7 +14,7 @@ export class VoiceStatusCommand extends CommandHandler {
   protected initCommandProps(): CommandProps {
     return {
       name: "voice-status",
-      description: "現在登録されているボイスを表示.",
+      description: "現在登録されているボイスを表示する.",
       permission: CommandPermission.Everyone,
     };
   }
