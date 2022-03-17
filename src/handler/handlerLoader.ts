@@ -4,6 +4,9 @@ import { YosugaClient } from "../yosugaClient";
 import { CommandHandler } from "./base/commandHandler";
 import { Handler } from "./base/handler";
 import { ClearCommand } from "./command/clearCommand";
+import { AddSpeakerDaemonSub } from "./command/configSub/addSpeakerDaemonSub";
+import { AddSpeakerTtsSub } from "./command/configSub/addSpeakerTtsSub";
+import { AddSpeakerVoicevoxSub } from "./command/configSub/addSpeakerVoicevoxSub";
 import { SetAutoLeaveSecSub } from "./command/configSub/setAutoLeaveSecSub";
 import { SetFastSpeedSub } from "./command/configSub/setFastSpeedSub";
 import { SetIgnorePrefixSub } from "./command/configSub/setIgnorePrefixSub";
@@ -50,7 +53,10 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new EndCommand(yosuga),
     new ClearCommand(yosuga),
     new VoiceStatusCommand(yosuga),
-    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga, "USER")]),
+    new UserConfigCommand(yosuga, [
+      new ShowConfigSub(yosuga, "USER"),
+      new SetVoiceSub(yosuga, "GUILD"),
+    ]),
     new GuildConfigCommand(yosuga, [
       new ShowConfigSub(yosuga, "GUILD"),
       new SetAutoLeaveSecSub(yosuga, "GUILD"),
@@ -74,6 +80,9 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
       new SetSpeedSub(yosuga, "MASTER"),
       new SetVoiceSub(yosuga, "MASTER"),
       new SetVolumeSub(yosuga, "MASTER"),
+      new AddSpeakerDaemonSub(yosuga, "MASTER"),
+      new AddSpeakerVoicevoxSub(yosuga, "MASTER"),
+      new AddSpeakerTtsSub(yosuga, "MASTER"),
     ]),
   ];
 };
