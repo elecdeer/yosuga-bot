@@ -2,6 +2,7 @@ import { Client, ClientEvents } from "discord.js";
 import { getLogger, Logger } from "log4js";
 
 import { YosugaClient } from "../../yosugaClient";
+import { EventFilter, Listener } from "../filter/eventFilter";
 
 export type EventKeysTuple = [...(keyof ClientEvents)[]];
 export type EventKeysUnion<TEventTuple extends EventKeysTuple> = TEventTuple[number];
@@ -28,13 +29,15 @@ export abstract class Handler<TEventTuple extends EventKeysTuple> {
     listener: (...args: EventArgs<TEventTuple>) => void;
   }[] {
     const listeners = this.listenEvents.map((eventName: EventKeysUnion<TEventTuple>) => {
-      const listener = async (...args: ClientEvents[typeof eventName]) => {
-        if (!(await this.filter(eventName, args))) return;
-        await this.onEvent(eventName, args);
+      const eventListener: Listener<typeof eventName> = async (...args) => {
+        await this.onEvent(eventName, ...args);
       };
+      const filter = this.filter(eventName);
+      const filteredListener = filter(eventListener);
+
       return {
         name: eventName,
-        listener: listener,
+        listener: filteredListener,
       };
     });
 
@@ -48,14 +51,12 @@ export abstract class Handler<TEventTuple extends EventKeysTuple> {
   /**
    * イベントを受けるかどうかのフィルタ
    * @param eventName
-   * @param args
    * @protected
    */
-  protected async filter(
-    eventName: EventKeysUnion<TEventTuple>,
-    args: EventArgs<TEventTuple>
-  ): Promise<boolean> {
-    return true;
+  protected filter(
+    eventName: EventKeysUnion<TEventTuple>
+  ): EventFilter<EventKeysUnion<TEventTuple>> {
+    return (listener) => listener;
   }
 
   /**
@@ -66,6 +67,6 @@ export abstract class Handler<TEventTuple extends EventKeysTuple> {
    */
   protected abstract onEvent(
     eventName: EventKeysUnion<TEventTuple>,
-    args: EventArgs<TEventTuple>
+    ...args: EventArgs<TEventTuple>
   ): Promise<void>;
 }

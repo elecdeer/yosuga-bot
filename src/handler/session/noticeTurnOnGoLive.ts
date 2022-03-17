@@ -1,31 +1,31 @@
+import { VoiceState } from "discord.js";
+
 import { Session } from "../../session";
 import { YosugaClient } from "../../yosugaClient";
-import { EventArgs, EventKeysUnion } from "../base/handler";
+import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
-import { isTurnOnGoLiveCall } from "../filter/turnOnGoLiveFilter";
+import { composeFilter, EventFilterGenerator } from "../filter/eventFilter";
+import { turnOnGoLiveFilter } from "../filter/turnOnCameraFilter";
 
 export class NoticeTurnOnGoLive extends SessionContextHandler<["voiceStateUpdate"]> {
   constructor(yosuga: YosugaClient, session: Session) {
     super(["voiceStateUpdate"], yosuga, session);
   }
 
-  protected override async filter(
-    eventName: EventKeysUnion<["voiceStateUpdate"]>,
-    args: EventArgs<["voiceStateUpdate"]>
-  ): Promise<boolean> {
-    const [oldState, newState] = args;
-
-    if (!(await super.filter(eventName, args))) return false;
-
-    const voiceChannel = this.session.getVoiceChannel();
-    return isTurnOnGoLiveCall(voiceChannel)(oldState, newState);
+  protected override filter(
+    eventName: EventKeysUnion<["voiceStateUpdate"]>
+  ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
+    return composeFilter(
+      super.filter(eventName),
+      turnOnGoLiveFilter(this.session.getVoiceChannel())
+    );
   }
 
-  protected async onEvent(
-    eventName: EventKeysUnion<["voiceStateUpdate"]>,
-    args: EventArgs<["voiceStateUpdate"]>
+  protected override async onEvent(
+    eventName: "voiceStateUpdate",
+    oldState: VoiceState,
+    newState: VoiceState
   ): Promise<void> {
-    const [oldState, newState] = args;
     const member = oldState.member;
     await this.session.pushSpeech({
       text: `${this.session.getUsernamePronunciation(member)}がゴーライブを開始しました。`,

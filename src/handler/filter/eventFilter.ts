@@ -4,29 +4,57 @@ export type Listener<TEvent extends keyof ClientEvents> = (
   ...args: ClientEvents[TEvent]
 ) => Awaitable<void>;
 
-export type EventFilter<TEvent extends keyof ClientEvents, TFilterArgs> = (
+export type EventFilterGenerator<TEvent extends keyof ClientEvents, TFilterArgs> = (
   ...args: [TFilterArgs]
-) => (listener: Listener<TEvent>) => Listener<TEvent>;
+) => EventFilter<TEvent>;
 
-export type FilterChecker<TEvent extends keyof ClientEvents, TFilterArgs> = (
+export type EventFilter<TEvent extends keyof ClientEvents> = (
+  listener: Listener<TEvent>
+) => Listener<TEvent>;
+
+export type FilterCheckerGenerator<TEvent extends keyof ClientEvents, TFilterArgs> = (
   ...args: [TFilterArgs]
-) => (...args: ClientEvents[TEvent]) => boolean;
+) => FilterChecker<TEvent>;
+
+export type FilterChecker<TEvent extends keyof ClientEvents> = (
+  ...eventArgs: ClientEvents[TEvent]
+) => Awaitable<boolean>;
 
 /**
- * FilterCheckerからEventFilterを生成
+ * FilterCheckerからEventFilterGeneratorを生成
  * @param checker
  */
-export const filterer = <TEvent extends keyof ClientEvents, TFilterArgs>(
-  checker: FilterChecker<TEvent, TFilterArgs>
-): EventFilter<TEvent, TFilterArgs> => {
+export const filterGenerator = <TEvent extends keyof ClientEvents, TGenerateParam>(
+  checker: FilterCheckerGenerator<TEvent, TGenerateParam>
+): EventFilterGenerator<TEvent, TGenerateParam> => {
   return (checkerArgs) => {
     return (listener) => {
       const appliedChecker = checker(checkerArgs);
-      return (...args) => {
-        if (appliedChecker(...args)) {
+      return async (...args) => {
+        if (await appliedChecker(...args)) {
           return listener(...args);
         }
       };
     };
+  };
+};
+
+export const filterer = <TEvent extends keyof ClientEvents>(
+  checker: FilterChecker<TEvent>
+): EventFilter<TEvent> => {
+  return (listener) => {
+    return async (...args) => {
+      if (await checker(...args)) {
+        return listener(...args);
+      }
+    };
+  };
+};
+
+export const composeFilter = <TEvent extends keyof ClientEvents>(
+  ...filters: EventFilter<TEvent>[]
+): EventFilter<TEvent> => {
+  return (listener) => {
+    return filters.reduceRight((prev, next) => (listener) => next(prev(listener)))(listener);
   };
 };

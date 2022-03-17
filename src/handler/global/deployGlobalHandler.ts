@@ -1,15 +1,15 @@
-import { ClientEvents } from "discord.js";
+import { Message } from "discord.js";
 
 import {
   constructApplicationCommandsData,
   registerApplicationCommands,
 } from "../../application/commandRegister";
-import { CommandPermission, hasMemberPermission } from "../../application/permission";
+import { CommandPermission } from "../../application/permission";
 import { constructEmbeds } from "../../util/createEmbed";
-import { removeMentionInMessageContent } from "../../util/removeMention";
 import { YosugaClient } from "../../yosugaClient";
-import { Handler } from "../base/handler";
-import { isMessageMentionedCall } from "../filter/messageMentionFilter";
+import { EventKeysUnion, Handler } from "../base/handler";
+import { composeFilter, EventFilterGenerator } from "../filter/eventFilter";
+import { textCommandFilter } from "../filter/textCommandFilter";
 import { loadCommands } from "../handlerLoader";
 
 export class DeployGlobalHandler extends Handler<["messageCreate"]> {
@@ -17,26 +17,23 @@ export class DeployGlobalHandler extends Handler<["messageCreate"]> {
     super(["messageCreate"], yosuga);
   }
 
-  protected override async filter(
-    eventName: "messageCreate",
-    args: ClientEvents["messageCreate"]
-  ): Promise<boolean> {
-    const [message] = args;
-
-    if (!message.member) return false;
-    if (!isMessageMentionedCall(this.yosuga.client.user)(message)) return false;
-    if (!removeMentionInMessageContent(message.content).startsWith("deploy global")) return false;
-
-    if (!(await hasMemberPermission(message.member, CommandPermission.AppOwner))) return false;
-    return super.filter(eventName, args);
+  protected override filter(
+    eventName: EventKeysUnion<["messageCreate"]>
+  ): ReturnType<EventFilterGenerator<EventKeysUnion<["messageCreate"]>, unknown>> {
+    return composeFilter(
+      super.filter(eventName),
+      textCommandFilter({
+        prefix: "deploy global",
+        permission: CommandPermission.AppOwner,
+        yosugaUser: this.yosuga.client.user,
+      })
+    );
   }
 
-  protected async onEvent(
-    eventName: "messageCreate",
-    args: ClientEvents["messageCreate"]
+  protected override async onEvent(
+    eventName: EventKeysUnion<["messageCreate"]>,
+    message: Message
   ): Promise<void> {
-    const [message] = args;
-
     this.logger.debug("deployGlobal");
 
     try {

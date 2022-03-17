@@ -1,11 +1,11 @@
 import { VoiceOrStageChannel } from "../../types";
-import { EventFilter, FilterChecker, filterer } from "./eventFilter";
+import { EventFilterGenerator, FilterCheckerGenerator, filterGenerator } from "./eventFilter";
 
 /**
  * 呼び出されたイベントがvoiceChannelからの退室を示すものであるかどうか
  * @param voiceChannel
  */
-export const isLeaveVoiceChannelCall: FilterChecker<
+export const isLeaveVoiceChannelCall: FilterCheckerGenerator<
   "voiceStateUpdate",
   Readonly<VoiceOrStageChannel>
 > =
@@ -25,7 +25,7 @@ export const isLeaveVoiceChannelCall: FilterChecker<
  * voiceChannelからの退室時のみ通過するイベントフィルタ
  * @param voiceChannel
  */
-export const leaveVoiceChannelFilter: EventFilter<
+export const leaveVoiceChannelFilter: EventFilterGenerator<
   "voiceStateUpdate",
   Readonly<VoiceOrStageChannel>
-> = filterer(isLeaveVoiceChannelCall);
+> = filterGenerator(isLeaveVoiceChannelCall);

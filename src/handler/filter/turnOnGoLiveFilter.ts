@@ -1,7 +1,7 @@
 import { ClientEvents } from "discord.js";
 
 import { VoiceOrStageChannel } from "../../types";
-import { EventFilter, filterer } from "./eventFilter";
+import { EventFilterGenerator, filterGenerator } from "./eventFilter";
 
 /**
  * 呼び出されたイベントがGoLive開始を示すものであるかどうか
@@ -27,7 +27,7 @@ export const isTurnOnGoLiveCall =
  * goLive開始時のみ通過するイベントフィルタ
  * @param voiceChannel
  */
-export const turnOnGoLiveFilter: EventFilter<
+export const turnOnGoLiveFilter: EventFilterGenerator<
   "voiceStateUpdate",
   Readonly<VoiceOrStageChannel>
-> = filterer(isTurnOnGoLiveCall);
+> = filterGenerator(isTurnOnGoLiveCall);

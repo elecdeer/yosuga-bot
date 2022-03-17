@@ -1,3 +1,5 @@
+import { Message } from "discord.js";
+
 import { UnifiedConfig } from "../../config/typesConfig";
 import { codeBlockProcessor } from "../../processor/codeBlockProcessor";
 import { emojiProcessor } from "../../processor/emojiProcessor";
@@ -12,8 +14,9 @@ import { urlProcessor } from "../../processor/urlProcessor";
 import { Session } from "../../session";
 import { SpeechText } from "../../types";
 import { YosugaClient } from "../../yosugaClient";
-import { EventArgs, EventKeysUnion } from "../base/handler";
+import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
+import { composeFilter, EventFilter, filterer } from "../filter/eventFilter";
 
 export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate"]> {
   protected processorCache: {
@@ -60,25 +63,26 @@ export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate
     }
   }
 
-  protected override async filter(
-    eventName: EventKeysUnion<["messageCreate"]>,
-    args: EventArgs<["messageCreate"]>
-  ): Promise<boolean> {
-    const [message] = args;
-    const config = await this.session.getConfig();
-    if (message.cleanContent.startsWith(config.ignorePrefix)) {
-      return false;
-    }
-    if (message.author.bot) return false;
-    if (!message.channel.isText()) return false;
-    return super.filter(eventName, args);
+  protected override filter(
+    eventName: EventKeysUnion<["messageCreate"]>
+  ): EventFilter<EventKeysUnion<["messageCreate"]>> {
+    return composeFilter(
+      super.filter(eventName),
+      filterer(async (message) => {
+        const config = await this.session.getConfig();
+        if (message.cleanContent.startsWith(config.ignorePrefix)) {
+          return false;
+        }
+        if (message.author.bot) return false;
+        return message.channel.isText();
+      })
+    );
   }
 
   protected async onEvent(
     eventName: EventKeysUnion<["messageCreate"]>,
-    args: EventArgs<["messageCreate"]>
+    message: Message
   ): Promise<void> {
-    const [message] = args;
     const config = await this.session.getConfig();
 
     this.logger.debug(`content: ${message.content}`);

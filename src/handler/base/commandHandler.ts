@@ -1,16 +1,13 @@
-import {
-  ChatInputApplicationCommandData,
-  ClientEvents,
-  CommandInteraction,
-  Interaction,
-} from "discord.js";
+import { ChatInputApplicationCommandData, CommandInteraction, Interaction } from "discord.js";
 
 import { CommandPermission, hasMemberPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
 import { YosugaClient } from "../../yosugaClient";
-import { isCommandCall } from "../filter/commandFilter";
-import { Handler } from "./handler";
+import { commandFilter } from "../filter/commandFilter";
+import { composeFilter, EventFilter } from "../filter/eventFilter";
+import { tapLogFilter } from "../filter/logFilter";
+import { EventKeysUnion, Handler } from "./handler";
 
 export type CommandProps = Omit<ChatInputApplicationCommandData, "type"> & {
   permission: CommandPermission;
@@ -39,25 +36,30 @@ export abstract class CommandHandler<TProp extends CommandProps = CommandProps> 
    */
   abstract execute(context: CommandContext): Promise<void>;
 
-  protected override async filter(
-    eventName: "interactionCreate",
-    args: [Interaction]
-  ): Promise<boolean> {
-    const [interaction] = args;
-
-    if (!isCommandCall(this)(interaction)) return false;
-    return super.filter(eventName, args);
+  protected override filter(
+    eventName: EventKeysUnion<["interactionCreate"]>
+  ): EventFilter<EventKeysUnion<["interactionCreate"]>> {
+    return composeFilter(
+      super.filter(eventName),
+      commandFilter(this),
+      tapLogFilter({
+        logger: this.logger,
+        textGen: (interaction) => {
+          return `commandCalled ${interaction.id} ${interaction.user.toString()}`;
+        },
+      })
+    );
   }
 
   protected override async onEvent(
-    eventName: "interactionCreate",
-    args: ClientEvents["interactionCreate"]
+    eventName: EventKeysUnion<["interactionCreate"]>,
+    interaction: Interaction
   ): Promise<void> {
     //filterでチェック済み
-    const [interaction] = args as [CommandInteraction];
+    const commandInteraction = interaction as CommandInteraction;
 
-    if (!isValidCommandInteraction(interaction)) return;
-    const context = new CommandContextSlash(interaction, this.yosuga);
+    if (!isValidCommandInteraction(commandInteraction)) return;
+    const context = new CommandContextSlash(commandInteraction, this.yosuga);
 
     if (!(await hasMemberPermission(context.member, this.commandProps.permission))) {
       await context.reply("prohibit", "このコマンドを実行する権限がありません.");

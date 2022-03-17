@@ -24,7 +24,6 @@ export const loadHandlers = (client: Client, yosuga: YosugaClient): HandlerList 
   return [
     new DeployGlobalHandler(yosuga),
     new DeployGuildHandler(yosuga),
-    new DeployGlobalHandler(yosuga),
     new UndeployGuildHandler(yosuga),
     new UndeployGlobalHandler(yosuga),
     ...loadCommands(client, yosuga),

@@ -1,9 +1,11 @@
-import { ApplicationCommandSubCommandData, CommandInteraction, Interaction } from "discord.js";
+import { ApplicationCommandSubCommandData, CommandInteraction } from "discord.js";
 
 import { CommandPermission } from "../../application/permission";
 import { YosugaClient } from "../../yosugaClient";
+import { composeFilter, EventFilter, filterer } from "../filter/eventFilter";
 import { CommandHandler } from "./commandHandler";
 import { GroupCommandHandler } from "./groupCommandHandler";
+import { EventKeysUnion } from "./handler";
 
 export type SubCommandProps = Omit<ApplicationCommandSubCommandData, "type"> & {
   permission: CommandPermission;
@@ -20,16 +22,29 @@ export abstract class SubCommandHandler extends CommandHandler<SubCommandProps> 
     this.groupCommand = groupCommand;
   }
 
-  protected override async filter(
-    eventName: "interactionCreate",
-    args: [Interaction]
-  ): Promise<boolean> {
-    const [interaction] = args;
+  protected override filter(
+    eventName: EventKeysUnion<["interactionCreate"]>
+  ): EventFilter<EventKeysUnion<["interactionCreate"]>> {
+    return composeFilter(
+      filterer((interaction) => {
+        if (!this.groupCommand!.getGroupFilter()(interaction)) return false;
+        const commandInteraction = interaction as CommandInteraction;
+        const subCommandName = commandInteraction.options.getSubcommand(true);
 
-    if (!this.groupCommand!.getGroupFilter()(interaction)) return false;
-    const commandInteraction = interaction as CommandInteraction;
-    const subCommandName = commandInteraction.options.getSubcommand(true);
-
-    return subCommandName === this.commandProps.name;
+        return subCommandName === this.commandProps.name;
+      }),
+      super.filter(eventName)
+    );
   }
+
+  // protected override async filter(
+  //   eventName: "interactionCreate",
+  //   interaction: Interaction
+  // ): Promise<boolean> {
+  //   if (!this.groupCommand!.getGroupFilter()(interaction)) return false;
+  //   const commandInteraction = interaction as CommandInteraction;
+  //   const subCommandName = commandInteraction.options.getSubcommand(true);
+  //
+  //   return subCommandName === this.commandProps.name;
+  // }
 }

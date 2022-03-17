@@ -1,10 +1,13 @@
+import { VoiceState } from "discord.js";
+
 import { Session } from "../../session";
 import { createYosugaEmbed } from "../../util/createEmbed";
 import { YosugaClient } from "../../yosugaClient";
-import { EventArgs, EventKeysUnion } from "../base/handler";
+import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
 import { enterVoiceChannelFilter } from "../filter/enterVoiceChannelFilter";
-import { isLeaveVoiceChannelCall } from "../filter/leaveVoiceChannelFilter";
+import { composeFilter, EventFilterGenerator, filterer } from "../filter/eventFilter";
+import { leaveVoiceChannelFilter } from "../filter/leaveVoiceChannelFilter";
 
 export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]> {
   private timer: NodeJS.Timeout | null = null;
@@ -13,24 +16,23 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
     super(["voiceStateUpdate"], yosuga, session);
   }
 
-  protected override async filter(
-    eventName: EventKeysUnion<["voiceStateUpdate"]>,
-    args: EventArgs<["voiceStateUpdate"]>
-  ): Promise<boolean> {
-    const [oldState, newState] = args;
-
-    if (!(await super.filter(eventName, args))) return false;
-
-    const voiceChannel = this.session.getVoiceChannel();
-    if (!isLeaveVoiceChannelCall(voiceChannel)(oldState, newState)) return false;
-
-    const member = newState.member!;
-    return member.id !== this.yosuga.client.user.id;
+  protected override filter(
+    eventName: EventKeysUnion<["voiceStateUpdate"]>
+  ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
+    return composeFilter(
+      super.filter(eventName),
+      leaveVoiceChannelFilter(this.session.getVoiceChannel()),
+      filterer((oldState, newState) => {
+        const member = newState.member!;
+        return member.id !== this.yosuga.client.user.id;
+      })
+    );
   }
 
-  protected async onEvent(
-    eventName: EventKeysUnion<["voiceStateUpdate"]>,
-    args: EventArgs<["voiceStateUpdate"]>
+  protected override async onEvent(
+    eventName: "voiceStateUpdate",
+    oldState: VoiceState,
+    newState: VoiceState
   ): Promise<void> {
     const memberNumExcludedBot = getMemberNumExcludedBot(this.session);
     //最後の1人ではない
