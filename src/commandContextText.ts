@@ -39,14 +39,14 @@ export class CommandContextText extends CommandContext {
     this.message = message;
   }
 
-  override reply(
+  override async reply(
     type: ReplyType,
     content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
-  ): Promise<Message> {
+  ): Promise<Message[]> {
     const embed = constructEmbeds(type, content);
 
-    return (channel ?? this.textChannel).send({ embeds: embed });
+    return [await (channel ?? this.textChannel).send({ embeds: embed })];
   }
 
   getOptions(): undefined {

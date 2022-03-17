@@ -6,12 +6,16 @@ import {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
+import { getLogger } from "log4js";
 
 import { CommandContext } from "./commandContext";
 import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
+import { splitArrayPerNum } from "./util/arrayUtil";
 import { constructEmbeds, ReplyType } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
+
+const logger = getLogger("commandContextSlash");
 
 export type ValidCommandInteraction = CommandInteraction & {
   guild: Guild;
@@ -69,26 +73,60 @@ export class CommandContextSlash extends CommandContext {
     type: ReplyType,
     content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
-  ): Promise<Message> {
+  ): Promise<Message[]> {
     const embeds = constructEmbeds(type, content);
+    logger.debug(`embedsLength: ${embeds.length}`);
+
+    //embedは各Messageに10個まで
+    const splitEmbeds = splitArrayPerNum(embeds, 10);
+    logger.debug(`splitNum: ${splitEmbeds.length}`);
 
     if (channel) {
-      return channel.send({ embeds: embeds });
+      return Promise.all(
+        splitEmbeds.map((embedsChunk) => {
+          logger.debug(`chunkLength: ${embedsChunk.length}`);
+          return channel.send({ embeds: embedsChunk });
+        })
+      );
     }
 
     if (!this.interaction.replied) {
       if (!this.interaction.deferred) {
         clearTimeout(this.differTimer);
-        const message = await this.interaction.reply({ embeds: embeds, fetchReply: true });
-        //DMはそもそもない
-        return message as Message;
+
+        const [headEmbeds, ...restEmbeds] = splitEmbeds;
+
+        //reply前
+        const replyMessage = await this.interaction.reply({ embeds: headEmbeds, fetchReply: true });
+        if (splitEmbeds.length <= 1) {
+          //DMはそもそもない
+          return [replyMessage] as Message[];
+        } else {
+          return [
+            replyMessage,
+            ...(await Promise.all(
+              splitEmbeds.map((embedsChunk) => {
+                logger.debug(`chunkLength: ${embedsChunk.length}`);
+                return this.interaction.followUp({ embeds: embedsChunk });
+              })
+            )),
+          ] as Message[];
+        }
       } else {
-        const message = await this.interaction.followUp({ embeds: embeds });
-        //DMはそもそもない
-        return message as Message;
+        return (await Promise.all(
+          splitEmbeds.map((embedsChunk) => {
+            logger.debug(`chunkLength: ${embedsChunk.length}`);
+            return this.interaction.followUp({ embeds: embedsChunk });
+          })
+        )) as Message[];
       }
     } else {
-      return this.textChannel.send({ embeds: embeds });
+      return Promise.all(
+        splitEmbeds.map((embedsChunk) => {
+          logger.debug(`chunkLength: ${embedsChunk.length}`);
+          return this.textChannel.send({ embeds: embedsChunk });
+        })
+      );
     }
   }
 

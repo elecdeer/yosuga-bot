@@ -1,3 +1,4 @@
+import { CommandPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { ConfigAccessor } from "../../config/accessor/configAccessor";
 import { ConfigCommandLevel, ConfigEachLevel } from "../../config/typesConfig";
@@ -9,7 +10,7 @@ export abstract class ConfigSubCommandHandler<
 > extends SubCommandHandler {
   protected readonly level: TConfigLevels;
 
-  protected constructor(yosuga: YosugaClient, level: TConfigLevels) {
+  public constructor(yosuga: YosugaClient, level: TConfigLevels) {
     super(yosuga);
     this.level = level;
   }
@@ -35,6 +36,22 @@ export abstract class ConfigSubCommandHandler<
         return context.configManager.getUserConfigAccessor(context.member.id) as ConfigAccessor<
           ConfigEachLevel<TConfigLevels>
         >;
+    }
+    throw Error();
+  }
+
+  /**
+   * 自身のconfigレベルから権限レベルを取得
+   * @protected
+   */
+  protected getPermissionLevel(): CommandPermission {
+    switch (this.level) {
+      case "MASTER":
+        return CommandPermission.AppOwner;
+      case "GUILD":
+        return CommandPermission.GuildAdmin;
+      case "USER":
+        return CommandPermission.Everyone;
     }
     throw Error();
   }

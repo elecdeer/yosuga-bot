@@ -50,8 +50,9 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new EndCommand(yosuga),
     new ClearCommand(yosuga),
     new VoiceStatusCommand(yosuga),
-    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga)]),
+    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga, "USER")]),
     new GuildConfigCommand(yosuga, [
+      new ShowConfigSub(yosuga, "GUILD"),
       new SetAutoLeaveSecSub(yosuga, "GUILD"),
       new SetFastSpeedSub(yosuga, "GUILD"),
       new SetIgnorePrefixSub(yosuga, "GUILD"),
@@ -63,6 +64,7 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
       new SetVolumeSub(yosuga, "GUILD"),
     ]),
     new MasterConfigCommand(yosuga, [
+      new ShowConfigSub(yosuga, "MASTER"),
       new SetAutoLeaveSecSub(yosuga, "MASTER"),
       new SetFastSpeedSub(yosuga, "MASTER"),
       new SetIgnorePrefixSub(yosuga, "MASTER"),
@@ -77,6 +79,7 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
 };
 
 export const hookHandlers = (handlers: HandlerList, client: Client): void => {
+  client.setMaxListeners(50);
   handlers.forEach((handler) => {
     handler.hookEvent(client);
   });

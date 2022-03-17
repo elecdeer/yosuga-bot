@@ -1,6 +1,5 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
 
-import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
 import {
   levelString,
@@ -46,22 +45,6 @@ export abstract class SetConfigSubCommandHandler<
     return {
       status: "valid",
     };
-  }
-
-  /**
-   * 自身のconfigレベルから権限レベルを取得
-   * @protected
-   */
-  protected getPermissionLevel(): CommandPermission {
-    switch (this.level) {
-      case "MASTER":
-        return CommandPermission.AppOwner;
-      case "GUILD":
-        return CommandPermission.GuildAdmin;
-      case "USER":
-        return CommandPermission.Everyone;
-    }
-    throw Error();
   }
 
   override async execute(context: CommandContextSlash): Promise<void> {

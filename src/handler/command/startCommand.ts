@@ -76,7 +76,7 @@ export class StartCommand extends CommandHandler {
 
           const connection = await this.connectToChannel(voiceChannel);
           const session = sessionManager.startSession(connection, textChannel, voiceChannel);
-          const message = await context.reply("plain", `接続しました!\nボイスの初期化中...`);
+          const message = (await context.reply("plain", `接続しました!\nボイスの初期化中...`))[0];
 
           await session.getVoiceProvider().getSpeakersStatus(true);
           await message.edit({
