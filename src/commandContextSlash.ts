@@ -105,7 +105,7 @@ export class CommandContextSlash extends CommandContext {
           return [
             replyMessage,
             ...(await Promise.all(
-              splitEmbeds.map((embedsChunk) => {
+              restEmbeds.map((embedsChunk) => {
                 logger.debug(`chunkLength: ${embedsChunk.length}`);
                 return this.interaction.followUp({ embeds: embedsChunk });
               })
