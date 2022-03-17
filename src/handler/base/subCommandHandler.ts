@@ -26,14 +26,13 @@ export abstract class SubCommandHandler extends CommandHandler<SubCommandProps> 
     eventName: EventKeysUnion<["interactionCreate"]>
   ): EventFilter<EventKeysUnion<["interactionCreate"]>> {
     return composeFilter(
+      this.groupCommand!.getGroupFilter(),
       filterer((interaction) => {
-        if (!this.groupCommand!.getGroupFilter()(interaction)) return false;
         const commandInteraction = interaction as CommandInteraction;
         const subCommandName = commandInteraction.options.getSubcommand(true);
 
         return subCommandName === this.commandProps.name;
-      }),
-      super.filter(eventName)
+      })
     );
   }
 }

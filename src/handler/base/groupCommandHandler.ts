@@ -2,7 +2,6 @@ import { ApplicationCommandOptionData, ChatInputApplicationCommandData, Client }
 
 import { CommandContext } from "../../commandContext";
 import { YosugaClient } from "../../yosugaClient";
-import { isCommandCall } from "../filter/commandFilter";
 import { CommandHandler } from "./commandHandler";
 import { EventArgs, EventKeysUnion } from "./handler";
 import { SubCommandHandler } from "./subCommandHandler";
@@ -47,7 +46,7 @@ export abstract class GroupCommandHandler extends CommandHandler {
   }
 
   public getGroupFilter() {
-    return isCommandCall(this);
+    return this.filter("interactionCreate");
   }
 
   override execute(context: CommandContext): Promise<void> {
