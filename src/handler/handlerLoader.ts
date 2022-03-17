@@ -4,6 +4,7 @@ import { YosugaClient } from "../yosugaClient";
 import { CommandHandler } from "./base/commandHandler";
 import { Handler } from "./base/handler";
 import { ClearCommand } from "./command/clearCommand";
+import { SetAutoLeaveSecSub } from "./command/configSub/setAutoLeaveSecSub";
 import { ShowConfigSub } from "./command/configSub/showConfigSub";
 import { EndCommand } from "./command/endCommand";
 import { StartCommand } from "./command/startCommand";
@@ -39,7 +40,10 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new EndCommand(yosuga),
     new ClearCommand(yosuga),
     new VoiceStatusCommand(yosuga),
-    new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga)]),
+    new UserConfigCommand(yosuga, [
+      new ShowConfigSub(yosuga),
+      new SetAutoLeaveSecSub(yosuga, "GUILD"),
+    ]),
   ];
 };
 

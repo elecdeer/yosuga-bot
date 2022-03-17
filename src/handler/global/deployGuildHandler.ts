@@ -49,6 +49,7 @@ export class DeployGuildHandler extends Handler<["messageCreate"]> {
         embeds: embed,
       });
     } catch (e) {
+      this.logger.error(e);
       const embed = constructEmbeds("warn", "登録中にエラーが発生しました.");
       await message.reply({
         embeds: embed,

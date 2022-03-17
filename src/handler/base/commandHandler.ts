@@ -15,11 +15,8 @@ export type CommandProps = Omit<ChatInputApplicationCommandData, "type"> & {
 export abstract class CommandHandler<TProp extends CommandProps = CommandProps> extends Handler<
   ["interactionCreate"]
 > {
-  public commandProps: Readonly<TProp>;
-
   public constructor(yosuga: YosugaClient) {
     super(["interactionCreate"], yosuga);
-    this.commandProps = this.initCommandProps();
   }
 
   /**
@@ -28,6 +25,10 @@ export abstract class CommandHandler<TProp extends CommandProps = CommandProps> 
    * @protected
    */
   protected abstract initCommandProps(): TProp;
+
+  public get commandProps(): TProp {
+    return this.initCommandProps();
+  }
 
   /**
    * コマンドの実行時に呼ばれる

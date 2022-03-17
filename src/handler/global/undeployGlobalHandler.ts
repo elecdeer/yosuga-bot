@@ -40,6 +40,7 @@ export class UndeployGlobalHandler extends Handler<["messageCreate"]> {
         embeds: embed,
       });
     } catch (e) {
+      this.logger.error(e);
       const embed = constructEmbeds("warn", "削除中にエラーが発生しました.");
       await message.reply({
         embeds: embed,
