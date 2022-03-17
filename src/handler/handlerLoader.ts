@@ -5,6 +5,14 @@ import { CommandHandler } from "./base/commandHandler";
 import { Handler } from "./base/handler";
 import { ClearCommand } from "./command/clearCommand";
 import { SetAutoLeaveSecSub } from "./command/configSub/setAutoLeaveSecSub";
+import { SetFastSpeedSub } from "./command/configSub/setFastSpeedSub";
+import { SetIgnorePrefixSub } from "./command/configSub/setIgnorePrefixSub";
+import { SetMaxLengthSub } from "./command/configSub/setMaxLengthSub";
+import { SetReadNameIntervalSub } from "./command/configSub/setReadNameIntervalSub";
+import { SetReadStatusUpdateSub } from "./command/configSub/setReadStatusUpdateSub";
+import { SetSpeedSub } from "./command/configSub/setSpeedSub";
+import { SetVoiceSub } from "./command/configSub/setVoiceSub";
+import { SetVolumeSub } from "./command/configSub/setVolumeSub";
 import { ShowConfigSub } from "./command/configSub/showConfigSub";
 import { EndCommand } from "./command/endCommand";
 import { GuildConfigCommand } from "./command/guildConfigCommand";
@@ -43,8 +51,28 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new ClearCommand(yosuga),
     new VoiceStatusCommand(yosuga),
     new UserConfigCommand(yosuga, [new ShowConfigSub(yosuga)]),
-    new GuildConfigCommand(yosuga, [new SetAutoLeaveSecSub(yosuga, "GUILD")]),
-    new MasterConfigCommand(yosuga, [new SetAutoLeaveSecSub(yosuga, "MASTER")]),
+    new GuildConfigCommand(yosuga, [
+      new SetAutoLeaveSecSub(yosuga, "GUILD"),
+      new SetFastSpeedSub(yosuga, "GUILD"),
+      new SetIgnorePrefixSub(yosuga, "GUILD"),
+      new SetMaxLengthSub(yosuga, "GUILD"),
+      new SetReadNameIntervalSub(yosuga, "GUILD"),
+      new SetReadStatusUpdateSub(yosuga, "GUILD"),
+      new SetSpeedSub(yosuga, "GUILD"),
+      new SetVoiceSub(yosuga, "GUILD"),
+      new SetVolumeSub(yosuga, "GUILD"),
+    ]),
+    new MasterConfigCommand(yosuga, [
+      new SetAutoLeaveSecSub(yosuga, "MASTER"),
+      new SetFastSpeedSub(yosuga, "MASTER"),
+      new SetIgnorePrefixSub(yosuga, "MASTER"),
+      new SetMaxLengthSub(yosuga, "MASTER"),
+      new SetReadNameIntervalSub(yosuga, "MASTER"),
+      new SetReadStatusUpdateSub(yosuga, "MASTER"),
+      new SetSpeedSub(yosuga, "MASTER"),
+      new SetVoiceSub(yosuga, "MASTER"),
+      new SetVolumeSub(yosuga, "MASTER"),
+    ]),
   ];
 };
 
