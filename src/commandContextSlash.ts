@@ -75,16 +75,13 @@ export class CommandContextSlash extends CommandContext {
     channel?: Readonly<TextChannel>
   ): Promise<Message[]> {
     const embeds = constructEmbeds(type, content);
-    logger.debug(`embedsLength: ${embeds.length}`);
 
     //embedは各Messageに10個まで
     const splitEmbeds = splitArrayPerNum(embeds, 10);
-    logger.debug(`splitNum: ${splitEmbeds.length}`);
 
     if (channel) {
       return Promise.all(
         splitEmbeds.map((embedsChunk) => {
-          logger.debug(`chunkLength: ${embedsChunk.length}`);
           return channel.send({ embeds: embedsChunk });
         })
       );
@@ -106,7 +103,6 @@ export class CommandContextSlash extends CommandContext {
             replyMessage,
             ...(await Promise.all(
               restEmbeds.map((embedsChunk) => {
-                logger.debug(`chunkLength: ${embedsChunk.length}`);
                 return this.interaction.followUp({ embeds: embedsChunk });
               })
             )),
@@ -115,7 +111,6 @@ export class CommandContextSlash extends CommandContext {
       } else {
         return (await Promise.all(
           splitEmbeds.map((embedsChunk) => {
-            logger.debug(`chunkLength: ${embedsChunk.length}`);
             return this.interaction.followUp({ embeds: embedsChunk });
           })
         )) as Message[];
@@ -123,7 +118,6 @@ export class CommandContextSlash extends CommandContext {
     } else {
       return Promise.all(
         splitEmbeds.map((embedsChunk) => {
-          logger.debug(`chunkLength: ${embedsChunk.length}`);
           return this.textChannel.send({ embeds: embedsChunk });
         })
       );
