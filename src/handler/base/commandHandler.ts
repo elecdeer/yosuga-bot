@@ -1,7 +1,6 @@
 import { ChatInputApplicationCommandData, CommandInteraction, Interaction } from "discord.js";
 
 import { CommandPermission, hasMemberPermission } from "../../application/permission";
-import { CommandContext } from "../../commandContext";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
 import { YosugaClient } from "../../yosugaClient";
 import { commandFilter } from "../filter/commandFilter";
@@ -34,7 +33,7 @@ export abstract class CommandHandler<TProp extends CommandProps = CommandProps> 
    * コマンドの実行時に呼ばれる
    * @param context
    */
-  abstract execute(context: CommandContext): Promise<void>;
+  abstract execute(context: CommandContextSlash): Promise<void>;
 
   protected override filter(
     eventName: EventKeysUnion<["interactionCreate"]>
