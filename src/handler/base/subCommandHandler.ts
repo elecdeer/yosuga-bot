@@ -36,15 +36,4 @@ export abstract class SubCommandHandler extends CommandHandler<SubCommandProps> 
       super.filter(eventName)
     );
   }
-
-  // protected override async filter(
-  //   eventName: "interactionCreate",
-  //   interaction: Interaction
-  // ): Promise<boolean> {
-  //   if (!this.groupCommand!.getGroupFilter()(interaction)) return false;
-  //   const commandInteraction = interaction as CommandInteraction;
-  //   const subCommandName = commandInteraction.options.getSubcommand(true);
-  //
-  //   return subCommandName === this.commandProps.name;
-  // }
 }
