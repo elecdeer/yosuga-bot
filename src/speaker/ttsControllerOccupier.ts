@@ -23,11 +23,11 @@ class TtsControllerOccupier {
   use(session: Session): boolean {
     if (!this.canUse(session)) return false;
     this.usingSessions.set(this.getKey(session), session);
-    logger.debug(`using: ${this.getKey(session)} ${session.getVoiceChannel().name}`);
+    logger.debug(`using: ${this.getKey(session)} ${session.voiceChannel.name}`);
 
-    const filter = endSessionFilter(session.getVoiceChannel());
+    const filter = endSessionFilter(session.voiceChannel);
     const handler = filter(() => {
-      logger.debug(`disposed: ${this.getKey(session)} ${session.getVoiceChannel().name}`);
+      logger.debug(`disposed: ${this.getKey(session)} ${session.voiceChannel.name}`);
       this.usingSessions.delete(this.getKey(session));
       session.yosuga.client.off("voiceStateUpdate", handler);
     });
@@ -38,7 +38,7 @@ class TtsControllerOccupier {
 
   // noinspection JSMethodCanBeStatic
   private getKey(session: Session): Snowflake {
-    return session.getVoiceChannel().id;
+    return session.voiceChannel.id;
   }
 }
 

@@ -11,7 +11,7 @@ export type SpeechQueue = async.QueueObject<SpeechTask>;
 export const createSpeechQueue = (session: Session): SpeechQueue => {
   const worker = async (task: SpeechTask): Promise<void> => {
     logger.debug(`work start: ${task.speechText.text.slice(0, 20)}`);
-    const voiceProvider = session.getVoiceProvider();
+    const voiceProvider = session.voiceProvider;
 
     const synthesisResult = await voiceProvider
       .synthesis(task.speechText, task.voiceOption)

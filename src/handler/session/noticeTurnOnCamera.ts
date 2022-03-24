@@ -15,10 +15,7 @@ export class NoticeTurnOnCamera extends SessionContextHandler<["voiceStateUpdate
   protected override filter(
     eventName: EventKeysUnion<["voiceStateUpdate"]>
   ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
-    return composeFilter(
-      super.filter(eventName),
-      turnOnGoLiveFilter(this.session.getVoiceChannel())
-    );
+    return composeFilter(super.filter(eventName), turnOnGoLiveFilter(this.session.voiceChannel));
   }
 
   protected override async onEvent(

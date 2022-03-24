@@ -20,7 +20,7 @@ export abstract class SessionContextHandler<
   ): { name: EventKeysUnion<TEventTuple>; listener: (...args: EventArgs<TEventTuple>) => void }[] {
     const listeners = super.hookEvent(client);
 
-    const filter = endSessionFilter(this.session.getVoiceChannel());
+    const filter = endSessionFilter(this.session.voiceChannel);
     const handler = filter(() => {
       listeners.forEach(({ name, listener }) => {
         client.off(name, listener);
@@ -32,12 +32,12 @@ export abstract class SessionContextHandler<
   }
 
   protected sessionFilter(guild: Guild): boolean {
-    return guild.id === this.session.getGuildId();
+    return guild.id === this.session.guild.id;
   }
 
   protected sessionFilterMessage(message: Message): boolean {
     if (!message.inGuild()) return false;
-    if (message.guildId !== this.session.getGuildId()) return false;
-    return message.channelId === this.session.getTextChannel().id;
+    if (message.guildId !== this.session.guild.id) return false;
+    return message.channelId === this.session.textChannel.id;
   }
 }

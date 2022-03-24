@@ -29,7 +29,7 @@ export class VoiceStatusCommand extends CommandHandler {
     }
 
     if (context.session) {
-      const voiceProvider = context.session.getVoiceProvider();
+      const voiceProvider = context.session.voiceProvider;
       const status = await voiceProvider.getSpeakersStatus();
 
       const embed = new MessageEmbed();

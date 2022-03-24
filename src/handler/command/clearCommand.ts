@@ -17,7 +17,7 @@ export class ClearCommand extends CommandHandler {
   }
 
   async execute(context: CommandContext): Promise<void> {
-    if (!context.session?.connection) {
+    if (!context.session?.voiceConnection) {
       await context.reply("warn", "未接続です.");
       return;
     }

@@ -34,7 +34,7 @@ export class SessionManager {
 
     this.sessionCollection.set(guildId, session);
 
-    const filter = endSessionFilter(session.getVoiceChannel());
+    const filter = endSessionFilter(session.voiceChannel);
     const handler = filter(() => {
       this.sessionCollection.delete(guildId);
       this.yosuga.client.off("voiceStateUpdate", handler);

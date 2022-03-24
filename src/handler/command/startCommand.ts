@@ -42,8 +42,8 @@ export class StartCommand extends CommandHandler {
       if (session) {
         //既に接続済み
         if (
-          session.getTextChannel().id === textChannel.id &&
-          session.getVoiceChannel().id === voiceChannel.id
+          session.textChannel.id === textChannel.id &&
+          session.voiceChannel.id === voiceChannel.id
         ) {
           //同じテキストルーム
           await context.reply("warn", "接続済みです.");
@@ -52,15 +52,15 @@ export class StartCommand extends CommandHandler {
 
           //TODO 確認処理
 
-          const oldTextChannel = session.getTextChannel();
+          const oldTextChannel = session.textChannel;
 
           const contents: string[] = [];
-          if (session.getTextChannel().id !== textChannel.id) {
+          if (session.textChannel.id !== textChannel.id) {
             contents.push(`読み上げチャンネルが${textChannel.name}に変更されました.`);
 
             session.changeTextChannel(textChannel);
           }
-          if (session.getVoiceChannel().id !== voiceChannel.id) {
+          if (session.voiceChannel.id !== voiceChannel.id) {
             contents.push(`接続チャンネルが${voiceChannel.name}に変更されました.`);
 
             const connection = await this.connectToChannel(voiceChannel);
@@ -78,7 +78,7 @@ export class StartCommand extends CommandHandler {
           const session = sessionManager.startSession(connection, textChannel, voiceChannel);
           const message = (await context.reply("plain", `接続しました!\nボイスの初期化中...`))[0];
 
-          await session.getVoiceProvider().getSpeakersStatus(true);
+          await session.voiceProvider.getSpeakersStatus(true);
           await message.edit({
             embeds: constructEmbeds("plain", "接続しました!\nボイスの初期化完了."),
           });

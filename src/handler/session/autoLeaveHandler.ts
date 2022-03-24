@@ -21,7 +21,7 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
   ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
     return composeFilter(
       super.filter(eventName),
-      leaveVoiceChannelFilter(this.session.getVoiceChannel()),
+      leaveVoiceChannelFilter(this.session.voiceChannel),
       filterer((oldState, newState) => {
         const member = newState.member!;
         return member.id !== this.yosuga.client.user.id;
@@ -52,12 +52,9 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
         message: "一定時間ボイスチャンネルに誰もいなくなったため退出しました.",
       });
 
-      void this.session
-        .getTextChannel()
-        .send({ embeds: [embed] })
-        .then(() => {
-          this.session.disconnect();
-        });
+      void this.session.textChannel.send({ embeds: [embed] }).then(() => {
+        this.session.disconnect();
+      });
     };
 
     const cancelAutoLeave = () => {
@@ -81,7 +78,7 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
     this.timer = setTimeout(handleTimeout, timeToAutoLeaveMs);
 
     //時間待ち中に入ってきた場合
-    const enterFilter = enterVoiceChannelFilter(this.session.getVoiceChannel());
+    const enterFilter = enterVoiceChannelFilter(this.session.voiceChannel);
     const handleEnterChannel = enterFilter(() => {
       if (getMemberNumExcludedBot(this.session) > 0) {
         cancelAutoLeave();
@@ -90,7 +87,7 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
     client.on("voiceStateUpdate", handleEnterChannel);
 
     //時間待ち中に退出した場合
-    const leaveFilter = enterVoiceChannelFilter(this.session.getVoiceChannel());
+    const leaveFilter = enterVoiceChannelFilter(this.session.voiceChannel);
     const handleLeaveChannel = leaveFilter((oldState) => {
       if (oldState.member?.id === this.yosuga.client.user.id) {
         cancelAutoLeave();
@@ -101,4 +98,4 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
 }
 
 const getMemberNumExcludedBot = (session: Session): number =>
-  session.getVoiceChannel().members.filter((member) => !member.user.bot).size;
+  session.voiceChannel.members.filter((member) => !member.user.bot).size;

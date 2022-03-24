@@ -42,7 +42,7 @@ export class TtsControllerSpeaker extends Speaker {
     this.option = option;
     this.recorder = new SIOAudioRecorder(this.option.wsUrl);
 
-    const filter = endSessionFilter(session.getVoiceChannel());
+    const filter = endSessionFilter(session.voiceChannel);
     session.yosuga.client.on(
       "voiceStateUpdate",
       filter(() => {

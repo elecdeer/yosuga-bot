@@ -2,6 +2,7 @@ import { CommandPermission } from "../../application/permission";
 import { CommandContext } from "../../commandContext";
 import { YosugaClient } from "../../yosugaClient";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
+import { endSessionFilter } from "../filter/endSessionFilter";
 
 export class EndCommand extends CommandHandler {
   constructor(yosuga: YosugaClient) {
@@ -17,13 +18,18 @@ export class EndCommand extends CommandHandler {
   }
 
   async execute(context: CommandContext): Promise<void> {
-    if (!context.session?.connection) {
+    if (!context.session?.voiceConnection) {
       await context.reply("warn", "未接続です.");
       return;
     }
 
     context.session.disconnect();
 
-    await context.reply("plain", "退出しました.");
+    const filter = endSessionFilter(context.session.voiceChannel);
+    const handler = filter(async () => {
+      this.yosuga.client.off("voiceStateUpdate", handler);
+      await context.reply("plain", "退出しました.");
+    });
+    this.yosuga.client.on("voiceStateUpdate", handler);
   }
 }
