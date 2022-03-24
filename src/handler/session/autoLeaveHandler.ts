@@ -21,7 +21,6 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
   ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
     return composeFilter(
       super.filter(eventName),
-      filterer((oldState) => oldState.guild.id === this.session.guild.id),
       leaveVoiceChannelFilter(this.session.voiceChannel),
       filterer((oldState, newState) => {
         const member = newState.member!;

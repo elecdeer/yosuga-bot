@@ -17,7 +17,6 @@ import { YosugaClient } from "../../yosugaClient";
 import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
 import { composeFilter, EventFilter, filterer } from "../filter/eventFilter";
-import { messageCreateSessionFilter } from "../filter/sessionFilter";
 
 export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate"]> {
   protected processorCache: {
@@ -69,8 +68,6 @@ export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate
   ): EventFilter<EventKeysUnion<["messageCreate"]>> {
     return composeFilter(
       super.filter(eventName),
-      messageCreateSessionFilter(this.session),
-      filterer((message) => message.channelId === this.session.textChannel.id),
       filterer(async (message) => {
         const config = await this.session.getConfig();
         if (message.cleanContent.startsWith(config.ignorePrefix)) {

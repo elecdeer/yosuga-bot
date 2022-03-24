@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Guild, Message } from "discord.js";
 
 import { Session } from "../../session";
 import { YosugaClient } from "../../yosugaClient";
@@ -29,5 +29,15 @@ export abstract class SessionContextHandler<
     this.yosuga.client.on("voiceStateUpdate", handler);
 
     return listeners;
+  }
+
+  protected sessionFilter(guild: Guild): boolean {
+    return guild.id === this.session.guild.id;
+  }
+
+  protected sessionFilterMessage(message: Message): boolean {
+    if (!message.inGuild()) return false;
+    if (message.guildId !== this.session.guild.id) return false;
+    return message.channelId === this.session.textChannel.id;
   }
 }
