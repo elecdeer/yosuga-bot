@@ -1,14 +1,21 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
 
 import { CommandContextSlash } from "../../commandContextSlash";
-import {
-  levelString,
-  ValidationResult,
-} from "../../commands/configSubCommands/setConfigSubCommand";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
 import { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";
 import { YosugaClient } from "../../yosugaClient";
 import { ConfigSubCommandHandler } from "./configSubCommandHandler";
+
+export const levelString: Record<ConfigCommandLevel, string> = {
+  MASTER: "Yosugaインスタンス",
+  GUILD: "サーバ",
+  USER: "ユーザ",
+};
+
+export type ValidationResult =
+  | { status: "valid" }
+  | { status: "warn"; message: string }
+  | { status: "error"; message: string };
 
 export abstract class SetConfigSubCommandHandler<
   TConfigLevels extends ConfigCommandLevel,

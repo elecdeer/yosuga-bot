@@ -1,11 +1,13 @@
 import { CommandInteraction } from "discord.js";
 
 import { CommandContextSlash } from "../../../commandContextSlash";
-import { ValidationResult } from "../../../commands/configSubCommands/setConfigSubCommand";
 import { ConfigEachLevel, GuildLevel, MasterLevel, UserLevel } from "../../../config/typesConfig";
 import { isInRange } from "../../../util/util";
 import { YosugaClient } from "../../../yosugaClient";
-import { SetConfigSubCommandHandler } from "../../base/setConfigSubCommandHandler";
+import {
+  SetConfigSubCommandHandler,
+  ValidationResult,
+} from "../../base/setConfigSubCommandHandler";
 import { SubCommandProps } from "../../base/subCommandHandler";
 
 export class SetVoiceSub extends SetConfigSubCommandHandler<

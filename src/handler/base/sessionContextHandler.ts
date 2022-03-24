@@ -2,6 +2,7 @@ import { Client, Guild, Message } from "discord.js";
 
 import { Session } from "../../session";
 import { YosugaClient } from "../../yosugaClient";
+import { endSessionFilter } from "../filter/endSessionFilter";
 import { EventArgs, EventKeysTuple, EventKeysUnion, Handler } from "./handler";
 
 export abstract class SessionContextHandler<
@@ -19,11 +20,13 @@ export abstract class SessionContextHandler<
   ): { name: EventKeysUnion<TEventTuple>; listener: (...args: EventArgs<TEventTuple>) => void }[] {
     const listeners = super.hookEvent(client);
 
-    this.session.on("disconnect", () => {
+    const filter = endSessionFilter(this.session.getVoiceChannel());
+    const handler = filter(() => {
       listeners.forEach(({ name, listener }) => {
         client.off(name, listener);
       });
     });
+    this.yosuga.client.on("voiceStateUpdate", handler);
 
     return listeners;
   }

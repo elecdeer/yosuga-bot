@@ -1,6 +1,7 @@
 import { Collection, Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 
+import { endSessionFilter } from "../handler/filter/endSessionFilter";
 import { Session } from "../session";
 
 const logger = getLogger("ttsControllerOccupier");
@@ -24,14 +25,18 @@ class TtsControllerOccupier {
     this.usingSessions.set(this.getKey(session), session);
     logger.debug(`using: ${this.getKey(session)} ${session.getVoiceChannel().name}`);
 
-    session.once("disconnect", () => {
+    const filter = endSessionFilter(session.getVoiceChannel());
+    const handler = filter(() => {
       logger.debug(`disposed: ${this.getKey(session)} ${session.getVoiceChannel().name}`);
       this.usingSessions.delete(this.getKey(session));
+      session.yosuga.client.off("voiceStateUpdate", handler);
     });
+    session.yosuga.client.on("voiceStateUpdate", handler);
 
     return true;
   }
 
+  // noinspection JSMethodCanBeStatic
   private getKey(session: Session): Snowflake {
     return session.getVoiceChannel().id;
   }

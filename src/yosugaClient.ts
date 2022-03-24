@@ -2,20 +2,6 @@ import { Client } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
 
-import { CommandManager } from "./commandManager";
-import { ClearCommand } from "./commands/clearCommand";
-import { DeployGlobalCommand } from "./commands/deployGlobalCommand";
-import { DeployGuildCommand } from "./commands/deployGuildCommand";
-import { EndCommand } from "./commands/endCommand";
-import { GuildConfigCommand } from "./commands/guildConfigCommand";
-import { HelpCommand } from "./commands/helpCommand";
-import { MasterConfigCommand } from "./commands/masterConfigCommand";
-import { StartCommand } from "./commands/startCommand";
-import { UndeployGlobalCommand } from "./commands/undeployGlobalCommand";
-import { UndeployGuildCommand } from "./commands/undeployGuildCommand";
-import { UserConfigCommand } from "./commands/userConfigCommand";
-import { VersionCommand } from "./commands/versionCommand";
-import { VoiceStatusCommand } from "./commands/voiceStatusCommand";
 import { ConfigManager } from "./config/configManager";
 import { KvsGuildConfigStore } from "./config/store/kvsGuildConfigStore";
 import { KvsMasterConfigStore } from "./config/store/kvsMasterConfigStore";
@@ -23,26 +9,18 @@ import { KvsUserConfigStore } from "./config/store/kvsUserConfigStore";
 import { yosugaEnv } from "./environment";
 import { hookHandlers, loadHandlers } from "./handler/handlerLoader";
 import { SessionManager } from "./sessionManager";
-import { YosugaEvent } from "./yosugaEvent";
 
 const logger = getLogger("yosugaClient");
 
 export class YosugaClient {
   readonly client: Client<true>;
 
-  readonly event: YosugaEvent;
-
-  readonly commandManager: CommandManager;
   readonly sessionManager: SessionManager;
   readonly configManager: ConfigManager;
 
   constructor(discordClient: Client<true>) {
     this.client = discordClient;
 
-    //一番最初
-    this.event = new YosugaEvent(this);
-
-    this.commandManager = new CommandManager(this);
     this.sessionManager = new SessionManager(this);
     this.configManager = new ConfigManager(this, {
       master: new KvsMasterConfigStore({
@@ -75,31 +53,9 @@ export class YosugaClient {
 
       const handlers = loadHandlers(this.client, this);
       hookHandlers(handlers, this.client);
-
-      //
-      // this.assignCommands();
-      //
-      // this.event.attachEvents();
     } catch (err) {
       logger.error("failed to login discord");
       logger.error(err);
     }
-  }
-
-  protected assignCommands(): void {
-    logger.debug("assign commands");
-    this.commandManager.assign(new StartCommand());
-    this.commandManager.assign(new EndCommand());
-    this.commandManager.assign(new ClearCommand());
-    this.commandManager.assign(new HelpCommand(this.commandManager));
-    this.commandManager.assign(new VersionCommand());
-    this.commandManager.assign(new DeployGlobalCommand());
-    this.commandManager.assign(new DeployGuildCommand());
-    this.commandManager.assign(new UndeployGlobalCommand());
-    this.commandManager.assign(new UndeployGuildCommand());
-    this.commandManager.assign(new MasterConfigCommand());
-    this.commandManager.assign(new GuildConfigCommand());
-    this.commandManager.assign(new UserConfigCommand());
-    this.commandManager.assign(new VoiceStatusCommand());
   }
 }

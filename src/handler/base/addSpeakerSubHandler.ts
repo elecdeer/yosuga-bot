@@ -1,10 +1,9 @@
 import { Collection, Formatters, MessageEmbed } from "discord.js";
 
-import { levelString } from "../../commands/configSubCommands/setConfigSubCommand";
 import { ConfigEachLevel, MasterLevel } from "../../config/typesConfig";
 import { SpeakerBuildOption } from "../../speaker/voiceProvider";
 import { YosugaClient } from "../../yosugaClient";
-import { SetConfigSubCommandHandler } from "./setConfigSubCommandHandler";
+import { levelString, SetConfigSubCommandHandler } from "./setConfigSubCommandHandler";
 
 export abstract class AddSpeakerSubHandler extends SetConfigSubCommandHandler<
   MasterLevel,
