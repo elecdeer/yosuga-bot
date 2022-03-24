@@ -4,10 +4,10 @@ import { Session } from "../../session";
 import { YosugaClient } from "../../yosugaClient";
 import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
-import { composeFilter, EventFilterGenerator } from "../filter/eventFilter";
-import { turnOnGoLiveFilter } from "../filter/turnOnCameraFilter";
+import { composeFilter, EventFilterGenerator, filterer } from "../filter/eventFilter";
+import { leaveVoiceChannelFilter } from "../filter/leaveVoiceChannelFilter";
 
-export class NoticeTurnOnCamera extends SessionContextHandler<["voiceStateUpdate"]> {
+export class NoticeLeaveChannelHandler extends SessionContextHandler<["voiceStateUpdate"]> {
   constructor(yosuga: YosugaClient, session: Session) {
     super(["voiceStateUpdate"], yosuga, session);
   }
@@ -15,7 +15,14 @@ export class NoticeTurnOnCamera extends SessionContextHandler<["voiceStateUpdate
   protected override filter(
     eventName: EventKeysUnion<["voiceStateUpdate"]>
   ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
-    return composeFilter(super.filter(eventName), turnOnGoLiveFilter(this.session.voiceChannel));
+    return composeFilter(
+      super.filter(eventName),
+      leaveVoiceChannelFilter(this.session.voiceChannel),
+      filterer((oldState, newState) => {
+        const member = newState.member!;
+        return member.id !== this.yosuga.client.user.id;
+      })
+    );
   }
 
   protected override async onEvent(
@@ -25,7 +32,7 @@ export class NoticeTurnOnCamera extends SessionContextHandler<["voiceStateUpdate
   ): Promise<void> {
     const member = oldState.member;
     await this.session.pushSpeech({
-      text: `${this.session.getUsernamePronunciation(member)}がカメラをオンにしました。`,
+      text: `${this.session.getUsernamePronunciation(member)}が退室しました。`,
     });
   }
 }

@@ -7,7 +7,7 @@ import { SessionContextHandler } from "../base/sessionContextHandler";
 import { composeFilter, EventFilterGenerator } from "../filter/eventFilter";
 import { turnOnGoLiveFilter } from "../filter/turnOnCameraFilter";
 
-export class NoticeTurnOnGoLive extends SessionContextHandler<["voiceStateUpdate"]> {
+export class NoticeTurnOnGoLiveHandler extends SessionContextHandler<["voiceStateUpdate"]> {
   constructor(yosuga: YosugaClient, session: Session) {
     super(["voiceStateUpdate"], yosuga, session);
   }

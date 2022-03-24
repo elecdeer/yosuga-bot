@@ -4,10 +4,10 @@ import { Session } from "../session";
 import { YosugaClient } from "../yosugaClient";
 import { SessionContextHandler } from "./base/sessionContextHandler";
 import { AutoLeaveHandler } from "./session/autoLeaveHandler";
-import { NoticeEnterChannel } from "./session/noticeEnterChannel";
-import { NoticeLeaveChannel } from "./session/noticeLeaveChannel";
-import { NoticeTurnOnCamera } from "./session/noticeTurnOnCamera";
-import { NoticeTurnOnGoLive } from "./session/noticeTurnOnGoLive";
+import { NoticeEnterChannelHandler } from "./session/noticeEnterChannelHandler";
+import { NoticeLeaveChannelHandler } from "./session/noticeLeaveChannelHandler";
+import { NoticeTurnOnCameraHandler } from "./session/noticeTurnOnCameraHandler";
+import { NoticeTurnOnGoLiveHandler } from "./session/noticeTurnOnGoLiveHandler";
 import { ReadOutMessageHandler } from "./session/readOutMessageHandler";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,10 +21,10 @@ export const loadSessionHandlers = (
   return [
     new ReadOutMessageHandler(yosuga, session),
     new AutoLeaveHandler(yosuga, session),
-    new NoticeEnterChannel(yosuga, session),
-    new NoticeLeaveChannel(yosuga, session),
-    new NoticeTurnOnGoLive(yosuga, session),
-    new NoticeTurnOnCamera(yosuga, session),
+    new NoticeEnterChannelHandler(yosuga, session),
+    new NoticeLeaveChannelHandler(yosuga, session),
+    new NoticeTurnOnGoLiveHandler(yosuga, session),
+    new NoticeTurnOnCameraHandler(yosuga, session),
   ];
 };
 
