@@ -72,7 +72,7 @@
     "ffmpeg-static": "^4.4.1",
     "http-status": "^1.5.0",
     "husky": "^7.0.4",
-    "libsodium-wrappers": "^0.7.9",
+    "libsodium-wrappers": "^0.7.10",
     "lint-staged": "^12.3.5",
     "log4js": "^6.4.2",
     "open-graph-scraper": "^4.11.0",
