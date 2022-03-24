@@ -4,27 +4,15 @@ import {
   NoSubscriberBehavior,
   VoiceConnection,
 } from "@discordjs/voice";
-import { GuildMember, TextChannel } from "discord.js";
+import { Guild, GuildMember, TextChannel } from "discord.js";
 import { getLogger } from "log4js";
 import { SetOptional } from "type-fest";
 
 import { UnifiedConfig } from "./config/typesConfig";
-import { SessionEmitter } from "./sessionEmitter";
-import { registerAutoLeave } from "./sessionHandler/autoLeave";
-import { registerMessageHandler } from "./sessionHandler/message";
-import { registerEnterRoom } from "./sessionHandler/speechEnterRoom";
-import { registerLeaveRoom } from "./sessionHandler/speechLeaveRoom";
-import { registerTurnOnGoLive } from "./sessionHandler/speechTurnOnGoLive";
-import { registerTurnOnVideo } from "./sessionHandler/speechTurnOnVideo";
+import { hookSessionHandlers, loadSessionHandlers } from "./handler/sessionHandlerLoader";
 import { VoiceProvider } from "./speaker/voiceProvider";
 import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import {
-  GuildId,
-  SessionEventHandlerRegistrant,
-  SpeechText,
-  UserId,
-  VoiceOrStageChannel,
-} from "./types";
+import { SpeechText, UserId, VoiceOrStageChannel } from "./types";
 import { constructEmbeds } from "./util/createEmbed";
 import { YosugaClient } from "./yosugaClient";
 
@@ -49,23 +37,17 @@ type PushSpeechRecord = {
   author: SpeechRecordAuthor;
 };
 
-const handlerRegistrants: SessionEventHandlerRegistrant[] = [
-  registerMessageHandler,
-  registerEnterRoom,
-  registerLeaveRoom,
-  registerTurnOnVideo,
-  registerTurnOnGoLive,
-  registerAutoLeave,
-];
+export class Session {
+  readonly yosuga: YosugaClient;
+  private _voiceChannel: VoiceOrStageChannel;
+  private _textChannel: TextChannel;
 
-export class Session extends SessionEmitter {
-  connection: VoiceConnection;
-  // protected readonly speakerMap: SpeakerMap;
+  private _voiceConnection: VoiceConnection;
 
   //TODO これまとめたさがある
-  protected voiceProvider: VoiceProvider;
+  public readonly voiceProvider: VoiceProvider;
+  public readonly player: AudioPlayer;
   protected speechQueue: SpeechQueue;
-  readonly player: AudioPlayer;
 
   lastPushedSpeech: PushSpeechRecord;
 
@@ -75,8 +57,11 @@ export class Session extends SessionEmitter {
     textChannel: TextChannel,
     voiceChannel: VoiceOrStageChannel
   ) {
-    super(yosuga, voiceChannel, textChannel);
-    this.connection = connection;
+    this.yosuga = yosuga;
+    this._voiceChannel = voiceChannel;
+    this._textChannel = textChannel;
+
+    this._voiceConnection = connection;
     this.speechQueue = this.initializeQueue();
     this.voiceProvider = new VoiceProvider(this);
 
@@ -95,9 +80,8 @@ export class Session extends SessionEmitter {
       },
     };
 
-    handlerRegistrants.forEach((registrant) => {
-      void registrant(this);
-    });
+    const handlers = loadSessionHandlers(yosuga.client, yosuga, this);
+    hookSessionHandlers(handlers, yosuga.client);
   }
 
   initializeQueue(): SpeechQueue {
@@ -108,10 +92,8 @@ export class Session extends SessionEmitter {
 
   disconnect(): void {
     logger.info(`disconnect: ${this.voiceChannel.id}`);
-    this.connection.disconnect();
+    this.voiceConnection.disconnect();
     this.speechQueue.kill();
-    this.emit("disconnect");
-    this.removeAllListeners();
   }
 
   async pushSpeech(
@@ -171,31 +153,36 @@ export class Session extends SessionEmitter {
 
   changeVoiceChannel(voiceChannel: VoiceOrStageChannel, connection: VoiceConnection): void {
     this.voiceChannel = voiceChannel;
-    this.connection = connection;
+    this.voiceConnection = connection;
   }
 
-  getTextChannel(): Readonly<TextChannel> {
-    return this.textChannel;
+  get voiceChannel(): VoiceOrStageChannel {
+    return this._voiceChannel;
+  }
+  protected set voiceChannel(value: VoiceOrStageChannel) {
+    this._voiceChannel = value;
   }
 
-  getVoiceChannel(): Readonly<VoiceOrStageChannel> {
-    return this.voiceChannel;
+  get textChannel(): TextChannel {
+    return this._textChannel;
+  }
+  protected set textChannel(value: TextChannel) {
+    this._textChannel = value;
+  }
+
+  get voiceConnection(): VoiceConnection {
+    return this._voiceConnection;
+  }
+  protected set voiceConnection(value: VoiceConnection) {
+    this._voiceConnection = value;
+  }
+
+  get guild(): Guild {
+    return this.voiceChannel.guild;
   }
 
   async getConfig(): Promise<Readonly<UnifiedConfig>> {
     return this.yosuga.configManager.getUnifiedConfigAccessor(this.guild.id).getAllValue();
-  }
-
-  getGuildId(): GuildId {
-    return this.guild.id;
-  }
-
-  getVoiceProvider(): Readonly<VoiceProvider> {
-    return this.voiceProvider;
-  }
-
-  getYosugaUserId(): UserId {
-    return this.guild.me!.id;
   }
 
   getUsernamePronunciation(member: GuildMember | null): string {

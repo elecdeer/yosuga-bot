@@ -25,7 +25,7 @@ export abstract class CommandContext {
     type: ReplyType,
     content: string | MessageEmbed | MessageEmbed[],
     channel?: Readonly<TextChannel>
-  ): Promise<Message>;
+  ): Promise<Message[]>;
 
   abstract getOptions(): CommandInteraction["options"] | undefined;
 

@@ -4,6 +4,7 @@ import { getLogger } from "log4js";
 import { opus } from "prism-media";
 import { Readable } from "stream";
 
+import { endSessionFilter } from "../handler/filter/endSessionFilter";
 import { Session } from "../session";
 import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
 import { wait } from "../util/promiseUtil";
@@ -41,9 +42,13 @@ export class TtsControllerSpeaker extends Speaker {
     this.option = option;
     this.recorder = new SIOAudioRecorder(this.option.wsUrl);
 
-    this.session.on("disconnect", () => {
-      this.recorder.destroy();
-    });
+    const filter = endSessionFilter(session.voiceChannel);
+    session.yosuga.client.on(
+      "voiceStateUpdate",
+      filter(() => {
+        this.recorder.destroy();
+      })
+    );
   }
 
   async checkValidConnection(): Promise<boolean> {

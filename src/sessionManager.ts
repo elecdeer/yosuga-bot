@@ -2,6 +2,7 @@ import { VoiceConnection } from "@discordjs/voice";
 import { Collection, TextChannel } from "discord.js";
 import log4js from "log4js";
 
+import { endSessionFilter } from "./handler/filter/endSessionFilter";
 import { Session } from "./session";
 import { GuildId, VoiceOrStageChannel } from "./types";
 import { YosugaClient } from "./yosugaClient";
@@ -32,9 +33,14 @@ export class SessionManager {
     const guildId = textChannel.guild.id;
 
     this.sessionCollection.set(guildId, session);
-    session.once("disconnect", () => {
+
+    const filter = endSessionFilter(session.voiceChannel);
+    const handler = filter(() => {
       this.sessionCollection.delete(guildId);
+      this.yosuga.client.off("voiceStateUpdate", handler);
     });
+    this.yosuga.client.on("voiceStateUpdate", handler);
+
     return session;
   }
 }
