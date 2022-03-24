@@ -6,6 +6,7 @@ import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
 import { enterVoiceChannelFilter } from "../filter/enterVoiceChannelFilter";
 import { composeFilter, EventFilterGenerator, filterer } from "../filter/eventFilter";
+import { voiceStatusSessionFilter } from "../filter/sessionFilter";
 
 export class NoticeEnterChannelHandler extends SessionContextHandler<["voiceStateUpdate"]> {
   constructor(yosuga: YosugaClient, session: Session) {
@@ -17,6 +18,7 @@ export class NoticeEnterChannelHandler extends SessionContextHandler<["voiceStat
   ): ReturnType<EventFilterGenerator<EventKeysUnion<["voiceStateUpdate"]>, unknown>> {
     return composeFilter(
       super.filter(eventName),
+      voiceStatusSessionFilter(this.session),
       enterVoiceChannelFilter(this.session.voiceChannel),
       filterer((oldState, newState) => {
         const member = newState.member!;
