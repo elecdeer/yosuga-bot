@@ -27,7 +27,7 @@ export const isTurnOnCameraCall =
  * カメラ開始時のみ通過するイベントフィルタ
  * @param voiceChannel
  */
-export const turnOnGoLiveFilter: EventFilterGenerator<
+export const turnOnCameraFilter: EventFilterGenerator<
   "voiceStateUpdate",
   Readonly<VoiceOrStageChannel>
 > = filterGenerator(isTurnOnCameraCall);
