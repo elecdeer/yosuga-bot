@@ -47,9 +47,20 @@ export class VoicevoxSpeaker extends Speaker {
         this.speakerOption.speakerUUID,
         this.speakerOption.styleName
       );
+      await this.voicevoxClient.audio_query.$post({
+        query: {
+          text: "クエリテスト",
+          speaker: this.speakerId,
+        },
+        config: {
+          timeout: 3000,
+          timeoutErrorMessage: "/audio_queryがタイムアウトしました",
+        },
+      });
 
       return "active";
     } catch (e) {
+      logger.error(e);
       return "inactive";
     }
   }
