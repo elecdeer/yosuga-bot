@@ -3,6 +3,7 @@ import {
   Guild,
   GuildMember,
   Message,
+  MessageActionRow,
   MessageEmbed,
   TextChannel,
 } from "discord.js";
@@ -13,11 +14,12 @@ import { ConfigManager } from "./config/configManager";
 import { Session } from "./session";
 import { splitArrayPerNum } from "./util/arrayUtil";
 import { constructEmbeds, ReplyType } from "./util/createEmbed";
+import { allSerial } from "./util/promiseUtil";
 import { YosugaClient } from "./yosugaClient";
 
 const logger = getLogger("commandContextSlash");
 
-export type ValidCommandInteraction = CommandInteraction & {
+export type ValidCommandInteraction = CommandInteraction<"cached"> & {
   guild: Guild;
   member: GuildMember;
   channel: TextChannel;
@@ -27,7 +29,7 @@ export const isValidCommandInteraction = (
   interaction: CommandInteraction
 ): interaction is ValidCommandInteraction => {
   return (
-    !!interaction.guild &&
+    interaction.inCachedGuild() &&
     !!interaction.member &&
     !!interaction.channel &&
     interaction.isCommand() &&
@@ -43,7 +45,7 @@ export class CommandContextSlash extends CommandContext {
   override readonly configManager: ConfigManager;
   override readonly member: GuildMember;
 
-  readonly interaction: CommandInteraction;
+  readonly interaction: CommandInteraction<"cached">;
 
   private readonly differTimer: NodeJS.Timeout;
 
@@ -69,59 +71,70 @@ export class CommandContextSlash extends CommandContext {
     }, 2500);
   }
 
-  override async reply(
-    type: ReplyType,
-    content: string | MessageEmbed | MessageEmbed[],
-    channel?: Readonly<TextChannel>
-  ): Promise<Message[]> {
+  override async reply({
+    type = "plain",
+    content,
+    components,
+    channel,
+  }: {
+    type?: ReplyType;
+    content: string | MessageEmbed | MessageEmbed[];
+    components?: MessageActionRow[];
+    channel?: Readonly<TextChannel>;
+  }): Promise<Message> {
+    if (Array.isArray(content) && content.length > 10) {
+      logger.error("10個以上のembedsを含む返信にはreplyMultiを使用する必要があります");
+    }
+
+    const embeds = constructEmbeds(type, content);
+    if (channel) {
+      return channel.send({
+        embeds: embeds,
+        components: components,
+      });
+    }
+
+    if (this.interaction.deferred || this.interaction.replied) {
+      return this.interaction.followUp({
+        embeds: embeds,
+        components: components,
+        fetchReply: true,
+      });
+    } else {
+      const message = await this.interaction.reply({
+        embeds: embeds,
+        components: components,
+        fetchReply: true,
+      });
+      clearTimeout(this.differTimer);
+      return message;
+    }
+  }
+
+  override async replyMulti({
+    type = "plain",
+    content,
+    channel,
+  }: {
+    type?: ReplyType;
+    content: MessageEmbed[];
+    channel?: Readonly<TextChannel>;
+  }): Promise<Message[]> {
     const embeds = constructEmbeds(type, content);
 
     //embedは各Messageに10個まで
     const splitEmbeds = splitArrayPerNum(embeds, 10);
 
-    if (channel) {
-      return Promise.all(
-        splitEmbeds.map((embedsChunk) => {
-          return channel.send({ embeds: embedsChunk });
-        })
-      );
-    }
+    const asyncProviders = splitEmbeds.map((embedsChunk) => {
+      return () =>
+        this.reply({
+          type: type,
+          content: content,
+          channel: channel,
+        });
+    });
 
-    if (!this.interaction.replied) {
-      if (!this.interaction.deferred) {
-        clearTimeout(this.differTimer);
-
-        const [headEmbeds, ...restEmbeds] = splitEmbeds;
-
-        //reply前
-        const replyMessage = await this.interaction.reply({ embeds: headEmbeds, fetchReply: true });
-        if (splitEmbeds.length <= 1) {
-          //DMはそもそもない
-          return [replyMessage] as Message[];
-        } else {
-          return [
-            replyMessage,
-            ...(await Promise.all(
-              restEmbeds.map((embedsChunk) => {
-                return this.interaction.followUp({ embeds: embedsChunk });
-              })
-            )),
-          ] as Message[];
-        }
-      } else {
-        return (await Promise.all(
-          splitEmbeds.map((embedsChunk) => {
-            return this.interaction.followUp({ embeds: embedsChunk });
-          })
-        )) as Message[];
-      }
-    } else {
-      return Promise.all(
-        splitEmbeds.map((embedsChunk) => {
-          return this.textChannel.send({ embeds: embedsChunk });
-        })
-      );
-    }
+    return allSerial(asyncProviders);
   }
 
   override getOptions(): CommandInteraction["options"] {

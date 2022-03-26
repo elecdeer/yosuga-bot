@@ -35,7 +35,10 @@ export class StartCommand extends CommandHandler {
 
     if (voiceChannel) {
       if (!hasBotPermission(textChannel, voiceChannel)) {
-        await context.reply("error", "チャンネルに参加する権限がBotにありません.");
+        await context.reply({
+          type: "error",
+          content: "チャンネルに参加する権限がBotにありません.",
+        });
         return;
       }
 
@@ -46,7 +49,10 @@ export class StartCommand extends CommandHandler {
           session.voiceChannel.id === voiceChannel.id
         ) {
           //同じテキストルーム
-          await context.reply("warn", "接続済みです.");
+          await context.reply({
+            type: "warn",
+            content: "接続済みです.",
+          });
         } else {
           //別テキストルーム
 
@@ -67,8 +73,8 @@ export class StartCommand extends CommandHandler {
             session.changeVoiceChannel(voiceChannel, connection);
           }
 
-          await context.reply("plain", contents.join("\n"), oldTextChannel);
-          await context.reply("plain", `接続しました!`);
+          await context.reply({ content: contents.join("\n"), channel: oldTextChannel });
+          await context.reply({ content: `接続しました!` });
         }
       } else {
         try {
@@ -76,18 +82,24 @@ export class StartCommand extends CommandHandler {
 
           const connection = await this.connectToChannel(voiceChannel);
           const session = sessionManager.startSession(connection, textChannel, voiceChannel);
-          const message = (await context.reply("plain", `接続しました!\nボイスの初期化中...`))[0];
+          const message = await context.reply({ content: `接続しました!\nボイスの初期化中...` });
 
           await session.voiceProvider.getSpeakersStatus(true);
           await message.edit({
             embeds: constructEmbeds("plain", "接続しました!\nボイスの初期化完了."),
           });
         } catch (error) {
-          await context.reply("error", "接続エラーが発生しました.");
+          await context.reply({
+            type: "error",
+            content: "接続エラーが発生しました.",
+          });
         }
       }
     } else {
-      await context.reply("warn", "先にボイスチャンネルに入る必要があります.");
+      await context.reply({
+        type: "warn",
+        content: "先にボイスチャンネルに入る必要があります.",
+      });
     }
   }
 

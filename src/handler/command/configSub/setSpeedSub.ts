@@ -43,7 +43,7 @@ export class SetSpeedSub extends SetConfigSubCommandHandler<
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["masterSpeed"] | undefined,
-    context: Omit<CommandContextSlash, "reply">
+    context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
     if (value && !isInRange(value, 0, 2)) {
       return {

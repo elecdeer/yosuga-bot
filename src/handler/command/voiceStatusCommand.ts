@@ -24,7 +24,10 @@ export class VoiceStatusCommand extends CommandHandler {
     const config = configManager.getMasterConfigAccessor();
     const voices = await config.get("speakerBuildOptions");
     if (!voices || Object.values(voices).length < 1) {
-      await context.reply("warn", "ボイスが登録されていません");
+      await context.reply({
+        type: "warn",
+        content: "ボイスが登録されていません",
+      });
       return;
     }
 
@@ -42,7 +45,9 @@ export class VoiceStatusCommand extends CommandHandler {
         }))
       );
 
-      await context.reply("plain", embed);
+      await context.reply({
+        content: embed,
+      });
     } else {
       assert(voices);
 
@@ -55,7 +60,9 @@ export class VoiceStatusCommand extends CommandHandler {
           inline: true,
         }))
       );
-      await context.reply("plain", embed);
+      await context.reply({
+        content: embed,
+      });
     }
   }
 }

@@ -19,6 +19,8 @@ export class VersionCommand extends CommandHandler {
 
   async execute(context: CommandContext): Promise<void> {
     const revision = imageEnv.commitId;
-    await context.reply("plain", `rev: ${revision}`);
+    await context.reply({
+      content: `rev: ${revision}`,
+    });
   }
 }

@@ -42,7 +42,7 @@ export class SetAutoLeaveSecSub extends SetConfigSubCommandHandler<
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["timeToAutoLeaveSec"] | undefined,
-    context: Omit<CommandContextSlash, "reply">
+    context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
     if (value && value < 0) {
       return {

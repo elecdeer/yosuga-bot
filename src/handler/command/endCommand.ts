@@ -19,7 +19,10 @@ export class EndCommand extends CommandHandler {
 
   async execute(context: CommandContext): Promise<void> {
     if (!context.session?.voiceConnection) {
-      await context.reply("warn", "未接続です.");
+      await context.reply({
+        type: "warn",
+        content: "未接続です.",
+      });
       return;
     }
 
@@ -28,7 +31,9 @@ export class EndCommand extends CommandHandler {
     const filter = endSessionFilter(context.session.voiceChannel);
     const handler = filter(async () => {
       this.yosuga.client.off("voiceStateUpdate", handler);
-      await context.reply("plain", "退出しました.");
+      await context.reply({
+        content: "退出しました.",
+      });
     });
     this.yosuga.client.on("voiceStateUpdate", handler);
   }

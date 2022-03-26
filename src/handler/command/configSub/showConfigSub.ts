@@ -58,6 +58,8 @@ export class ShowConfigSub extends ConfigSubCommandHandler<MasterLevel | GuildLe
       return embed;
     });
 
-    await context.reply("plain", [configEmbed, ...speakerEmbeds]);
+    await context.replyMulti({
+      content: [configEmbed, ...speakerEmbeds],
+    });
   }
 }
