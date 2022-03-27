@@ -9,6 +9,7 @@ import {
 
 import { CommandContextSlash } from "../../../commandContextSlash";
 import { ConfigEachLevel, GuildLevel, MasterLevel, UserLevel } from "../../../config/typesConfig";
+import { createYosugaEmbed } from "../../../util/createEmbed";
 import { range } from "../../../util/range";
 import { YosugaClient } from "../../../yosugaClient";
 import { SetConfigSubCommandHandler } from "../../base/setConfigSubCommandHandler";
@@ -80,16 +81,7 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
       .setDisabled(context.session === null);
 
     const replyMessage = await context.reply({
-      content: new MessageEmbed()
-        .setDescription("読み上げボイスの設定\nコマンド呼び出しユーザ以外は反応しません.")
-        .addField(
-          "変更前の値",
-          [
-            `Voice: ${oldValue?.speakerName ?? "デフォルト値"}`,
-            `Pitch: ${oldValue?.voiceParam.pitch ?? "デフォルト値"}`,
-            `Intonation: ${oldValue?.voiceParam.intonation ?? "デフォルト値"}`,
-          ].join("\n")
-        ),
+      content: this.constructConfigReplyEmbed(oldValue),
       components: [
         new MessageActionRow().addComponents(voiceMenu),
         new MessageActionRow().addComponents(pitchMenu),
@@ -110,38 +102,49 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
 
       const old = await accessor.get("speakerOption");
       if (interaction.customId === "voice" && interaction.isSelectMenu()) {
-        await accessor.set("speakerOption", {
+        const newValue = {
           speakerName: interaction.values[0],
           voiceParam: {
             pitch: old?.voiceParam.pitch ?? 1,
             intonation: old?.voiceParam.intonation ?? 1,
           },
-        });
+        };
+        await accessor.set("speakerOption", newValue);
         await interaction.deferUpdate();
-        // this.logger.debug(`voice set: ${interaction.values[0]}`);
+        await replyMessage.edit({
+          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+        });
       }
 
       if (interaction.customId === "pitch" && interaction.isSelectMenu()) {
-        await accessor.set("speakerOption", {
+        const newValue = {
           speakerName: old?.speakerName ?? "",
           voiceParam: {
             pitch: valueMap[Number.parseInt(interaction.values[0])],
             intonation: old?.voiceParam.intonation ?? 1,
           },
-        });
+        };
+        await accessor.set("speakerOption", newValue);
         await interaction.deferUpdate();
+        await replyMessage.edit({
+          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+        });
         // this.logger.debug(`pitch set: ${valueMap[Number.parseInt(interaction.values[0])]}`);
       }
 
       if (interaction.customId === "intonation" && interaction.isSelectMenu()) {
-        await accessor.set("speakerOption", {
+        const newValue = {
           speakerName: old?.speakerName ?? "",
           voiceParam: {
             pitch: old?.voiceParam.pitch ?? 1,
             intonation: valueMap[Number.parseInt(interaction.values[0])],
           },
-        });
+        };
+        await accessor.set("speakerOption", newValue);
         await interaction.deferUpdate();
+        await replyMessage.edit({
+          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+        });
         // this.logger.debug(`intonation set: ${valueMap[Number.parseInt(interaction.values[0])]}`);
       }
 
@@ -181,5 +184,43 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
         intonation: options.getNumber("intonation") ?? 1,
       },
     };
+  }
+
+  protected override constructConfigReplyEmbed(
+    oldValue: Readonly<
+      ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"] | undefined
+    >,
+    newValue?: Readonly<
+      ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"] | undefined
+    >
+  ): MessageEmbed {
+    const embed = new MessageEmbed().setDescription(
+      "読み上げボイスの設定\nコマンド呼び出しユーザ以外の入力には反応しません."
+    );
+
+    embed.addField(
+      "変更前の値",
+      [
+        `Voice: ${oldValue?.speakerName ?? "デフォルト値"}`,
+        `Pitch: ${oldValue?.voiceParam.pitch ?? "デフォルト値"}`,
+        `Intonation: ${oldValue?.voiceParam.intonation ?? "デフォルト値"}`,
+      ].join("\n"),
+      true
+    );
+
+    if (newValue) {
+      embed.addField(
+        "変更後の値",
+        [
+          `Voice: ${newValue.speakerName ?? "デフォルト値"}`,
+          `Pitch: ${newValue.voiceParam.pitch ?? "デフォルト値"}`,
+          `Intonation: ${newValue.voiceParam.intonation ?? "デフォルト値"}`,
+        ].join("\n"),
+        true
+      );
+    }
+    return createYosugaEmbed({
+      base: embed,
+    });
   }
 }
