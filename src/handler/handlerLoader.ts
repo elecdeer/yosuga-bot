@@ -55,7 +55,7 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
     new VoiceStatusCommand(yosuga),
     new UserConfigCommand(yosuga, [
       new ShowConfigSub(yosuga, "USER"),
-      new SetVoiceSub(yosuga, "GUILD"),
+      new SetVoiceSub(yosuga, "USER"),
     ]),
     new GuildConfigCommand(yosuga, [
       new ShowConfigSub(yosuga, "GUILD"),
