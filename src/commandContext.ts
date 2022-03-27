@@ -3,6 +3,7 @@ import {
   Guild,
   GuildMember,
   Message,
+  MessageActionRow,
   MessageEmbed,
   TextChannel,
 } from "discord.js";
@@ -21,11 +22,18 @@ export abstract class CommandContext {
   abstract readonly member: GuildMember;
   abstract readonly textChannel: TextChannel;
 
-  abstract reply(
-    type: ReplyType,
-    content: string | MessageEmbed | MessageEmbed[],
-    channel?: Readonly<TextChannel>
-  ): Promise<Message[]>;
+  abstract reply(props: {
+    type?: ReplyType;
+    content: string | MessageEmbed | MessageEmbed[];
+    component?: MessageActionRow[];
+    channel?: Readonly<TextChannel>;
+  }): Promise<Message>;
+
+  abstract replyMulti(props: {
+    type?: ReplyType;
+    content: MessageEmbed[];
+    channel?: Readonly<TextChannel>;
+  }): Promise<Message[]>;
 
   abstract getOptions(): CommandInteraction["options"] | undefined;
 

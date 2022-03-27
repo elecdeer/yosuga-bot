@@ -47,7 +47,7 @@ export abstract class SetConfigSubCommandHandler<
    */
   protected async validateValue(
     value: ConfigEachLevel<TConfigLevels>[TKey] | undefined,
-    context: Omit<CommandContextSlash, "reply">
+    context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
     return {
       status: "valid",
@@ -63,16 +63,24 @@ export abstract class SetConfigSubCommandHandler<
 
     const validateResult = await this.validateValue(optionValue, context);
     if (validateResult.status === "warn") {
-      await context.reply("warn", validateResult.message);
+      await context.reply({
+        type: "warn",
+        content: validateResult.message,
+      });
     }
     if (validateResult.status === "error") {
-      await context.reply("error", validateResult.message);
+      await context.reply({
+        type: "error",
+        content: validateResult.message,
+      });
       return;
     }
 
     const newValue = await accessor.set(this.configKey, optionValue);
 
-    await context.reply("plain", this.constructConfigReplyEmbed(oldValue, newValue));
+    await context.reply({
+      content: this.constructConfigReplyEmbed(oldValue, newValue),
+    });
   }
 
   /**

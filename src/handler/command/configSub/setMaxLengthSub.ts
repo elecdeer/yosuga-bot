@@ -42,7 +42,7 @@ export class SetMaxLengthSub extends SetConfigSubCommandHandler<
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["maxStringLength"] | undefined,
-    context: Omit<CommandContextSlash, "reply">
+    context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
     if (value && value < 0) {
       return {

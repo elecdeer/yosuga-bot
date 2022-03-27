@@ -18,13 +18,18 @@ export class ClearCommand extends CommandHandler {
 
   async execute(context: CommandContext): Promise<void> {
     if (!context.session?.voiceConnection) {
-      await context.reply("warn", "未接続です.");
+      await context.reply({
+        type: "warn",
+        content: "未接続です.",
+      });
       return;
     }
 
     context.session.player.stop();
     context.session.initializeQueue();
 
-    await context.reply("plain", "読み上げキューをクリアしました.");
+    await context.reply({
+      content: "読み上げキューをクリアしました.",
+    });
   }
 }

@@ -57,19 +57,25 @@ export abstract class CommandHandler<TProp extends CommandProps = CommandProps> 
   ): Promise<void> {
     //filterでチェック済み
     const commandInteraction = interaction as CommandInteraction;
-
+    await commandInteraction.guild?.fetch();
     if (!isValidCommandInteraction(commandInteraction)) return;
     const context = new CommandContextSlash(commandInteraction, this.yosuga);
 
     if (!(await hasMemberPermission(context.member, this.commandProps.permission))) {
-      await context.reply("prohibit", "このコマンドを実行する権限がありません.");
+      await context.reply({
+        type: "prohibit",
+        content: "このコマンドを実行する権限がありません.",
+      });
       return;
     }
 
     try {
       await this.execute(context);
     } catch (err) {
-      await context.reply("warn", "エラーが発生しました.");
+      await context.reply({
+        type: "warn",
+        content: "エラーが発生しました.",
+      });
       this.logger.error(err);
     }
   }

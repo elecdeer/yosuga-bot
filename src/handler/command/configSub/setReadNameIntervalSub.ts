@@ -44,7 +44,7 @@ export class SetReadNameIntervalSub extends SetConfigSubCommandHandler<
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["timeToReadMemberNameSec"] | undefined,
-    context: Omit<CommandContextSlash, "reply">
+    context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
     if (value && value < 0) {
       return {
