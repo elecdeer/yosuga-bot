@@ -129,7 +129,7 @@ export class CommandContextSlash extends CommandContext {
       return () =>
         this.reply({
           type: type,
-          content: content,
+          content: embedsChunk,
           channel: channel,
         });
     });
