@@ -1,12 +1,10 @@
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { SpeakerOption } from "../types";
 
 export type MasterLevelConfig = {
   speakerBuildOptions: Record<string, SpeakerBuildOption>;
 };
 
 export type GuildLevelConfig = {
-  commandPrefix: string;
   ignorePrefix: string;
   masterVolume: number;
   masterSpeed: number;
@@ -19,13 +17,17 @@ export type GuildLevelConfig = {
 };
 
 export type UserLevelConfig = {
-  speakerOption: SpeakerOption;
+  speakerName: string;
+  speakerPitch: number;
+  speakerIntonation: number;
 };
 
 export type UnifiedConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
 export type MasterConfig = MasterLevelConfig & GuildLevelConfig & UserLevelConfig;
 export type GuildConfig = GuildLevelConfig & UserLevelConfig;
 export type UserConfig = UserLevelConfig;
+
+export type VoiceConfigKey = "speakerName" | "speakerPitch" | "speakerIntonation";
 
 //Store用
 export type MasterConfigRecord = Record<string, Partial<MasterConfig>>;

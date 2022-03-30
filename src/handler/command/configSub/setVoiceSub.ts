@@ -1,5 +1,4 @@
 import {
-  CommandInteraction,
   MessageActionRow,
   MessageButton,
   MessageEmbed,
@@ -8,22 +7,26 @@ import {
 } from "discord.js";
 
 import { CommandContextSlash } from "../../../commandContextSlash";
+import { ConfigAccessor } from "../../../config/accessor/configAccessor";
 import { ConfigEachLevel, GuildLevel, MasterLevel, UserLevel } from "../../../config/typesConfig";
 import { createYosugaEmbed } from "../../../util/createEmbed";
 import { range } from "../../../util/range";
 import { YosugaClient } from "../../../yosugaClient";
-import { SetConfigSubCommandHandler } from "../../base/setConfigSubCommandHandler";
+import { ConfigSubCommandHandler } from "../../base/configSubCommandHandler";
 import { SubCommandProps } from "../../base/subCommandHandler";
 
-export class SetVoiceSub extends SetConfigSubCommandHandler<
-  MasterLevel | GuildLevel | UserLevel,
-  "speakerOption"
-> {
+type SpeakerParams = {
+  name: string | null;
+  pitch: number | null;
+  intonation: number | null;
+};
+
+export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLevel | UserLevel> {
   constructor(yosuga: YosugaClient, level: MasterLevel | GuildLevel | UserLevel) {
-    super(yosuga, level, "speakerOption");
+    super(yosuga, level);
   }
 
-  protected initCommandProps(): SubCommandProps {
+  protected override initCommandProps(): SubCommandProps {
     return {
       name: "voice",
       description: "読み上げボイスの設定",
@@ -31,9 +34,19 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
     };
   }
 
+  protected async getCurrentConfigValue(
+    accessor: ConfigAccessor<ConfigEachLevel<"MASTER" | "GUILD" | "USER">, true>
+  ): Promise<SpeakerParams> {
+    return {
+      name: (await accessor.get("speakerName")) ?? null,
+      pitch: (await accessor.get("speakerPitch")) ?? null,
+      intonation: (await accessor.get("speakerIntonation")) ?? null,
+    };
+  }
+
   override async execute(context: CommandContextSlash): Promise<void> {
     const accessor = this.getConfigAccessor(context);
-    const oldValue = await accessor.get(this.configKey);
+    const oldValue = await this.getCurrentConfigValue(accessor);
 
     const voices = await context.configManager.getMasterConfigAccessor().get("speakerBuildOptions");
 
@@ -99,51 +112,49 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
 
     collector.on("collect", async (interaction) => {
       this.logger.debug(interaction.toJSON());
+      const currentValue = await this.getCurrentConfigValue(accessor);
 
-      const old = await accessor.get("speakerOption");
       if (interaction.customId === "voice" && interaction.isSelectMenu()) {
-        const newValue = {
-          speakerName: interaction.values[0],
-          voiceParam: {
-            pitch: old?.voiceParam.pitch ?? 1,
-            intonation: old?.voiceParam.intonation ?? 1,
-          },
-        };
-        await accessor.set("speakerOption", newValue);
+        const newName = interaction.values[0];
+
+        await accessor.set("speakerName", newName);
         await interaction.deferUpdate();
         await replyMessage.edit({
-          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+          embeds: [
+            this.constructConfigReplyEmbed(oldValue, {
+              ...currentValue,
+              name: newName,
+            }),
+          ],
         });
       }
 
       if (interaction.customId === "pitch" && interaction.isSelectMenu()) {
-        const newValue = {
-          speakerName: old?.speakerName ?? "",
-          voiceParam: {
-            pitch: valueMap[Number.parseInt(interaction.values[0])],
-            intonation: old?.voiceParam.intonation ?? 1,
-          },
-        };
-        await accessor.set("speakerOption", newValue);
+        const newPitch = valueMap[Number.parseInt(interaction.values[0])];
+        await accessor.set("speakerPitch", newPitch);
         await interaction.deferUpdate();
         await replyMessage.edit({
-          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+          embeds: [
+            this.constructConfigReplyEmbed(oldValue, {
+              ...currentValue,
+              pitch: newPitch,
+            }),
+          ],
         });
         // this.logger.debug(`pitch set: ${valueMap[Number.parseInt(interaction.values[0])]}`);
       }
 
       if (interaction.customId === "intonation" && interaction.isSelectMenu()) {
-        const newValue = {
-          speakerName: old?.speakerName ?? "",
-          voiceParam: {
-            pitch: old?.voiceParam.pitch ?? 1,
-            intonation: valueMap[Number.parseInt(interaction.values[0])],
-          },
-        };
-        await accessor.set("speakerOption", newValue);
+        const intonation = valueMap[Number.parseInt(interaction.values[0])];
+        await accessor.set("speakerIntonation", intonation);
         await interaction.deferUpdate();
         await replyMessage.edit({
-          embeds: [this.constructConfigReplyEmbed(oldValue, newValue)],
+          embeds: [
+            this.constructConfigReplyEmbed(oldValue, {
+              ...currentValue,
+              intonation: intonation,
+            }),
+          ],
         });
         // this.logger.debug(`intonation set: ${valueMap[Number.parseInt(interaction.values[0])]}`);
       }
@@ -159,40 +170,16 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
       }
     });
 
-    collector.on("end", async (interactionRecord) => {
+    collector.on("end", async () => {
       await replyMessage.edit({
         components: [],
       });
     });
   }
 
-  protected override async getValueFromOptions(
-    options: CommandInteraction["options"],
-    oldValue:
-      | Readonly<ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"]>
-      | undefined
-  ): Promise<ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"] | undefined> {
-    const voiceName = options.getString("voicename");
-    if (!voiceName) {
-      return undefined;
-    }
-
-    return {
-      speakerName: voiceName,
-      voiceParam: {
-        pitch: options.getNumber("pitch") ?? 1,
-        intonation: options.getNumber("intonation") ?? 1,
-      },
-    };
-  }
-
-  protected override constructConfigReplyEmbed(
-    oldValue: Readonly<
-      ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"] | undefined
-    >,
-    newValue?: Readonly<
-      ConfigEachLevel<MasterLevel | GuildLevel | UserLevel>["speakerOption"] | undefined
-    >
+  protected constructConfigReplyEmbed(
+    oldValue: Partial<SpeakerParams>,
+    newValue?: Partial<SpeakerParams>
   ): MessageEmbed {
     const embed = new MessageEmbed().setDescription(
       "読み上げボイスの設定\nコマンド呼び出しユーザ以外の入力には反応しません."
@@ -201,9 +188,9 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
     embed.addField(
       "変更前の値",
       [
-        `Voice: ${oldValue?.speakerName ?? "デフォルト値"}`,
-        `Pitch: ${oldValue?.voiceParam.pitch ?? "デフォルト値"}`,
-        `Intonation: ${oldValue?.voiceParam.intonation ?? "デフォルト値"}`,
+        `Voice: ${oldValue.name ?? "デフォルト値"}`,
+        `Pitch: ${oldValue.pitch ?? "デフォルト値"}`,
+        `Intonation: ${oldValue.intonation ?? "デフォルト値"}`,
       ].join("\n"),
       true
     );
@@ -212,9 +199,9 @@ export class SetVoiceSub extends SetConfigSubCommandHandler<
       embed.addField(
         "変更後の値",
         [
-          `Voice: ${newValue.speakerName ?? "デフォルト値"}`,
-          `Pitch: ${newValue.voiceParam.pitch ?? "デフォルト値"}`,
-          `Intonation: ${newValue.voiceParam.intonation ?? "デフォルト値"}`,
+          `Voice: ${newValue.name ?? "デフォルト値"}`,
+          `Pitch: ${newValue.pitch ?? "デフォルト値"}`,
+          `Intonation: ${newValue.intonation ?? "デフォルト値"}`,
         ].join("\n"),
         true
       );

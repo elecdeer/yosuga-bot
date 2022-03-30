@@ -66,10 +66,8 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig,
   }
 }
 
-const defaultConfig = {
+const defaultConfig: UnifiedConfig = {
   speakerBuildOptions: {},
-
-  commandPrefix: "yosuga",
   ignorePrefix: "!!",
   masterVolume: 1,
   masterSpeed: 1.1,
@@ -79,12 +77,7 @@ const defaultConfig = {
   timeToAutoLeaveSec: 10,
   timeToReadMemberNameSec: 30,
   maxStringLength: 80,
-
-  speakerOption: {
-    speakerName: "null",
-    voiceParam: {
-      pitch: 1,
-      intonation: 1,
-    },
-  },
+  speakerName: "null",
+  speakerPitch: 1,
+  speakerIntonation: 1,
 } as const;
