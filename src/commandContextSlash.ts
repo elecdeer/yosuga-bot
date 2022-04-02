@@ -76,11 +76,13 @@ export class CommandContextSlash extends CommandContext {
     content,
     components,
     channel,
+    ephemeral = false,
   }: {
     type?: ReplyType;
     content: string | MessageEmbed | MessageEmbed[];
     components?: MessageActionRow[];
     channel?: Readonly<TextChannel>;
+    ephemeral?: boolean;
   }): Promise<Message> {
     if (Array.isArray(content) && content.length > 10) {
       logger.error("10個以上のembedsを含む返信にはreplyMultiを使用する必要があります");
@@ -99,12 +101,14 @@ export class CommandContextSlash extends CommandContext {
         embeds: embeds,
         components: components,
         fetchReply: true,
+        ephemeral: ephemeral,
       });
     } else {
       const message = await this.interaction.reply({
         embeds: embeds,
         components: components,
         fetchReply: true,
+        ephemeral: ephemeral,
       });
       clearTimeout(this.differTimer);
       return message;
@@ -115,10 +119,12 @@ export class CommandContextSlash extends CommandContext {
     type = "plain",
     content,
     channel,
+    ephemeral,
   }: {
     type?: ReplyType;
     content: MessageEmbed[];
     channel?: Readonly<TextChannel>;
+    ephemeral?: boolean;
   }): Promise<Message[]> {
     const embeds = constructEmbeds(type, content);
 
@@ -131,6 +137,7 @@ export class CommandContextSlash extends CommandContext {
           type: type,
           content: embedsChunk,
           channel: channel,
+          ephemeral: ephemeral,
         });
     });
 
