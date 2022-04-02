@@ -1,7 +1,6 @@
 import { Collection, Formatters } from "discord.js";
 
 import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { SpeakerOption } from "../types";
 import { UnifiedConfig } from "./typesConfig";
 
 export const stringifyConfigEntry = <T extends keyof UnifiedConfig>(
@@ -30,14 +29,6 @@ export const stringifyConfigEntry = <T extends keyof UnifiedConfig>(
     return {
       name: configKey,
       value: value,
-    };
-  }
-
-  if (configKey === "speakerOption") {
-    const option = configValue as SpeakerOption;
-    return {
-      name: configKey,
-      value: `${option.speakerName}\n pitch: ${option.voiceParam.pitch}  intonation: ${option.voiceParam.intonation}`,
     };
   }
 

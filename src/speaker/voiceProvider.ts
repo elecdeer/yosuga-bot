@@ -35,7 +35,17 @@ export class VoiceProvider {
     const collection = await this.speakerCollection;
     const accessor = configManager.getValidVoiceConfigAccessor(collection, guildId, userId);
 
-    return (await accessor.get("speakerOption")) ?? null;
+    const name = await accessor.get("speakerName");
+    if (name === undefined) {
+      return null;
+    }
+    return {
+      speakerName: name,
+      voiceParam: {
+        pitch: await accessor.get("speakerPitch"),
+        intonation: await accessor.get("speakerIntonation"),
+      },
+    };
   }
 
   async synthesis(
