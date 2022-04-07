@@ -13,9 +13,8 @@ export type ComponentParam<TId extends string> = {
   id: TId;
 };
 
-export type InquirerResolver<TComponent extends InquireComponent<string, unknown>> = Parameters<
-  TComponent["hookMessage"]
->[2];
+export type ComponentId<T> = T extends InquireComponent<infer TId, unknown> ? TId : never;
+export type ComponentValue<T> = T extends InquireComponent<string, infer TValue> ? TValue : never;
 
 export abstract class InquireComponent<
   TId extends string,

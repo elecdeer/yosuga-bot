@@ -30,7 +30,11 @@ export class TestCommand extends CommandHandler {
         message: "test",
       }
     );
+    result.collect((id, value) => {
+      this.logger.debug(`answer: ${id} ${value}`);
+    });
+    const answer = await result.awaitAll();
 
-    this.logger.debug(JSON.stringify(result));
+    this.logger.debug(JSON.stringify(answer));
   }
 }
