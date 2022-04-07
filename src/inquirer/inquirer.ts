@@ -111,15 +111,15 @@ export class InteractionInquirer {
         value: value,
       });
 
-      //全てansweredになった
+      //全てansweredになったら
       if (answerStatusCollection.every((item) => item.state === "answered")) {
         allDiffered.resolve(
-          answerStatusCollection.reduce<PromptResult<T>>((acc, cur) => {
+          answerStatusCollection.reduce((acc, cur) => {
             return {
               ...acc,
               [cur.id]: cur,
             };
-          })
+          }, {} as PromptResult<T>)
         );
       }
     };

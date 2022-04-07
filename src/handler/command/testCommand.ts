@@ -24,6 +24,9 @@ export class TestCommand extends CommandHandler {
         new ButtonComponent({
           id: "button",
         }),
+        new ButtonComponent({
+          id: "button2",
+        }),
       ],
       {
         time: 60 * 1000,
