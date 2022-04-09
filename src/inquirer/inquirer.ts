@@ -5,9 +5,10 @@ import {
   MessageComponentInteraction,
   MessageEmbed,
 } from "discord.js";
+import EventEmitter from "events";
 import { getLogger } from "log4js";
 
-import { Deferred } from "../util/deferred";
+import { TypedEventEmitter } from "../util/typedEventEmitter";
 import { ComponentId, ComponentValue, InquireComponent } from "./inquireComponent";
 
 export type PromptParam = {
@@ -25,12 +26,51 @@ export type InteractionInquirerParam = {
   splitMessage?: boolean;
 };
 
-type PromptResult<T extends InquireComponent<string, unknown>> = {
+type InquireComponentBase = InquireComponent<string, unknown>;
+
+/**
+ * promptの返り値
+ */
+type PromptResult<T extends InquireComponentBase> = {
   [K in T["id"]]: {
     id: K;
     value: ComponentValue<Extract<T, InquireComponent<K, unknown>>>;
   };
 };
+
+/**
+ * 各コンポーネントの回答状態
+ */
+type AnswerStatus<T extends InquireComponentBase> =
+  | {
+      id: ComponentId<T>;
+      state: "unanswered";
+    }
+  | {
+      id: ComponentId<T>;
+      state: "answered";
+      value: ComponentValue<T>;
+    }
+  | {
+      id: ComponentId<T>;
+      state: "timeout";
+    };
+
+/**
+ * promptの状態
+ */
+type Context<T extends InquireComponentBase> = {
+  answers: Collection<ComponentId<T>, AnswerStatus<T>>;
+};
+
+/**
+ * 回答を得られたときのイベントハンドラ
+ */
+type AnswerEventHandler<T extends InquireComponentBase> = (
+  context: Context<T>,
+  id: ComponentId<T>,
+  value: ComponentValue<T>
+) => void;
 
 const logger = getLogger("Inquirer");
 
@@ -41,13 +81,15 @@ export class InteractionInquirer {
     this.param = param;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async prompt<T extends InquireComponent<string, any, any>>(
+  async prompt<T extends InquireComponent<string, unknown>>(
     components: T[],
     promptParam: PromptParam
   ): Promise<{
-    collect: (handler: (id: ComponentId<T>, value: ComponentValue<T>) => void) => void;
     awaitAll: () => Promise<PromptResult<T>>;
+    awaitAnswer: <TId extends ComponentId<T>>(
+      id: TId
+    ) => Promise<{ id: TId; value: ComponentValue<Extract<T, InquireComponent<TId, unknown>>> }>;
+    collect: (handler: AnswerEventHandler<T>) => void;
   }> {
     const applyParam: PromptParam = {
       ...this.param,
@@ -74,21 +116,6 @@ export class InteractionInquirer {
       components: components.map((com) => com.createComponent()).flat(),
     });
 
-    type AnswerStatus<TComponent extends T> =
-      | {
-          id: ComponentId<TComponent>;
-          state: "unanswered";
-        }
-      | {
-          id: ComponentId<TComponent>;
-          state: "answered";
-          value: ComponentValue<TComponent>;
-        }
-      | {
-          id: ComponentId<TComponent>;
-          state: "timeout";
-        };
-
     const entries: [ComponentId<T>, AnswerStatus<T>][] = components.map((com) => {
       const key = com.id as ComponentId<T>;
       const value = {
@@ -99,56 +126,76 @@ export class InteractionInquirer {
     });
     const answerStatusCollection = new Collection<ComponentId<T>, AnswerStatus<T>>(entries);
 
-    const allDiffered = new Deferred<PromptResult<T>>();
+    const context: Context<T> = {
+      answers: answerStatusCollection,
+    };
 
-    const answer = <TComponent extends T>(
-      id: ComponentId<TComponent>,
-      value: ComponentValue<TComponent>
-    ) => {
+    // const allDiffered = new Deferred<PromptResult<T>>();
+
+    const answerEvent = new EventEmitter() as TypedEventEmitter<{
+      answered: Parameters<AnswerEventHandler<T>>;
+    }>;
+
+    answerEvent.on("answered", (context, id, value) => {
       answerStatusCollection.set(id, {
         id: id,
         state: "answered",
         value: value,
       });
-
-      //全てansweredになったら
-      if (answerStatusCollection.every((item) => item.state === "answered")) {
-        allDiffered.resolve(
-          answerStatusCollection.reduce((acc, cur) => {
-            return {
-              ...acc,
-              [cur.id]: cur,
-            };
-          }, {} as PromptResult<T>)
-        );
-      }
-    };
-
-    const handlers: ((id: ComponentId<T>, value: ComponentValue<T>) => void)[] = [];
+    });
 
     components.forEach((com) => {
       com.hookMessage(message, applyParam, (value) => {
         const id = com.id as ComponentId<T>;
         const answerValue = value as ComponentValue<T>;
-        answer(id, answerValue);
-        handlers.forEach((handler) => {
-          handler(id, answerValue);
-        });
+
+        answerEvent.emit("answered", context, id, answerValue);
       });
     });
 
     const awaitAll = (): Promise<PromptResult<T>> => {
-      return allDiffered.promise;
+      return new Promise<PromptResult<T>>((resolve) => {
+        answerEvent.on("answered", (context) => {
+          if (context.answers.every((item) => item.state === "answered")) {
+            resolve(
+              answerStatusCollection.reduce((acc, cur) => {
+                return {
+                  ...acc,
+                  [cur.id]: cur,
+                };
+              }, {} as PromptResult<T>)
+            );
+          }
+        });
+      });
     };
     //TODO タイムアウト時の処理
 
-    const collect = (handler: (id: ComponentId<T>, value: ComponentValue<T>) => void) => {
-      handlers.push(handler);
+    const awaitAnswer = <TId extends ComponentId<T>>(id: TId) => {
+      return new Promise<{
+        id: TId;
+        value: ComponentValue<Extract<T, InquireComponent<TId, unknown>>>;
+      }>((resolve) => {
+        answerEvent.on("answered", (context, idEvent, valueEvent) => {
+          if (idEvent !== id) return;
+          resolve({
+            id: id,
+            value: valueEvent,
+          });
+        });
+      });
+    };
+
+    const collect = (handler: AnswerEventHandler<T>) => {
+      answerEvent.on("answered", handler);
     };
 
     return {
       awaitAll,
       collect,
+      awaitAnswer,
     };
+
+    //やっぱhandler周りはイベントにした方がよさそう
   }
 }
