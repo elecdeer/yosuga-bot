@@ -9,7 +9,7 @@ import { MessageInteractionComponent } from "./MessageInteractionComponent";
 
 type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
-export class ButtonComponent<TId extends string> extends MessageInteractionComponent<TId, void> {
+export class SelectComponent<TId extends string> extends MessageInteractionComponent<TId, number> {
   readonly buttonParam: ButtonParam;
 
   constructor(param: { id: TId } & ButtonParam) {
@@ -23,8 +23,8 @@ export class ButtonComponent<TId extends string> extends MessageInteractionCompo
     return [new MessageActionRow().addComponents([button])];
   }
 
-  protected override onInteraction(interaction: MessageComponentInteraction): void | null {
-    return;
+  protected override onInteraction(interaction: MessageComponentInteraction): number | null {
+    return Math.floor(Math.random() * 100);
   }
 }
 
