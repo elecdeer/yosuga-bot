@@ -62,8 +62,6 @@ export class InteractionInquirer {
       components: components.map((com) => com.createComponent()).flat(),
     });
 
-    type CollectorType<T> = T[] extends InquireComponent<string, unknown, infer U>[] ? U : never;
-
     return new AnswerCollector<TId, TValue, TCollector, T>(
       components.map((com) => {
         const collector = com.createCollector(message, applyParam);

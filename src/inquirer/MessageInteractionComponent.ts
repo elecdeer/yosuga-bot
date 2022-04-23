@@ -19,11 +19,6 @@ export abstract class MessageInteractionComponent<TId extends string, TValue>
 
   abstract createComponent(): MessageActionRow[];
 
-  hookMessage(context: AnswerCallback<TValue>, message: Message, param: PromptParam): void {
-    const collector = this.createCollector(message, param);
-    this.hookCollector(context, collector);
-  }
-
   public createCollector(
     message: Message,
     param: PromptParam

@@ -48,7 +48,7 @@ export class AnswerCollector<
   TCollector,
   T extends InquireComponent<TId, TValue, TCollector>
 > extends TypedEventEmitter<Events<TId, TValue, T>> {
-  answerStatus: Collection<TId, AnswerStatus<TId, TValue, T>>;
+  readonly answerStatus: Collection<TId, AnswerStatus<TId, TValue, T>>;
 
   constructor(
     //ここの型定義ちょっと甘いけど面倒なのでこのまま
