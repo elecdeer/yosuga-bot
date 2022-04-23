@@ -9,11 +9,15 @@ import { MessageInteractionComponent } from "./MessageInteractionComponent";
 
 type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
-export class ButtonComponent<TId extends string> extends MessageInteractionComponent<TId, void> {
+export class ButtonComponent<TId extends string> extends MessageInteractionComponent<
+  TId,
+  void,
+  "BUTTON"
+> {
   readonly buttonParam: ButtonParam;
 
   constructor(param: { id: TId } & ButtonParam) {
-    super(param);
+    super(param, "BUTTON");
     this.buttonParam = param;
   }
 

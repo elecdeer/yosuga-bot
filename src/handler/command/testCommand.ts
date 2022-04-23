@@ -2,7 +2,7 @@ import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
 import { ButtonComponent } from "../../inquirer/buttonComponent";
 import { InteractionInquirer } from "../../inquirer/inquirer";
-import { SelectComponent } from "../../inquirer/selectComponent";
+import { SelectComponent, SelectOption } from "../../inquirer/selectComponent";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
 
 export class TestCommand extends CommandHandler {
@@ -20,6 +20,17 @@ export class TestCommand extends CommandHandler {
       message: "テスト",
     });
 
+    const options: SelectOption<"hello" | number>[] = [
+      {
+        label: "str",
+        value: "hello" as const,
+      },
+      {
+        label: "num",
+        value: 100,
+      },
+    ];
+
     const result = await inquirer.prompt(
       [
         new ButtonComponent({
@@ -30,6 +41,7 @@ export class TestCommand extends CommandHandler {
         }),
         new SelectComponent({
           id: "select",
+          options: options,
         }),
       ],
       {
@@ -49,9 +61,7 @@ export class TestCommand extends CommandHandler {
     this.logger.debug("select answered");
     const res2 = await result.awaitAnswer("button2");
 
-    const resAll = await result.awaitAllAnswer().catch((reason) => {
-      return "rejected";
-    });
+    const resAll = await result.awaitAllAnswer();
 
     this.logger.debug("allAnswered");
     this.logger.debug(JSON.stringify(resAll));

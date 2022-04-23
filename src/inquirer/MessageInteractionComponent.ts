@@ -1,20 +1,27 @@
 import {
   InteractionCollector,
+  MappedInteractionTypes,
   Message,
   MessageActionRow,
-  MessageComponentInteraction,
+  MessageComponentTypeResolvable,
 } from "discord.js";
 
 import { AnswerCallback, ComponentParam, InquireComponent } from "./inquireComponent";
 import { PromptParam } from "./inquirer";
 
-export abstract class MessageInteractionComponent<TId extends string, TValue>
-  implements InquireComponent<TId, TValue, InteractionCollector<MessageComponentInteraction>>
+export abstract class MessageInteractionComponent<
+  TId extends string,
+  TValue,
+  TInteractionType extends MessageComponentTypeResolvable
+> implements
+    InquireComponent<TId, TValue, InteractionCollector<MappedInteractionTypes[TInteractionType]>>
 {
   readonly id: TId;
+  readonly interactionType: TInteractionType;
 
-  protected constructor({ id }: ComponentParam<TId>) {
+  protected constructor({ id }: ComponentParam<TId>, type: TInteractionType) {
     this.id = id;
+    this.interactionType = type;
   }
 
   abstract createComponent(): MessageActionRow[];
@@ -22,8 +29,9 @@ export abstract class MessageInteractionComponent<TId extends string, TValue>
   public createCollector(
     message: Message,
     param: PromptParam
-  ): InteractionCollector<MessageComponentInteraction> {
+  ): InteractionCollector<MappedInteractionTypes[TInteractionType]> {
     return message.createMessageComponentCollector({
+      componentType: this.interactionType,
       filter: (interaction) => interaction.customId === this.id,
       time: param.time,
       idle: param.idle,
@@ -32,7 +40,7 @@ export abstract class MessageInteractionComponent<TId extends string, TValue>
 
   public hookCollector(
     context: AnswerCallback<TValue>,
-    collector: InteractionCollector<MessageComponentInteraction>
+    collector: InteractionCollector<MappedInteractionTypes[TInteractionType]>
   ): void {
     collector.on("collect", async (interaction) => {
       await interaction.deferUpdate();
@@ -47,5 +55,7 @@ export abstract class MessageInteractionComponent<TId extends string, TValue>
     });
   }
 
-  protected abstract onInteraction(interaction: MessageComponentInteraction): TValue | null;
+  protected abstract onInteraction(
+    interaction: MappedInteractionTypes[TInteractionType]
+  ): TValue | null;
 }

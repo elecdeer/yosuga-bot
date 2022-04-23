@@ -9,7 +9,6 @@ export type PromptParam = {
   time?: number;
   idle?: number;
   ephemeral?: boolean;
-  onTimeout?: () => void;
   // onInteract?: (interaction: MessageComponentInteraction) => boolean;
 };
 
