@@ -5,7 +5,7 @@ import {
   MessageComponentInteraction,
 } from "discord.js";
 
-import { MessageInteractionComponent } from "./MessageInteractionComponent";
+import { MessageInteractionComponent } from "./messageInteractionComponent";
 
 type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 

@@ -7,7 +7,7 @@ import {
   SelectMenuInteraction,
 } from "discord.js";
 
-import { MessageInteractionComponent } from "./MessageInteractionComponent";
+import { MessageInteractionComponent } from "./messageInteractionComponent";
 
 type SelectorParam = Partial<Omit<MessageSelectMenuOptions, "customId" | "type" | "options">>;
 
