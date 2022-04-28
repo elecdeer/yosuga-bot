@@ -66,7 +66,7 @@
     "bufferutil": "^4.0.6",
     "charset": "^1.0.1",
     "deepmerge": "^4.2.2",
-    "discord-api-types": "^0.31.0",
+    "discord-api-types": "^0.32.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "emoji-regex": "^10.1.0",
