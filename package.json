@@ -55,7 +55,7 @@
   "dependencies": {
     "@aspida/axios": "^1.10.0",
     "@discordjs/opus": "^0.7.0",
-    "@discordjs/rest": "^0.3.0",
+    "@discordjs/rest": "^0.4.1",
     "@discordjs/voice": "0.9.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@kvs/node-localstorage": "^2.1.1",
