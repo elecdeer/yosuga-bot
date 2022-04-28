@@ -57,14 +57,28 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       return;
     }
 
-    const voiceOptions: MessageSelectOptionData[] = Object.values(voices).map((item) => ({
+    const voiceList = Object.values(voices).sort((a, b) => {
+      if (a.type != b.type) {
+        return a.type.localeCompare(b.type);
+      }
+      return a.voiceName.localeCompare(b.voiceName, "ja");
+    });
+
+    const defaultName = "!default!";
+    const defaultOption = {
+      label: "デフォルト",
+      description: "上位の設定を使用する",
+      value: defaultName,
+    };
+
+    const voiceOptions: MessageSelectOptionData[] = voiceList.map((item) => ({
       label: item.voiceName,
       description: `[${item.type}]`,
       value: item.voiceName,
     }));
     const voiceMenu = new MessageSelectMenu()
       .setCustomId("voice")
-      .addOptions(voiceOptions)
+      .addOptions([defaultOption, ...voiceOptions])
       .setPlaceholder("Voice");
 
     const valueMap = range(0, 21).map((i) => i / 10);
@@ -75,7 +89,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
     }));
     const pitchMenu = new MessageSelectMenu()
       .setCustomId("pitch")
-      .addOptions(pitchOptions)
+      .addOptions([defaultOption, ...pitchOptions])
       .setPlaceholder("Pitch");
 
     const intonationOptions: MessageSelectOptionData[] = valueMap.map((f, index) => ({
@@ -84,7 +98,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
     }));
     const intonationMenu = new MessageSelectMenu()
       .setCustomId("intonation")
-      .addOptions(intonationOptions)
+      .addOptions([defaultOption, ...intonationOptions])
       .setPlaceholder("Intonation");
 
     const testButton = new MessageButton()
@@ -103,7 +117,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       ],
     });
 
-    const collector = replyMessage.createMessageComponentCollector({
+    const collector = replyMessage.createMessageComponentCollector<"BUTTON" | "SELECT_MENU">({
       idle: 5 * 60 * 1000,
       filter: (interaction) => {
         return interaction.user.id === context.interaction.user.id;
@@ -115,7 +129,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       const currentValue = await this.getCurrentConfigValue(accessor);
 
       if (interaction.customId === "voice" && interaction.isSelectMenu()) {
-        const newName = interaction.values[0];
+        const newName = interaction.values[0] === defaultName ? undefined : interaction.values[0];
 
         await accessor.set("speakerName", newName);
         await interaction.deferUpdate();
@@ -130,7 +144,11 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       }
 
       if (interaction.customId === "pitch" && interaction.isSelectMenu()) {
-        const newPitch = valueMap[Number.parseInt(interaction.values[0])];
+        const newPitch =
+          interaction.values[0] === defaultName
+            ? undefined
+            : valueMap[Number.parseInt(interaction.values[0])];
+
         await accessor.set("speakerPitch", newPitch);
         await interaction.deferUpdate();
         await replyMessage.edit({
@@ -145,14 +163,18 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       }
 
       if (interaction.customId === "intonation" && interaction.isSelectMenu()) {
-        const intonation = valueMap[Number.parseInt(interaction.values[0])];
-        await accessor.set("speakerIntonation", intonation);
+        const newIntonation =
+          interaction.values[0] === defaultName
+            ? undefined
+            : valueMap[Number.parseInt(interaction.values[0])];
+
+        await accessor.set("speakerIntonation", newIntonation);
         await interaction.deferUpdate();
         await replyMessage.edit({
           embeds: [
             this.constructConfigReplyEmbed(oldValue, {
               ...currentValue,
-              intonation: intonation,
+              intonation: newIntonation,
             }),
           ],
         });
@@ -162,7 +184,9 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       if (interaction.customId === "test" && interaction.isButton() && context.session) {
         await context.session.pushSpeech(
           {
-            text: "これは音声のテストです。",
+            text: `${context.session.getUsernamePronunciation(
+              interaction.member
+            )} これは音声のテストです。`,
           },
           interaction.user.id
         );
