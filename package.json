@@ -33,7 +33,6 @@
   "devDependencies": {
     "@types/async": "^3.2.12",
     "@types/charset": "^1.0.2",
-    "@types/encoding-japanese": "^1.0.18",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.23",
     "@types/open-graph-scraper": "^4.8.1",
