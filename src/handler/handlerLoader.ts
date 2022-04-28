@@ -21,6 +21,7 @@ import { EndCommand } from "./command/endCommand";
 import { GuildConfigCommand } from "./command/guildConfigCommand";
 import { MasterConfigCommand } from "./command/masterConfigCommand";
 import { StartCommand } from "./command/startCommand";
+import { TestCommand } from "./command/testCommand";
 import { UserConfigCommand } from "./command/userConfigCommand";
 import { VersionCommand } from "./command/versionCommand";
 import { VoiceStatusCommand } from "./command/voiceStatusCommand";
@@ -84,6 +85,7 @@ export const loadCommands = (client: Client, yosuga: YosugaClient): CommandHandl
       new AddSpeakerVoicevoxSub(yosuga, "MASTER"),
       new AddSpeakerTtsSub(yosuga, "MASTER"),
     ]),
+    new TestCommand(yosuga),
   ];
 };
 

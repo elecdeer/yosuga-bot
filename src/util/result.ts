@@ -17,6 +17,9 @@ class Success<T> {
   isFailure(): this is Failure<T> {
     return false;
   }
+  unwrap(): T {
+    return this.value;
+  }
 }
 
 class Failure<E> {
@@ -27,5 +30,8 @@ class Failure<E> {
   }
   isFailure(): this is Failure<E> {
     return true;
+  }
+  unwrap(): never {
+    throw this.value;
   }
 }
