@@ -88,7 +88,7 @@ export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]
     client.on("voiceStateUpdate", handleEnterChannel);
 
     //時間待ち中に退出した場合
-    const leaveFilter = enterVoiceChannelFilter(this.session.voiceChannel);
+    const leaveFilter = leaveVoiceChannelFilter(this.session.voiceChannel);
     const handleLeaveChannel = leaveFilter((oldState) => {
       if (oldState.member?.id === this.yosuga.client.user.id) {
         cancelAutoLeave();
