@@ -36,7 +36,6 @@ export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate
     //ReDoS防止のために頭にも文字数制限入れてる
 
     return new ProcessorChain()
-      .use(maxLengthProcessor(config.maxStringLength))
       .use(codeBlockProcessor())
       .use(nlSplitProcessor())
       .use(urlProcessor(config.fastSpeedScale))
