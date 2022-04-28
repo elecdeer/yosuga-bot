@@ -1,8 +1,8 @@
 import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
-import { ButtonComponent } from "../../inquirer/buttonComponent";
+import { ButtonComponent } from "../../inquirer/component/buttonComponent";
+import { MultiSelectComponent, SelectOption } from "../../inquirer/component/multiSelectComponent";
 import { InteractionInquirer } from "../../inquirer/inquirer";
-import { SelectComponent, SelectOption } from "../../inquirer/selectComponent";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
 
 export class TestCommand extends CommandHandler {
@@ -39,7 +39,7 @@ export class TestCommand extends CommandHandler {
         new ButtonComponent({
           id: "button2",
         }),
-        new SelectComponent({
+        new MultiSelectComponent({
           id: "select",
           options: options,
         }),

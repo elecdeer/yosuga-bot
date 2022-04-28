@@ -1,7 +1,7 @@
 import { Collection } from "discord.js";
 
 import { TypedEventEmitter } from "../util/typedEventEmitter";
-import { ComponentId, ComponentValue, InquireComponent } from "./inquireComponent";
+import { ComponentId, ComponentValue, InquireComponent } from "./component/inquireComponent";
 
 /**
  * 各コンポーネントの回答状態
@@ -74,7 +74,7 @@ export class AnswerCollector<
     this.hookCollectors(componentWithCollectors);
   }
 
-  protected hookCollectors(
+  public hookCollectors(
     componentWithCollectors: {
       component: T;
       collector: TCollector;

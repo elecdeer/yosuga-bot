@@ -6,8 +6,8 @@ import {
   MessageComponentTypeResolvable,
 } from "discord.js";
 
+import { PromptParam } from "../inquirer";
 import { AnswerCallback, ComponentParam, InquireComponent } from "./inquireComponent";
-import { PromptParam } from "./inquirer";
 
 export abstract class MessageInteractionComponent<
   TId extends string,

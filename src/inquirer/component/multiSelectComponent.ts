@@ -19,7 +19,7 @@ export type SelectOption<T> = {
   emoji?: EmojiIdentifierResolvable;
 };
 
-export class SelectComponent<
+export class MultiSelectComponent<
   TOptionValue,
   TId extends string = string
 > extends MessageInteractionComponent<TId, TOptionValue[], "SELECT_MENU"> {

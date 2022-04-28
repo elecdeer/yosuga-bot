@@ -1,6 +1,6 @@
 import { Message, MessageActionRow } from "discord.js";
 
-import { PromptParam } from "./inquirer";
+import { PromptParam } from "../inquirer";
 
 export type ComponentParam<TId extends string> = {
   id: TId;

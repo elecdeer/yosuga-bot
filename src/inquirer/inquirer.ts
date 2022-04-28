@@ -1,11 +1,11 @@
-import { BaseCommandInteraction, Message, MessageEmbed } from "discord.js";
+import { BaseCommandInteraction, Collection, Message, MessageEmbed, Snowflake } from "discord.js";
 import { getLogger } from "log4js";
 
 import { AnswerCollector } from "./answerCollector";
-import { InquireComponent } from "./inquireComponent";
+import { InquireComponent } from "./component/inquireComponent";
 
 export type PromptParam = {
-  message: string | MessageEmbed;
+  message: MessageContent;
   time?: number;
   idle?: number;
   ephemeral?: boolean;
@@ -14,9 +14,11 @@ export type PromptParam = {
 
 export type InteractionInquirerParam = {
   replyRoot: BaseCommandInteraction<"cached"> | Message<true>;
-  formatMessage?: (message: string | MessageEmbed) => string | MessageEmbed;
+  formatMessage?: (message: MessageContent) => MessageContent;
   splitMessage?: boolean;
 };
+
+type MessageContent = string | MessageEmbed;
 
 const logger = getLogger("Inquirer");
 
@@ -41,34 +43,103 @@ export class InteractionInquirer {
       ...promptParam,
     };
 
-    const formattedMessage = this.param.formatMessage
-      ? this.param.formatMessage(applyParam.message)
-      : applyParam.message;
+    const createMessageContent = (messageContent: MessageContent) => {
+      const formattedMessage = this.param.formatMessage
+        ? this.param.formatMessage(messageContent)
+        : messageContent;
 
-    const messageOption =
-      typeof formattedMessage === "string"
-        ? {
-            content: formattedMessage,
-          }
-        : {
-            embeds: [formattedMessage],
-          };
+      if (typeof formattedMessage === "string") {
+        return {
+          content: formattedMessage,
+        };
+      } else {
+        return {
+          embeds: [formattedMessage],
+        };
+      }
+    };
 
-    const message = await this.param.replyRoot.reply({
-      ...messageOption,
-      fetchReply: true,
-      ephemeral: applyParam.ephemeral,
-      components: components.map((com) => com.createComponent()).flat(),
-    });
+    const createMessageOption = (messageContent: MessageContent) => {
+      return {
+        ...createMessageContent(messageContent),
+        fetchReply: true as const,
+        ephemeral: applyParam.ephemeral,
+        components: components.map((com) => com.createComponent()).flat(),
+      };
+    };
 
-    return new AnswerCollector<TId, TValue, TCollector, T>(
-      components.map((com) => {
-        const collector = com.createCollector(message, applyParam);
+    const firstMessageOption = createMessageOption(this.param.message);
+    const firstMessage = await this.param.replyRoot.reply(firstMessageOption);
+
+    // const messages: Message[] = [firstMessage];
+    const messages = new Collection<Snowflake, Message>();
+    messages.set(firstMessage.id, firstMessage);
+
+    // TODO 実装予定のpromptController
+    // const promptController = {
+    //   close: async (messageContent?: MessageContent) => {
+    //     //送ったMessageを削除/コンポーネントを削除するようeditする
+    //
+    //     const latestMessage = messages.last();
+    //     if (!latestMessage) {
+    //       logger.warn("Messageが一度も送信されていないのにCloseを呼び出しました");
+    //       return;
+    //     }
+    //     const messageOption: MessageEditOptions = messageContent
+    //       ? {
+    //           ...createMessageContent(messageContent),
+    //           components: [],
+    //         }
+    //       : {
+    //           content: latestMessage?.content,
+    //           embeds: latestMessage?.embeds,
+    //           components: [],
+    //         };
+    //
+    //     await latestMessage.edit(messageOption);
+    //
+    //     //TODO AnswerCollector側にcloseしたことを知らせる必要がある
+    //   },
+    //   repost: async (messageContent?: MessageContent) => {
+    //     //新しくMessageを作りpostする
+    //   },
+    //   reconstruct: async (messageContent?: MessageContent) => {
+    //     //送ったMessageをeditする
+    //
+    //     const latestMessage = messages.last();
+    //     if (!latestMessage) {
+    //       logger.warn("Messageが一度も送信されていないのにCloseを呼び出しました");
+    //       return;
+    //     }
+    //     const messageOption: MessageEditOptions = messageContent
+    //       ? {
+    //           ...createMessageContent(messageContent),
+    //           components: [],
+    //         }
+    //       : {
+    //           content: latestMessage?.content,
+    //           embeds: latestMessage?.embeds,
+    //           components: [],
+    //         };
+    //
+    //     await latestMessage.edit(messageOption);
+    //   },
+    // };
+    //いずれもcollector作り直してhookし直す必要がある
+
+    const constructCollectorPairs = () => {
+      return components.map((com) => {
+        const collector = com.createCollector(firstMessage, applyParam);
         return {
           component: com,
           collector: collector,
         };
-      })
+      });
+    };
+
+    const answerCollector = new AnswerCollector<TId, TValue, TCollector, T>(
+      constructCollectorPairs()
     );
+    return answerCollector;
   }
 }
