@@ -56,7 +56,7 @@
     "@aspida/axios": "^1.9.1",
     "@discordjs/opus": "^0.7.0",
     "@discordjs/rest": "^0.3.0",
-    "@discordjs/voice": "0.8.0",
+    "@discordjs/voice": "0.9.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@kvs/node-localstorage": "^2.1.1",
     "@kvs/types": "^2.1.1",
