@@ -1,4 +1,3 @@
-import assert from "assert";
 import {
   CommandInteraction,
   Guild,
@@ -84,19 +83,17 @@ export class CommandContextSlash extends CommandContext {
     components?: MessageActionRow[];
     channel?: Readonly<TextChannel>;
     ephemeral?: boolean;
-  }): Promise<Message<true>> {
+  }): Promise<Message> {
     if (Array.isArray(content) && content.length > 10) {
       logger.error("10個以上のembedsを含む返信にはreplyMultiを使用する必要があります");
     }
 
     const embeds = constructEmbeds(type, content);
     if (channel) {
-      const message = await channel.send({
+      return channel.send({
         embeds: embeds,
         components: components,
       });
-      assert(message.inGuild());
-      return message;
     }
 
     if (this.interaction.deferred || this.interaction.replied) {
@@ -128,7 +125,7 @@ export class CommandContextSlash extends CommandContext {
     content: MessageEmbed[];
     channel?: Readonly<TextChannel>;
     ephemeral?: boolean;
-  }): Promise<Message<true>[]> {
+  }): Promise<Message[]> {
     const embeds = constructEmbeds(type, content);
 
     //embedは各Messageに10個まで

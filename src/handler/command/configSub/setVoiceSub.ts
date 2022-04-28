@@ -117,7 +117,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       ],
     });
 
-    const collector = replyMessage.createMessageComponentCollector<"BUTTON" | "SELECT_MENU">({
+    const collector = replyMessage.createMessageComponentCollector({
       idle: 5 * 60 * 1000,
       filter: (interaction) => {
         return interaction.user.id === context.interaction.user.id;
@@ -184,9 +184,7 @@ export class SetVoiceSub extends ConfigSubCommandHandler<MasterLevel | GuildLeve
       if (interaction.customId === "test" && interaction.isButton() && context.session) {
         await context.session.pushSpeech(
           {
-            text: `${context.session.getUsernamePronunciation(
-              interaction.member
-            )} これは音声のテストです。`,
+            text: "これは音声のテストです。",
           },
           interaction.user.id
         );
