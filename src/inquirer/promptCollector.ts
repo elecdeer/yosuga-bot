@@ -1,4 +1,5 @@
 import { Collection } from "discord.js";
+import { getLogger } from "log4js";
 
 import { TypedEventEmitter } from "../util/typedEventEmitter";
 import {
@@ -10,6 +11,8 @@ import {
   PromptResult,
   PromptStatus,
 } from "./promptTypes";
+
+const logger = getLogger("promptCollector");
 
 export const createPromptCollector = <T extends Record<string, PromptComponent<unknown>>>(
   answerStatus: Collection<keyof T, AnswerStatus<PromptComponentValue<T[keyof T]>>>,
@@ -53,13 +56,15 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
       };
     });
 
-  const reduceAnswerResultToObj = (): PromptResult<T> =>
-    answerStatus.reduce<PromptResult<T>>((acc, cur, key) => {
+  const reduceAnswerResultToObj = (): PromptResult<T> => {
+    logger.debug(answerStatus);
+    return answerStatus.reduce((acc, cur, key) => {
       return {
         ...acc,
         [key]: cur.status === "answered" ? cur.value : null,
       };
-    });
+    }, {} as PromptResult<T>);
+  };
 
   const awaitAll: PromptCollector<T>["awaitAll"] = () =>
     new Promise((resolve, reject) => {
@@ -71,6 +76,7 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
           | undefined;
 
       if (checkAllAnswered()) {
+        logger.debug(reduceAnswerResultToObj());
         resolve(reduceAnswerResultToObj());
       }
 

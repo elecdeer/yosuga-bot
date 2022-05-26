@@ -4,6 +4,11 @@ import { Lazy } from "../util/lazy";
 import { ReplyDestination } from "../util/replyHelper";
 import { Awaited } from "../util/typedEventEmitter";
 
+//TODO AwaitedはTS標準の型と名前が被っているのでやめる
+//TODO PromptComponentFactoryを止めてコンポーネントごとに定義するように
+//TODO Component生成の基本的な部分を切り出す
+//TODO Button, Toggle, SingleSelect, MultiSelect, ModalTextInput,
+
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
   update: {
     key: keyof T;
@@ -107,7 +112,11 @@ export interface PromptComponent<TValue> {
   /**
    * MessageへのInteractionを拾うhookを掛ける
    */
-  hook: (message: Message, param: PromptParamHook, updateCallback: () => void) => void;
+  hook: (
+    message: Message,
+    param: PromptParamHook,
+    updateCallback: () => void
+  ) => void | (() => Awaited);
 
   getStatus: () => AnswerStatus<TValue>;
 }
