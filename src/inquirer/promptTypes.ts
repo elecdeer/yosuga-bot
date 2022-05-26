@@ -10,13 +10,6 @@ import {
 import { Lazy } from "../util/lazy";
 import { ReplyDestination } from "../util/replyHelper";
 
-export type Prompt<T extends Record<string, PromptComponent<unknown>>> = (
-  components: T
-) => Promise<{
-  controller: PromptController;
-  collector: PromptCollector<T>;
-}>;
-
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
   update: {
     key: keyof T;
