@@ -1,6 +1,6 @@
 import { Collection } from "discord.js";
 
-import { createReplyHelper, ReplyDestination } from "../util/replyHelper";
+import { ReplyDestination } from "../util/replyHelper";
 import { TypedEventEmitter } from "../util/typedEventEmitter";
 import { createPromptCollector } from "./promptCollector";
 import { createPromptController } from "./promptController";
@@ -25,7 +25,6 @@ export const prompt = async <T extends Record<string, PromptComponent<unknown>>>
   const componentCollection = new Collection<keyof T, T[keyof T]>(
     Object.entries(components) as [keyof T, T[keyof T]][]
   );
-  const replyHelper = createReplyHelper(replyDestination, param);
 
   const answerStatus = componentCollection.mapValues((com) => com.getStatus()) as Collection<
     keyof T,
