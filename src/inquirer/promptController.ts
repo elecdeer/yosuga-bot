@@ -2,7 +2,7 @@ import { Collection, Message, MessageActionRow } from "discord.js";
 
 import { resolveLazy } from "../util/lazy";
 import { createReplyHelper, ReplyDestination } from "../util/replyHelper";
-import { TypedEventEmitter } from "../util/typedEventEmitter";
+import { Awaited, TypedEventEmitter } from "../util/typedEventEmitter";
 import { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
 
 export const createPromptController = async <T extends Record<string, PromptComponent<unknown>>>(
@@ -21,14 +21,22 @@ export const createPromptController = async <T extends Record<string, PromptComp
     }, []);
   };
 
-  const hookComponents = (message: Message) => {
-    componentCollection.forEach((com, key) =>
-      com.hook(message, param, () => {
-        event.emit("update", {
-          key: key,
-          status: com.getStatus() as PromptEvent<T>["update"]["status"],
-        });
-      })
+  let hookCleaner: (() => Awaited)[];
+  const hookComponents = async (message: Message) => {
+    if (hookCleaner) {
+      await Promise.all(hookCleaner.map((item) => item()));
+    }
+    hookCleaner = componentCollection.map(
+      (com, key) =>
+        com.hook(message, param, () => {
+          event.emit("update", {
+            key: key,
+            status: com.getStatus() as PromptEvent<T>["update"]["status"],
+          });
+        }) ??
+        (() => {
+          return;
+        })
     );
   };
 
@@ -45,7 +53,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
       ephemeral: param.ephemeral,
     });
 
-    hookComponents(message);
+    await hookComponents(message);
   };
 
   //これまでに送ったMessageからcomponentsを削除
@@ -86,7 +94,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
       components: actionRows,
     });
 
-    hookComponents(editMessage);
+    await hookComponents(editMessage);
   };
 
   const repost = async (destination: ReplyDestination, rerender?: boolean) => {
