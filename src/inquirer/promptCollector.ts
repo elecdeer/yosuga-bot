@@ -23,9 +23,18 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
       }
 
       const handler = ({ key, status }: PromptEvent<T>["update"]) => {
-        if (key === watchKey && status.status === "answered") {
+        if (key !== watchKey) {
+          return;
+        }
+
+        if (status.status === "answered") {
           event.off("update", handler);
           resolve(status.value);
+        }
+
+        if (status.status === "rejected") {
+          event.off("update", handler);
+          reject(status.reason);
         }
       };
       event.on("update", handler);
@@ -56,15 +65,28 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
     new Promise((resolve, reject) => {
       //全てansweredになったタイミングでの状態を返したいのでawaitOneの組合せではだめ
       const checkAllAnswered = () => answerStatus.every((status) => status.status === "answered");
+      const checkSomeRejected = () =>
+        answerStatus.find((status) => status.status === "rejected") as
+          | { status: "rejected"; reason: string }
+          | undefined;
 
       if (checkAllAnswered()) {
         resolve(reduceAnswerResultToObj());
+      }
+
+      const checkRejected = checkSomeRejected();
+      if (checkRejected) {
+        reject(checkRejected.reason);
       }
 
       const handler = () => {
         if (checkAllAnswered()) {
           event.off("update", handler);
           resolve(reduceAnswerResultToObj());
+        }
+        const checkRejected = checkSomeRejected();
+        if (checkRejected) {
+          reject(checkRejected.reason);
         }
       };
       event.on("update", handler);
