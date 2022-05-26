@@ -1,14 +1,8 @@
-import {
-  BaseCommandInteraction,
-  Message,
-  MessageActionRow,
-  MessageComponentInteraction,
-  MessageEmbed,
-  TextChannel,
-} from "discord.js";
+import { Message, MessageActionRow, MessageEmbed } from "discord.js";
 
 import { Lazy } from "../util/lazy";
 import { ReplyDestination } from "../util/replyHelper";
+import { Awaited } from "../util/typedEventEmitter";
 
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
   update: {
@@ -40,11 +34,6 @@ export type PromptParamMessage = {
    * 送信するMessageに含まれるコンテント
    */
   messageContent: Lazy<MessageEmbed>;
-
-  /**
-   * Messageを送信する対象
-   */
-  replyRoot: TextChannel | Message | BaseCommandInteraction | MessageComponentInteraction;
 };
 
 export type PromptParam = PromptParamHook & PromptParamMessage;
@@ -64,14 +53,14 @@ export interface PromptCollector<T extends Record<string, PromptComponent<unknow
   /**
    * 任意のコンポーネントの回答状態変化時のイベントをセット
    */
-  onUpdateAny: (callback: (status: PromptStatus<T>, key: keyof T) => void) => void;
+  onUpdateAny: (callback: (status: PromptStatus<T>, key: keyof T) => Awaited) => void;
 
   /**
    * 特定のコンポーネントの回答状態変化時のイベントをセット
    */
   onUpdateOne: <TKey extends keyof T>(
     key: TKey,
-    callback: (status: PromptStatus<T>[TKey], key: TKey) => void
+    callback: (status: PromptStatus<T>[TKey], key: TKey) => Awaited
   ) => void;
 
   /**

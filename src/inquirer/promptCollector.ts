@@ -99,7 +99,7 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
 
   const onUpdateAny: PromptCollector<T>["onUpdateAny"] = (callback) => {
     const handler = ({ key }: PromptEvent<T>["update"]) => {
-      callback(reduceAnswerStatusToObj(), key);
+      void callback(reduceAnswerStatusToObj(), key);
     };
     event.on("update", handler);
 
@@ -111,7 +111,7 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
   const onUpdateOne: PromptCollector<T>["onUpdateOne"] = (watchKey, callback) => {
     const handler = ({ key }: PromptEvent<T>["update"]) => {
       if (key === watchKey) {
-        callback(answerStatus.get(watchKey)!, watchKey);
+        void callback(answerStatus.get(watchKey)!, watchKey);
       }
     };
     event.on("update", handler);
