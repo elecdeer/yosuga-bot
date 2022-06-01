@@ -12,19 +12,9 @@ export const createButtonComponent = (param: {
   initial?: Lazy<boolean>;
 }): PromptComponent<true> => {
   const customId = param.customId ?? "button";
-  const { getStatus, hook } = messageInteractionHook<true, "BUTTON">(
-    customId,
-    "BUTTON",
-    () => {
-      return {
-        status: "answered",
-        value: true,
-      };
-    },
-    {
-      status: "unanswered",
-    }
-  );
+  const { getStatus, hook } = messageInteractionHook<true, "BUTTON">(customId, "BUTTON", () => {
+    return true;
+  });
 
   return {
     getStatus: getStatus,
