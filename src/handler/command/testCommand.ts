@@ -1,7 +1,6 @@
 import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
 import { createButtonComponent } from "../../inquirer/component/button";
-import { createSelectComponent } from "../../inquirer/component/select";
 import { prompt } from "../../inquirer/prompt";
 import { createYosugaEmbed } from "../../util/createEmbed";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
@@ -18,8 +17,12 @@ export class TestCommand extends CommandHandler {
   override async execute(context: CommandContextSlash): Promise<void> {
     const { controller, collector } = await prompt(
       {
-        toggle: createButtonComponent({}),
-        select: createSelectComponent({}),
+        toggle: createButtonComponent({
+          button: {
+            label: "Test",
+          },
+        }),
+        // select: createSelectComponent({}),
       },
       {
         type: "commandInteraction",
@@ -37,10 +40,10 @@ export class TestCommand extends CommandHandler {
       await controller.edit();
     });
 
-    collector.onUpdateOne("select", async (status) => {
-      this.logger.log(`selected: ${JSON.stringify(status)}`);
-      // await controller.edit();
-    });
+    // collector.onUpdateOne("select", async (status) => {
+    //   this.logger.log(`selected: ${JSON.stringify(status)}`);
+    //   // await controller.edit();
+    // });
 
     const result = await collector.awaitAll();
     this.logger.log(`allSelected: ${JSON.stringify(result)}`);
