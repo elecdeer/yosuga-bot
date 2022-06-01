@@ -10,9 +10,9 @@ import {
 } from "discord.js";
 
 interface ReplyHelper {
-  reply: (param: ReplyParam) => Promise<Message>;
+  reply: (param: ReplyParam) => Promise<Message<true>>;
   changeDestination: (destination: ReplyDestination) => void;
-  postedMessages: Message[];
+  postedMessages: Message<true>[];
 }
 
 type ReplyParam = {
@@ -49,7 +49,7 @@ export const createReplyHelper = (
 ): ReplyHelper => {
   let replyRoot: ReplyDestination = root;
 
-  const messages: Message[] = [];
+  const messages: Message<true>[] = [];
 
   return {
     reply: async (param) => {
@@ -75,44 +75,49 @@ export const createReplyHelper = (
   };
 };
 
-const replyToDestination = (
+const replyToDestination = async (
   root: ReplyDestination,
   param: Omit<ReplyParam, "transferRoot">
-): Promise<Message> => {
-  switch (root.type) {
-    case "textChannel":
-      return root.destination.send({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-      });
-    case "message":
-      return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-      });
-    case "commandInteraction":
-      return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-        fetchReply: true,
-      });
-    case "messageComponentInteraction":
-      return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-        fetchReply: true,
-      });
+): Promise<Message<true>> => {
+  if (root.type === "textChannel") {
+    const message = await root.destination.send({
+      content: param.content,
+      embeds: param.embeds,
+      components: param.components,
+      attachments: param.attachments,
+      allowedMentions: param.allowedMentions,
+    });
+    if (!message.inGuild()) throw new Error("Guild外のTextChannelは指定できません");
+    return message;
+  } else if (root.type === "message") {
+    const message = await root.destination.reply({
+      content: param.content,
+      embeds: param.embeds,
+      components: param.components,
+      attachments: param.attachments,
+      allowedMentions: param.allowedMentions,
+    });
+    if (!message.inGuild()) throw new Error("Guild外のMessageは指定できません");
+    return message;
+  } else if (root.type === "commandInteraction") {
+    return root.destination.reply({
+      content: param.content,
+      embeds: param.embeds,
+      components: param.components,
+      attachments: param.attachments,
+      allowedMentions: param.allowedMentions,
+      fetchReply: true,
+    });
+  } else if (root.type === "messageComponentInteraction") {
+    return root.destination.reply({
+      content: param.content,
+      embeds: param.embeds,
+      components: param.components,
+      attachments: param.attachments,
+      allowedMentions: param.allowedMentions,
+      fetchReply: true,
+    });
   }
+
+  throw new Error("到達不能");
 };
