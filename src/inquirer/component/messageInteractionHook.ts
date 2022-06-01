@@ -9,18 +9,20 @@ import {
 } from "discord.js";
 
 import { Lazy, resolveLazy } from "../../util/lazy";
-import { AnswerStatus, PromptComponent } from "../promptTypes";
+import { PromptComponent } from "../promptTypes";
 
 export const messageInteractionHook = <TValue, TComponent extends MessageComponentType>(
   customId: string,
   componentType: TComponent,
   reducer: (
     interaction: MappedInteractionTypes[TComponent],
-    prevStatus: AnswerStatus<TValue>
-  ) => Awaitable<AnswerStatus<TValue>>,
-  initialState: Lazy<AnswerStatus<TValue>>
-): Pick<PromptComponent<TValue>, "hook" | "getStatus"> => {
-  let status: AnswerStatus<TValue> = resolveLazy(initialState);
+    prevStatus: TValue | null
+  ) => Awaitable<TValue>,
+  initialState?: Lazy<TValue | null>
+): Pick<PromptComponent<TValue>, "hook" | "getStatus"> & {
+  getRawValue: () => TValue | null;
+} => {
+  let status: TValue | null = initialState === undefined ? null : resolveLazy(initialState);
 
   return {
     hook: (message, param, updateCallback) => {
@@ -52,7 +54,19 @@ export const messageInteractionHook = <TValue, TComponent extends MessageCompone
         collector.stop(stopReason);
       };
     },
-    getStatus: () => status,
+    getRawValue: () => status,
+    getStatus: () => {
+      if (status !== null) {
+        return {
+          status: "answered",
+          value: status,
+        };
+      } else {
+        return {
+          status: "unanswered",
+        };
+      }
+    },
   };
 };
 
