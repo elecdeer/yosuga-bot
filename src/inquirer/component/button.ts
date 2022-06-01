@@ -1,9 +1,14 @@
-import { MessageActionRow, MessageButton } from "discord.js";
+import { InteractionButtonOptions, MessageActionRow, MessageButton } from "discord.js";
 
-import { resolveLazy } from "../../util/lazy";
-import { AnswerStatus, PromptComponentFactory } from "../promptTypes";
+import { Lazy, resolveLazy } from "../../util/lazy";
+import { AnswerStatus, PromptComponent } from "../promptTypes";
 
-export const createButtonComponent: PromptComponentFactory<boolean> = (param) => {
+type ButtonParam = Partial<Omit<InteractionButtonOptions, "type">>;
+
+export const createButtonComponent = (param: {
+  button: ButtonParam;
+  initial?: Lazy<boolean>;
+}): PromptComponent<boolean> => {
   let status: AnswerStatus<boolean> = {
     status: "answered",
     value: resolveLazy(param.initial) ?? false,
@@ -17,7 +22,7 @@ export const createButtonComponent: PromptComponentFactory<boolean> = (param) =>
           new MessageButton()
             .setCustomId("primary")
             .setStyle("PRIMARY")
-            .setEmoji(status.status === "answered" && status.value ? "👍" : "👎")
+            .setEmoji(status.value ? "👍" : "👎")
         ),
       ];
     },
@@ -34,7 +39,7 @@ export const createButtonComponent: PromptComponentFactory<boolean> = (param) =>
 
         status = {
           status: "answered",
-          value: status.status === "answered" ? !status.value : true,
+          value: status.value ?? false,
         };
         await interaction.deferUpdate();
 
@@ -57,4 +62,14 @@ export const createButtonComponent: PromptComponentFactory<boolean> = (param) =>
       };
     },
   };
+};
+
+const createButton = (param: ButtonParam): MessageButton => {
+  const button = new MessageButton();
+  button.setCustomId(param.customId ?? "button");
+  if (param.disabled) button.setDisabled(param.disabled);
+  if (param.emoji) button.setEmoji(param.emoji);
+  button.setLabel(param.label ?? "");
+  button.setStyle(param.style ?? "PRIMARY");
+  return button;
 };
