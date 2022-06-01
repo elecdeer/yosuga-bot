@@ -1,13 +1,13 @@
 import { InteractionButtonOptions, MessageActionRow, MessageButton } from "discord.js";
 
-import { Lazy } from "../../util/lazy";
+import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 import { messageInteractionHook } from "./messageInteractionHook";
 
 type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
 export const createButtonComponent = (param: {
-  button: ButtonParam;
+  button: Lazy<ButtonParam>;
   customId?: string;
   initial?: Lazy<boolean>;
 }): PromptComponent<true> => {
@@ -19,7 +19,9 @@ export const createButtonComponent = (param: {
   return {
     getStatus: getStatus,
     renderComponent: () => {
-      return [new MessageActionRow().addComponents(createButton(customId, param.button))];
+      return [
+        new MessageActionRow().addComponents(createButton(customId, resolveLazy(param.button))),
+      ];
     },
     hook: hook,
   };

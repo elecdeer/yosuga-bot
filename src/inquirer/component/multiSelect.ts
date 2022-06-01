@@ -6,6 +6,7 @@ import {
   MessageSelectMenuOptions,
 } from "discord.js";
 
+import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 import { messageInteractionHook } from "./messageInteractionHook";
 
@@ -22,7 +23,7 @@ export type SelectOption<T> = {
 };
 
 export const createMultiSelectComponent = <TOptionValue>(param: {
-  selector: SelectorParam;
+  selector: Lazy<SelectorParam>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
   emptyAnswered?: boolean;
@@ -59,7 +60,7 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
     },
     hook: hook,
     renderComponent: () => {
-      const component = createSelectMenu(customId, param.selector);
+      const component = createSelectMenu(customId, resolveLazy(param.selector));
 
       component.setOptions(
         options.map((opt) => {
