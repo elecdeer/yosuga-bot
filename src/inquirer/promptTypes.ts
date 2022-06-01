@@ -5,7 +5,7 @@ import { ReplyDestination } from "../util/replyHelper";
 import { Awaited } from "../util/typedEventEmitter";
 
 //TODO AwaitedはTS標準の型と名前が被っているのでやめる
-//TODO Toggle, SingleSelect, ModalTextInput,
+//TODO Toggle, ModalTextInput,
 
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
   update: {
