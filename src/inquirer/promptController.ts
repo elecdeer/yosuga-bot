@@ -11,8 +11,6 @@ export const createPromptController = async <T extends Record<string, PromptComp
   replyDestination: ReplyDestination,
   param: PromptParam
 ): Promise<PromptController> => {
-  //TODO componentからrejectする経路を追加する
-
   const replyHelper = createReplyHelper(replyDestination, {});
 
   const renderActionRows = () => {
