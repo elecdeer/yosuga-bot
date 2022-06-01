@@ -1,72 +1,43 @@
 import { InteractionButtonOptions, MessageActionRow, MessageButton } from "discord.js";
 
-import { Lazy, resolveLazy } from "../../util/lazy";
-import { AnswerStatus, PromptComponent } from "../promptTypes";
+import { Lazy } from "../../util/lazy";
+import { PromptComponent } from "../promptTypes";
+import { messageInteractionHook } from "./messageInteractionHook";
 
-type ButtonParam = Partial<Omit<InteractionButtonOptions, "type">>;
+type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
 export const createButtonComponent = (param: {
   button: ButtonParam;
+  customId?: string;
   initial?: Lazy<boolean>;
-}): PromptComponent<boolean> => {
-  let status: AnswerStatus<boolean> = {
-    status: "answered",
-    value: resolveLazy(param.initial) ?? false,
-  };
-
-  return {
-    getStatus: () => status,
-    renderComponent: () => {
-      return [
-        new MessageActionRow().addComponents(
-          new MessageButton()
-            .setCustomId("primary")
-            .setStyle("PRIMARY")
-            .setEmoji(status.value ? "👍" : "👎")
-        ),
-      ];
-    },
-    hook: (message, hookParam, updateCallback) => {
-      const collector = message.createMessageComponentCollector({
-        time: hookParam.time,
-        idle: hookParam.idle,
-      });
-
-      collector.on("collect", async (interaction) => {
-        if (interaction.customId !== "primary") {
-          return;
-        }
-
-        status = {
-          status: "answered",
-          value: status.value ?? false,
-        };
-        await interaction.deferUpdate();
-
-        updateCallback();
-      });
-
-      collector.on("end", (_, reason) => {
-        if (reason === "cleanHook") {
-          return;
-        }
-        status = {
-          status: "rejected",
-          reason: "end",
-        };
-        updateCallback();
-      });
-
-      return () => {
-        collector.stop("cleanHook");
+}): PromptComponent<true> => {
+  const customId = param.customId ?? "button";
+  const { getStatus, hook } = messageInteractionHook<true, "BUTTON">(
+    customId,
+    "BUTTON",
+    () => {
+      return {
+        status: "answered",
+        value: true,
       };
     },
+    {
+      status: "unanswered",
+    }
+  );
+
+  return {
+    getStatus: getStatus,
+    renderComponent: () => {
+      return [new MessageActionRow().addComponents(createButton(customId, param.button))];
+    },
+    hook: hook,
   };
 };
 
-const createButton = (param: ButtonParam): MessageButton => {
+const createButton = (customId: string, param: ButtonParam): MessageButton => {
   const button = new MessageButton();
-  button.setCustomId(param.customId ?? "button");
+  button.setCustomId(customId);
   if (param.disabled) button.setDisabled(param.disabled);
   if (param.emoji) button.setEmoji(param.emoji);
   button.setLabel(param.label ?? "");
