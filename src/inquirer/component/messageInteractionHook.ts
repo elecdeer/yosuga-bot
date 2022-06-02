@@ -36,8 +36,8 @@ export const messageInteractionHook = <TValue, TComponent extends MessageCompone
         if (interaction.customId !== customId) return;
         if (!isMappedInteractionType(componentType, interaction)) return;
 
-        await interaction.deferUpdate();
         status = await reducer(interaction, status);
+        if (!interaction.deferred && !interaction.replied) await interaction.deferUpdate();
         updateCallback();
       });
 
