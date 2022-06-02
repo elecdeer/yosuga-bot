@@ -4,7 +4,7 @@ import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 import { messageInteractionHook } from "./messageInteractionHook";
 
-type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
+export type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
 export const createButtonComponent = (param: {
   button: Lazy<ButtonParam>;
@@ -27,7 +27,7 @@ export const createButtonComponent = (param: {
   };
 };
 
-const createButton = (customId: string, param: ButtonParam): MessageButton => {
+export const createButton = (customId: string, param: ButtonParam): MessageButton => {
   const button = new MessageButton();
   button.setCustomId(customId);
   if (param.disabled) button.setDisabled(param.disabled);
