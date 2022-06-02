@@ -1,6 +1,7 @@
 import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
 import { createButtonComponent } from "../../inquirer/component/button";
+import { createModalTextComponent } from "../../inquirer/component/modalText";
 import { createMultiSelectComponent } from "../../inquirer/component/multiSelect";
 import { prompt } from "../../inquirer/prompt";
 import { createYosugaEmbed } from "../../util/createEmbed";
@@ -41,6 +42,24 @@ export class TestCommand extends CommandHandler {
             },
           ],
         }),
+        text: createModalTextComponent({
+          openButton: {
+            label: "Text",
+          },
+          textInputs: {
+            short: {
+              label: "Short Text",
+              style: "SHORT",
+            },
+            paragraph: {
+              label: "Paragraph Text",
+              style: "PARAGRAPH",
+            },
+          },
+          modal: {
+            title: "Modal!!",
+          },
+        }),
       },
       {
         type: "commandInteraction",
@@ -60,6 +79,11 @@ export class TestCommand extends CommandHandler {
 
     collector.onUpdateOne("select", async (status) => {
       this.logger.log(`selected: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
+
+    collector.onUpdateOne("text", async (status) => {
+      this.logger.log(`text: ${JSON.stringify(status)}`);
       await controller.edit();
     });
 
