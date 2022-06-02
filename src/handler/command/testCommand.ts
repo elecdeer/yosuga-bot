@@ -3,6 +3,7 @@ import { CommandContextSlash } from "../../commandContextSlash";
 import { createButtonComponent } from "../../inquirer/component/button";
 import { createModalTextComponent } from "../../inquirer/component/modalText";
 import { createMultiSelectComponent } from "../../inquirer/component/multiSelect";
+import { createToggleComponent } from "../../inquirer/component/toggle";
 import { prompt } from "../../inquirer/prompt";
 import { createYosugaEmbed } from "../../util/createEmbed";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
@@ -19,7 +20,7 @@ export class TestCommand extends CommandHandler {
   override async execute(context: CommandContextSlash): Promise<void> {
     const { controller, collector } = await prompt(
       {
-        toggle: createButtonComponent({
+        button: createButtonComponent({
           button: {
             label: "Test",
           },
@@ -41,6 +42,21 @@ export class TestCommand extends CommandHandler {
               value: "CCC",
             },
           ],
+        }),
+        toggle: createToggleComponent<"happy" | "crying" | "thinking">({
+          button: () => {
+            const map = {
+              happy: "😀",
+              crying: "😢",
+              thinking: "🤔",
+            } as const;
+            const state: keyof typeof map = collector.getStatus().toggle.value ?? "happy";
+
+            return {
+              emoji: map[state],
+            };
+          },
+          toggleOptions: ["happy", "crying", "thinking"],
         }),
         text: createModalTextComponent({
           openButton: {
@@ -80,6 +96,11 @@ export class TestCommand extends CommandHandler {
         }),
       }
     );
+
+    collector.onUpdateOne("button", async (status) => {
+      this.logger.log(`toggled: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
 
     collector.onUpdateOne("toggle", async (status) => {
       this.logger.log(`toggled: ${JSON.stringify(status)}`);
