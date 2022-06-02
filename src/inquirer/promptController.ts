@@ -101,7 +101,10 @@ export const createPromptController = async <T extends Record<string, PromptComp
   };
 
   //初回post
-  await post(replyDestination);
+  //コンポーネントのlazyでpromptの返り値を使えるようにするため、lazyの解決をpromptが返った後にする
+  setImmediate(() => {
+    void post(replyDestination);
+  });
 
   return {
     repost,
