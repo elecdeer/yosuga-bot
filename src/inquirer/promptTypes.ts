@@ -90,6 +90,7 @@ export type PromptStatus<T extends Record<string, PromptComponent<unknown>>> = {
 export type ValidateResult =
   | {
       result: "ok";
+      reason?: undefined;
     }
   | {
       result: "reject";

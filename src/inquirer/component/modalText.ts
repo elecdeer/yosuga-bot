@@ -1,5 +1,6 @@
 import {
   MessageActionRow,
+  MessageEmbed,
   Modal,
   ModalActionRowComponent,
   ModalOptions,
@@ -9,21 +10,25 @@ import {
 import { getLogger } from "log4js";
 
 import { Lazy, resolveLazy } from "../../util/lazy";
-import { PromptComponent } from "../promptTypes";
+import { PromptComponent, ValidateResult } from "../promptTypes";
 import { ButtonParam, createButton } from "./button";
 import { messageInteractionHook } from "./messageInteractionHook";
 
 type ModalParam = Partial<Omit<ModalOptions, "customId">>;
 type TextInputParam = Partial<Omit<TextInputComponentOptions, "customId">>;
+type TextInputParamWithValidate = TextInputParam & {
+  validation?: (input: string) => ValidateResult;
+};
 
 const logger = getLogger("modalText");
 //TODO validate
 
 export const createModalTextComponent = <TKey extends string>(param: {
   openButton: Lazy<ButtonParam>;
-  textInputs: Lazy<Record<TKey, TextInputParam>>;
+  textInputs: Lazy<Record<TKey, TextInputParamWithValidate>>;
   modal: Lazy<ModalParam>;
   customId?: string;
+  formatErrorMessage?: (reasons: string[]) => string | MessageEmbed[];
 }): PromptComponent<Record<TKey, string>> => {
   const customId = param.customId ?? "modal";
   const openButtonCustomId = `modal-button-${customId}`;
@@ -62,11 +67,29 @@ export const createModalTextComponent = <TKey extends string>(param: {
         time: 10 * 60 * 1000,
       });
 
-      //モーダルが閉じる
-      // await modalRes.deferUpdate();
-      await modalRes.reply({
-        content: "wow!",
+      const resultEntries = Object.keys(param.textInputs).map((key) => [
+        key,
+        modalRes.fields.getTextInputValue(`${customId}-${key}`),
+      ]);
+
+      const validateResults: ValidateResult[] = resultEntries.map(([key, value]) => {
+        const validator = resolveLazy(param.textInputs)[key as TKey].validation;
+        if (validator !== undefined) {
+          return validator(value);
+        } else {
+          return {
+            result: "ok",
+          };
+        }
       });
+
+      const validateErrors = validateResults.filter((value) => value.result === "reject");
+      if (validateErrors.length > 0) {
+        const errorTexts = validateErrors.map((value) => value.reason!);
+        await modalRes.reply(formatErrorMessage(errorTexts, param.formatErrorMessage));
+      } else {
+        await modalRes.deferUpdate();
+      }
 
       return Object.keys(param.textInputs)
         .map((key) => [key, modalRes.fields.getTextInputValue(`${customId}-${key}`)])
@@ -110,4 +133,26 @@ const createTextInput = (customId: string, param: TextInputParam): TextInputComp
   textInput.setStyle(param.style ?? "SHORT");
   if (param.value !== undefined) textInput.setValue(param.value);
   return textInput;
+};
+
+const formatErrorMessage = (
+  messages: string[],
+  formatter: ((reasons: string[]) => string | MessageEmbed[]) | undefined
+) => {
+  if (formatter === undefined) {
+    return {
+      content: messages.join("\n"),
+    };
+  } else {
+    const formatted = formatter(messages);
+    if (typeof formatted === "string") {
+      return {
+        content: formatted,
+      };
+    } else {
+      return {
+        embeds: formatted,
+      };
+    }
+  }
 };

@@ -50,6 +50,15 @@ export class TestCommand extends CommandHandler {
             short: {
               label: "Short Text",
               style: "SHORT",
+              validation: (input) =>
+                input.startsWith("!")
+                  ? {
+                      result: "ok",
+                    }
+                  : {
+                      result: "reject",
+                      reason: "Short Textの値が!から始まっていません",
+                    },
             },
             paragraph: {
               label: "Paragraph Text",
