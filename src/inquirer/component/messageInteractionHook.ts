@@ -11,13 +11,15 @@ import {
 import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 
+//componentTypeカリー化した方がよさそう
+
 export const messageInteractionHook = <TValue, TComponent extends MessageComponentType>(
   customId: string,
   componentType: TComponent,
   reducer: (
     interaction: MappedInteractionTypes[TComponent],
     prevStatus: TValue | null
-  ) => Awaitable<TValue>,
+  ) => Awaitable<TValue | null>,
   initialState?: Lazy<TValue | null>
 ): Pick<PromptComponent<TValue>, "hook" | "getStatus"> & {
   getRawValue: () => TValue | null;

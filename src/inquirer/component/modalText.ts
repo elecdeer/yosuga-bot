@@ -1,4 +1,5 @@
 import {
+  Collection,
   MessageActionRow,
   MessageEmbed,
   Modal,
@@ -10,9 +11,8 @@ import {
 import { getLogger } from "log4js";
 
 import { Lazy, resolveLazy } from "../../util/lazy";
-import { PromptComponent, ValidateResult } from "../promptTypes";
+import { PromptComponent, ValidateResult, ValidateResultReject } from "../promptTypes";
 import { ButtonParam, createButton } from "./button";
-import { messageInteractionHook } from "./messageInteractionHook";
 
 type ModalParam = Partial<Omit<ModalOptions, "customId">>;
 type TextInputParam = Partial<Omit<TextInputComponentOptions, "customId">>;
@@ -21,8 +21,10 @@ type TextInputParamWithValidate = TextInputParam & {
 };
 
 const logger = getLogger("modalText");
-//TODO validate
 
+//TODO 回答の一部がvalidateでrejectされたとき、値は保持しつつstatusはunansweredにしたい
+// messageInteractionHookではなく独自で組んだ方がよさそう
+// awaitModalSubmitのタイムアウトもparamからの値に合わせる
 export const createModalTextComponent = <TKey extends string>(param: {
   openButton: Lazy<ButtonParam>;
   textInputs: Lazy<Record<TKey, TextInputParamWithValidate>>;
@@ -33,78 +35,124 @@ export const createModalTextComponent = <TKey extends string>(param: {
   const customId = param.customId ?? "modal";
   const openButtonCustomId = `modal-button-${customId}`;
 
+  // //ここでresolveするのよくない？
+  const getFormCollection = () => {
+    return new Collection<TKey, TextInputParamWithValidate>(
+      Object.entries(resolveLazy(param.textInputs)) as [TKey, TextInputParamWithValidate][]
+    ).mapValues((item, key) => ({
+      ...item,
+      value: result[key],
+      validation:
+        item.validation ??
+        (() => ({
+          result: "ok",
+        })),
+    }));
+  };
+
   const constructModal = () => {
     const modal = createModal(customId, resolveLazy(param.modal));
-    const inputs = Object.entries<TextInputParam>(resolveLazy(param.textInputs))
-      .map(([key, value]) => {
-        const prevValue = getStatus().value;
-        return createTextInput(
-          `${customId}-${key}`,
-          prevValue !== undefined
-            ? {
-                ...value,
-                value: prevValue[key as TKey],
-              }
-            : value
-        );
-      })
+    const inputs = getFormCollection()
+      .map((item, key) => createTextInput(`${customId}-${key}`, item))
       .map((item) => new MessageActionRow<ModalActionRowComponent>().addComponents(item));
     modal.setComponents(...inputs);
     return modal;
   };
 
-  const { getStatus, hook } = messageInteractionHook<Record<TKey, string>, "BUTTON">(
-    openButtonCustomId,
-    "BUTTON",
-    async (interaction, prevStatus) => {
-      logger.debug("ModalOpenButton Interact");
-      const modal = constructModal();
-      await interaction.showModal(modal);
+  let validateErrors: ValidateResultReject[] = [];
+  let result: Record<TKey, string> = Object.entries<TextInputParamWithValidate>(
+    resolveLazy(param.textInputs)
+  ).reduce((acc, [key, value]) => {
+    return {
+      ...acc,
+      [key]: value.value,
+    };
+  }, {} as Record<TKey, string>);
 
-      //TODO timeもっと適切なのがあるかも
-      const modalRes = await interaction.awaitModalSubmit({
-        filter: (modalInteraction) => modalInteraction.customId === customId,
-        time: 10 * 60 * 1000,
-      });
-
-      const resultEntries = Object.keys(param.textInputs).map((key) => [
-        key,
-        modalRes.fields.getTextInputValue(`${customId}-${key}`),
-      ]);
-
-      const validateResults: ValidateResult[] = resultEntries.map(([key, value]) => {
-        const validator = resolveLazy(param.textInputs)[key as TKey].validation;
-        if (validator !== undefined) {
-          return validator(value);
-        } else {
-          return {
-            result: "ok",
-          };
-        }
-      });
-
-      const validateErrors = validateResults.filter((value) => value.result === "reject");
+  return {
+    getStatus: () => {
       if (validateErrors.length > 0) {
-        const errorTexts = validateErrors.map((value) => value.reason!);
-        await modalRes.reply(formatErrorMessage(errorTexts, param.formatErrorMessage));
+        return {
+          status: "unanswered",
+        };
       } else {
-        await modalRes.deferUpdate();
+        return {
+          status: "answered",
+          value: result,
+        };
       }
+    },
+    hook: (message, hookParam, updateCallback) => {
+      const formCollection = getFormCollection();
 
-      return Object.keys(param.textInputs)
-        .map((key) => [key, modalRes.fields.getTextInputValue(`${customId}-${key}`)])
-        .reduce((acc, [key, value]) => {
+      const collector = message.createMessageComponentCollector({
+        time: hookParam.time,
+        idle: hookParam.idle,
+        componentType: "BUTTON",
+      });
+
+      collector.on("collect", async (interaction) => {
+        if (interaction.customId !== openButtonCustomId || !interaction.isButton()) return;
+
+        const modal = constructModal();
+        await interaction.showModal(modal);
+
+        const modalRes = await interaction
+          .awaitModalSubmit({
+            filter: (modalInteraction) => modalInteraction.customId === customId,
+            time: hookParam.time ?? 10 * 60 * 1000,
+            idle: hookParam.idle,
+          })
+          .catch(() => null);
+
+        if (modalRes === null) {
+          collector.stop("modalTimeout");
+          return;
+        }
+
+        const modalResult = formCollection.mapValues((form, key) => {
+          return modalRes.fields.getTextInputValue(`${customId}-${key}`) ?? "";
+        });
+        logger.log(modalResult.toJSON().join("  "));
+
+        result = modalResult.reduce((acc, value, key) => {
           return {
             ...acc,
             [key]: value,
           };
         }, {} as Record<TKey, string>);
-    }
-  );
 
-  return {
-    getStatus: getStatus,
-    hook: hook,
+        const validateResults = formCollection.mapValues((form, key) => {
+          return form.validation(modalResult.get(key)!);
+        });
+
+        validateErrors = validateResults
+          .map((validateResult) => validateResult)
+          .filter((value) => value.result === "reject") as ValidateResultReject[];
+
+        updateCallback();
+
+        if (validateErrors.length > 0) {
+          const errorTexts = validateErrors.map((value) => value.reason);
+          await modalRes.reply(formatErrorMessage(errorTexts, param.formatErrorMessage));
+        } else {
+          await modalRes.deferUpdate();
+        }
+      });
+
+      const stopReason = "cleanHook";
+      collector.on("end", (_, reason) => {
+        if (reason === stopReason) {
+          return;
+        }
+
+        updateCallback();
+      });
+
+      return () => {
+        collector.stop(stopReason);
+      };
+    },
     renderComponent: () => {
       return [
         new MessageActionRow().addComponents(
