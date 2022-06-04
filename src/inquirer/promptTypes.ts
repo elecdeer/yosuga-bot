@@ -87,15 +87,17 @@ export type PromptStatus<T extends Record<string, PromptComponent<unknown>>> = {
   [K in keyof T]: AnswerStatus<PromptComponentValue<T[K]>>;
 };
 
-export type ValidateResult =
-  | {
-      result: "ok";
-      reason?: undefined;
-    }
-  | {
-      result: "reject";
-      reason: string;
-    };
+export type ValidateResultOk = {
+  result: "ok";
+  reason?: undefined;
+};
+
+export type ValidateResultReject = {
+  result: "reject";
+  reason: string;
+};
+
+export type ValidateResult = ValidateResultOk | ValidateResultReject;
 
 export interface PromptComponent<TValue> {
   /**
