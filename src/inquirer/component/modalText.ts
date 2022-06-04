@@ -22,9 +22,6 @@ type TextInputParamWithValidate = TextInputParam & {
 
 const logger = getLogger("modalText");
 
-//TODO 回答の一部がvalidateでrejectされたとき、値は保持しつつstatusはunansweredにしたい
-// messageInteractionHookではなく独自で組んだ方がよさそう
-// awaitModalSubmitのタイムアウトもparamからの値に合わせる
 export const createModalTextComponent = <TKey extends string>(param: {
   openButton: Lazy<ButtonParam>;
   textInputs: Lazy<Record<TKey, TextInputParamWithValidate>>;
