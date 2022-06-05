@@ -15,15 +15,14 @@ export type SelectorParam = Partial<
 >;
 
 export type SelectOption<T> = {
-  label: string;
+  label: Lazy<string>;
   value: T;
-  default?: boolean;
-  description?: string;
-  emoji?: EmojiIdentifierResolvable;
+  default?: Lazy<boolean>;
+  description?: Lazy<string>;
+  emoji?: Lazy<EmojiIdentifierResolvable>;
+  inactive?: Lazy<boolean>;
 };
 
-//TODO OptionsもLazyにしたい
-// SelectOptionに非表示のパラメータがあれば良い?
 export const createMultiSelectComponent = <TOptionValue>(param: {
   selector: Lazy<SelectorParam>;
   options: SelectOption<TOptionValue>[];
@@ -64,15 +63,17 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
       const component = createSelectMenu(customId, resolveLazy(param.selector));
 
       component.setOptions(
-        options.map((opt) => {
-          return {
-            label: opt.label,
-            value: opt.indexKey,
-            default: getRawValue()?.includes(opt.indexKey) ?? false,
-            description: opt.description,
-            emoji: opt.emoji,
-          };
-        })
+        options
+          .filter((opt) => resolveLazy(opt.inactive) !== true)
+          .map((opt) => {
+            return {
+              label: resolveLazy(opt.label),
+              value: opt.indexKey,
+              default: getRawValue()?.includes(opt.indexKey) ?? false,
+              description: resolveLazy(opt.description),
+              emoji: resolveLazy(opt.emoji),
+            };
+          })
       );
       return [new MessageActionRow().addComponents(component)];
     },
