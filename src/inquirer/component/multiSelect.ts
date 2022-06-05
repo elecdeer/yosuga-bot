@@ -8,7 +8,7 @@ import {
 
 import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
-import { messageInteractionHook } from "./messageInteractionHook";
+import { selectMenuInteractionHook } from "./messageInteractionHook";
 
 export type SelectorParam = Partial<
   Omit<MessageSelectMenuOptions, "customId" | "type" | "options">
@@ -22,6 +22,8 @@ export type SelectOption<T> = {
   emoji?: EmojiIdentifierResolvable;
 };
 
+//TODO OptionsもLazyにしたい
+// SelectOptionに非表示のパラメータがあれば良い?
 export const createMultiSelectComponent = <TOptionValue>(param: {
   selector: Lazy<SelectorParam>;
   options: SelectOption<TOptionValue>[];
@@ -33,12 +35,11 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
   const { options, relationCollection } = createValueRelation(param.options);
 
   const initState = options.filter((item) => item.default === true).map((item) => item.indexKey);
-  const { getRawValue, hook } = messageInteractionHook<string[], "SELECT_MENU">(
-    customId,
-    "SELECT_MENU",
-    (interaction) => interaction.values,
-    initState.length > 0 ? initState : param.emptyAnswered ? [] : null
-  );
+  const { getRawValue, hook } = selectMenuInteractionHook<string[]>({
+    customId: customId,
+    reducer: (interaction) => interaction.values,
+    initialState: initState.length > 0 ? initState : param.emptyAnswered ? [] : null,
+  });
 
   return {
     getStatus: () => {
