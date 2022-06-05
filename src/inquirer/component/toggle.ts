@@ -3,7 +3,7 @@ import { MessageActionRow } from "discord.js";
 import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 import { ButtonParam, createButton } from "./button";
-import { messageInteractionHook } from "./messageInteractionHook";
+import { buttonInteractionHook } from "./messageInteractionHook";
 
 export const createToggleComponent = <T>(param: {
   button: Lazy<ButtonParam>;
@@ -20,14 +20,13 @@ export const createToggleComponent = <T>(param: {
     return index;
   };
 
-  const { getRawValue, hook } = messageInteractionHook<number, "BUTTON">(
-    customId,
-    "BUTTON",
-    (_, prevStatus) => {
+  const { getRawValue, hook } = buttonInteractionHook<number>({
+    customId: customId,
+    reducer: (_, prevStatus) => {
       return ((prevStatus ?? 0) + 1) % param.toggleOptions.length;
     },
-    calcInitialValue()
-  );
+    initialState: calcInitialValue(),
+  });
 
   return {
     getStatus: () => {

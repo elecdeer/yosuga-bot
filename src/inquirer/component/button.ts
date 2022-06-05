@@ -2,7 +2,7 @@ import { InteractionButtonOptions, MessageActionRow, MessageButton } from "disco
 
 import { Lazy, resolveLazy } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
-import { messageInteractionHook } from "./messageInteractionHook";
+import { buttonInteractionHook } from "./messageInteractionHook";
 
 export type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 
@@ -12,8 +12,9 @@ export const createButtonComponent = (param: {
   initial?: Lazy<boolean>;
 }): PromptComponent<true> => {
   const customId = param.customId ?? "button";
-  const { getStatus, hook } = messageInteractionHook<true, "BUTTON">(customId, "BUTTON", () => {
-    return true;
+  const { getStatus, hook } = buttonInteractionHook<true>({
+    customId: customId,
+    reducer: () => true,
   });
 
   return {
