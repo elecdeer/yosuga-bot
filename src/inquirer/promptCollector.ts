@@ -49,21 +49,13 @@ export const createPromptCollector = <T extends Record<string, PromptComponent<u
     });
 
   const reduceAnswerStatusToObj = (): PromptStatus<T> =>
-    answerStatus.reduce<PromptStatus<T>>((acc, cur, key) => {
-      return {
-        ...acc,
-        [key]: cur,
-      };
-    });
+    Object.fromEntries(answerStatus.entries()) as PromptStatus<T>;
 
   const reduceAnswerResultToObj = (): PromptResult<T> => {
     logger.debug(answerStatus);
-    return answerStatus.reduce((acc, cur, key) => {
-      return {
-        ...acc,
-        [key]: cur.status === "answered" ? cur.value : null,
-      };
-    }, {} as PromptResult<T>);
+    return Object.fromEntries(
+      answerStatus.mapValues((item) => (item.status === "answered" ? item.value : null)).entries()
+    ) as PromptResult<T>;
   };
 
   const awaitAll: PromptCollector<T>["awaitAll"] = () =>

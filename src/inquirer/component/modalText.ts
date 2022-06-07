@@ -57,14 +57,11 @@ export const createModalTextComponent = <TKey extends string>(param: {
   };
 
   let validateErrors: ValidateResultReject[] = [];
-  let result: Record<TKey, string> = Object.entries<TextInputParamWithValidate>(
-    resolveLazy(param.textInputs)
-  ).reduce((acc, [key, value]) => {
-    return {
-      ...acc,
-      [key]: value.value,
-    };
-  }, {} as Record<TKey, string>);
+  let result: Record<TKey, string> = Object.fromEntries(
+    Object.entries<TextInputParamWithValidate>(resolveLazy(param.textInputs)).map(
+      ([key, value]) => [key, value.value ?? ""]
+    )
+  ) as Record<TKey, string>;
 
   return {
     getStatus: () => {
@@ -112,12 +109,7 @@ export const createModalTextComponent = <TKey extends string>(param: {
         });
         logger.log(modalResult.toJSON().join("  "));
 
-        result = modalResult.reduce((acc, value, key) => {
-          return {
-            ...acc,
-            [key]: value,
-          };
-        }, {} as Record<TKey, string>);
+        result = Object.fromEntries(modalResult.entries()) as Record<TKey, string>;
 
         const validateResults = formCollection.mapValues((form, key) => {
           return form.validation(modalResult.get(key)!);
