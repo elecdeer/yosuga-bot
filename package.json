@@ -61,7 +61,7 @@
     "@kvs/node-localstorage": "^2.1.1",
     "@kvs/types": "^2.1.1",
     "@sap_oss/node-socketio-stream": "^1.0.3",
-    "async": "^3.2.3",
+    "async": "^3.2.4",
     "axios": "^0.27.2",
     "bufferutil": "^4.0.6",
     "charset": "^1.0.1",
