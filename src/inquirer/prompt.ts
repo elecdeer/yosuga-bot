@@ -15,7 +15,7 @@ import {
 } from "./promptTypes";
 
 export const prompt = async <T extends Record<string, PromptComponent<unknown>>>(
-  components: T,
+  components: T | [keyof T, T[keyof T]][],
   replyDestination: ReplyDestination,
   param: PromptParam
 ): Promise<{
@@ -23,7 +23,7 @@ export const prompt = async <T extends Record<string, PromptComponent<unknown>>>
   collector: PromptCollector<T>;
 }> => {
   const componentCollection = new Collection<keyof T, T[keyof T]>(
-    Object.entries(components) as [keyof T, T[keyof T]][]
+    Array.isArray(components) ? components : (Object.entries(components) as [keyof T, T[keyof T]][])
   );
 
   const answerStatus = componentCollection.mapValues((com) => com.getStatus()) as Collection<
