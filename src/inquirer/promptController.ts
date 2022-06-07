@@ -1,4 +1,4 @@
-import { Collection, Message, MessageActionRow } from "discord.js";
+import { Collection, Message } from "discord.js";
 
 import { resolveLazy } from "../util/lazy";
 import { createReplyHelper, ReplyDestination } from "../util/replyHelper";
@@ -14,9 +14,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
   const replyHelper = createReplyHelper(replyDestination, {});
 
   const renderActionRows = () => {
-    return componentCollection.reduce<MessageActionRow[]>((acc, item) => {
-      return [...acc, ...item.renderComponent()];
-    }, []);
+    return componentCollection.map((item) => item.renderComponent()).flat();
   };
 
   let hookCleaner: (() => Awaited)[];
