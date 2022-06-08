@@ -12,6 +12,20 @@ type TextInputParamWithValidate = TextInputParamLazy & {
   validation?: (input: string) => ValidateResult;
 };
 
+const resolveTextInputParamLazy = (param: TextInputParamWithValidate) =>
+  resolveLazyParam(param, [
+    "type",
+    "label",
+    "maxLength",
+    "minLength",
+    "placeholder",
+    "required",
+    "style",
+  ]);
+
+const resolveModalParamLazy = (param: LazyParam<ModalParam>) =>
+  resolveLazyParam(param, ["title", "title"]);
+
 const logger = getLogger("modalText");
 
 export const createModalTextComponent = <TKey extends string>(param: {
@@ -29,15 +43,7 @@ export const createModalTextComponent = <TKey extends string>(param: {
     return new Collection(
       Object.entries(param.textInputs) as [TKey, TextInputParamWithValidate][]
     ).mapValues((item, key) => ({
-      ...resolveLazyParam(item, [
-        "type",
-        "label",
-        "maxLength",
-        "minLength",
-        "placeholder",
-        "required",
-        "style",
-      ]),
+      ...resolveTextInputParamLazy(item),
       value: result[key],
       validation:
         item.validation ??
@@ -48,9 +54,9 @@ export const createModalTextComponent = <TKey extends string>(param: {
   };
 
   const constructModal = () => {
-    const modal = createModal(customId, resolveLazyParam(param.modal, ["title", "title"]));
+    const modal = createModal(customId, resolveModalParamLazy(param.modal));
     const inputs = getFormCollection()
-      .map((item, key) => createTextInput(`${customId}-${key}`, resolveLazyParam(item)))
+      .map((item, key) => createTextInput(`${customId}-${key}`, item))
       .map((item) => new MessageActionRow<ModalActionRowComponent>().addComponents(item));
     modal.setComponents(...inputs);
     return modal;

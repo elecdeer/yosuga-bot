@@ -14,6 +14,8 @@ export type SelectOption<T> = {
   inactive?: Lazy<boolean>;
 };
 
+const resolveSelectorLazyParam = (param: LazyParam<SelectorParam>) => resolveLazyParam(param);
+
 export const createMultiSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<SelectorParam>;
   options: SelectOption<TOptionValue>[];
@@ -51,7 +53,7 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
     },
     hook: hook,
     renderComponent: () => {
-      const component = createSelectMenu(customId, resolveLazyParam(param.selector));
+      const component = createSelectMenu(customId, resolveSelectorLazyParam(param.selector));
 
       component.setOptions(
         options

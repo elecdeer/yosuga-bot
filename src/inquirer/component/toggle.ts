@@ -6,6 +6,9 @@ import { PromptComponent } from "../promptTypes";
 import { ButtonParam, createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
 
+const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
+  resolveLazyParam(param, ["label", "emoji", "style", "disabled"]);
+
 const logger = getLogger("toggle");
 export const createToggleComponent = <T>(param: {
   button: LazyParam<ButtonParam>;
@@ -38,7 +41,7 @@ export const createToggleComponent = <T>(param: {
       };
     },
     renderComponent: () => {
-      const buttonParam = resolveLazyParam(param.button);
+      const buttonParam = resolveButtonParamLazy(param.button);
       return [new MessageActionRow().addComponents(createButton(customId, buttonParam))];
     },
     hook: hook,
