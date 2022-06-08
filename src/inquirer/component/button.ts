@@ -5,6 +5,9 @@ import { PromptComponent } from "../promptTypes";
 import { ButtonParam, createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
 
+const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
+  resolveLazyParam(param, ["label", "emoji", "style", "disabled"]);
+
 export const createButtonComponent = (param: {
   button: LazyParam<ButtonParam>;
   customId?: string;
@@ -21,10 +24,7 @@ export const createButtonComponent = (param: {
     renderComponent: () => {
       return [
         new MessageActionRow().addComponents(
-          createButton(
-            customId,
-            resolveLazyParam(param.button, ["label", "emoji", "style", "disabled"])
-          )
+          createButton(customId, resolveButtonParamLazy(param.button))
         ),
       ];
     },
