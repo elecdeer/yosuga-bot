@@ -1,21 +1,24 @@
-FROM node:16-alpine
+
+FROM node:18 as build
 
 WORKDIR /app
 
-COPY package*.json ./
 COPY tsconfig.json ./
+COPY package*.json ./
 
-RUN apk add --no-cache --virtual .gyp python3 make g++ \
-    && npm ci \
-    && apk del .gyp
+RUN npm ci
 
 COPY src src
 COPY imageenv.json ./
 
 RUN npm run build
 
+FROM gcr.io/distroless/nodejs:18
+COPY --from=build /app /app
+WORKDIR /app
+
 EXPOSE 80
 EXPOSE 443
 
-CMD ["node", "dist/index.js"]
+CMD ["dist/index.js"]
 
