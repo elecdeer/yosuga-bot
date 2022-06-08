@@ -1,8 +1,11 @@
 import { CommandPermission } from "../../application/permission";
 import { CommandContextSlash } from "../../commandContextSlash";
-import { ButtonComponent } from "../../inquirer/component/buttonComponent";
-import { MultiSelectComponent, SelectOption } from "../../inquirer/component/multiSelectComponent";
-import { InteractionInquirer } from "../../inquirer/inquirer";
+import { createButtonComponent } from "../../inquirer/component/button";
+import { createModalTextComponent } from "../../inquirer/component/modalText";
+import { createMultiSelectComponent } from "../../inquirer/component/multiSelect";
+import { createToggleComponent } from "../../inquirer/component/toggle";
+import { prompt } from "../../inquirer/prompt";
+import { createYosugaEmbed } from "../../util/createEmbed";
 import { CommandHandler, CommandProps } from "../base/commandHandler";
 
 export class TestCommand extends CommandHandler {
@@ -15,55 +18,106 @@ export class TestCommand extends CommandHandler {
   }
 
   override async execute(context: CommandContextSlash): Promise<void> {
-    const inquirer = new InteractionInquirer({
-      replyRoot: context.interaction,
-      message: "テスト",
-    });
-
-    const options: SelectOption<"hello" | number>[] = [
+    const { controller, collector } = await prompt(
       {
-        label: "str",
-        value: "hello" as const,
+        button: createButtonComponent({
+          button: {
+            label: "Test",
+          },
+        }),
+        select: createMultiSelectComponent({
+          selector: {},
+          options: [
+            {
+              label: "AAAStr",
+              value: "AAA",
+              default: true,
+            },
+            {
+              label: "BBBStr",
+              value: "BBB",
+            },
+            {
+              label: "CCCStr",
+              value: "CCC",
+            },
+          ],
+        }),
+        toggle: createToggleComponent<"happy" | "crying" | "thinking">({
+          button: {
+            emoji: () => {
+              const map = {
+                happy: "😀",
+                crying: "😢",
+                thinking: "🤔",
+              } as const;
+              const state: keyof typeof map = collector.getStatus().toggle.value ?? "happy";
+
+              return map[state];
+            },
+          },
+          toggleOptions: ["happy", "crying", "thinking"],
+        }),
+        text: createModalTextComponent({
+          openButton: {
+            label: "Text",
+          },
+          textInputs: {
+            short: {
+              label: "Short Text",
+              style: "SHORT",
+              validation: (input) =>
+                input.startsWith("!")
+                  ? {
+                      result: "ok",
+                    }
+                  : {
+                      result: "reject",
+                      reason: "Short Textの値が!から始まっていません",
+                    },
+            },
+            paragraph: {
+              label: "Paragraph Text",
+              style: "PARAGRAPH",
+            },
+          },
+          modal: {
+            title: "Modal!!",
+          },
+        }),
       },
       {
-        label: "num",
-        value: 100,
+        type: "commandInteraction",
+        destination: context.interaction,
       },
-    ];
-
-    const result = await inquirer.prompt(
-      [
-        new ButtonComponent({
-          id: "button",
-        }),
-        new ButtonComponent({
-          id: "button2",
-        }),
-        new MultiSelectComponent({
-          id: "select",
-          options: options,
-        }),
-      ],
       {
-        time: 60 * 1000,
-        message: "test",
+        messageContent: createYosugaEmbed({
+          message: "toggle test",
+        }),
       }
     );
 
-    result.on("answered", ({ id, value }) => {
-      this.logger.debug(`answer: ${id} ${value}`);
-      this.logger.debug(`collection: ${JSON.stringify(result.answerStatus)}`);
+    collector.onUpdateOne("button", async (status) => {
+      this.logger.log(`toggled: ${JSON.stringify(status)}`);
+      await controller.edit();
     });
 
-    // const answer = await result.awaitAll();
+    collector.onUpdateOne("toggle", async (status) => {
+      this.logger.log(`toggled: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
 
-    const res = await result.awaitAnswer("select");
-    this.logger.debug("select answered");
-    const res2 = await result.awaitAnswer("button2");
+    collector.onUpdateOne("select", async (status) => {
+      this.logger.log(`selected: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
 
-    const resAll = await result.awaitAllAnswer();
+    collector.onUpdateOne("text", async (status) => {
+      this.logger.log(`text: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
 
-    this.logger.debug("allAnswered");
-    this.logger.debug(JSON.stringify(resAll));
+    const result = await collector.awaitAll();
+    this.logger.log(`allSelected: ${JSON.stringify(result)}`);
   }
 }
