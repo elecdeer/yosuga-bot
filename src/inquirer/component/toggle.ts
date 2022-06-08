@@ -1,10 +1,12 @@
 import { MessageActionRow } from "discord.js";
+import { getLogger } from "log4js";
 
 import { LazyParam, resolveLazyParam } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
 import { ButtonParam, createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
 
+const logger = getLogger("toggle");
 export const createToggleComponent = <T>(param: {
   button: LazyParam<ButtonParam>;
   toggleOptions: T[];
@@ -36,11 +38,8 @@ export const createToggleComponent = <T>(param: {
       };
     },
     renderComponent: () => {
-      return [
-        new MessageActionRow().addComponents(
-          createButton(customId, resolveLazyParam(param.button))
-        ),
-      ];
+      const buttonParam = resolveLazyParam(param.button);
+      return [new MessageActionRow().addComponents(createButton(customId, buttonParam))];
     },
     hook: hook,
   };

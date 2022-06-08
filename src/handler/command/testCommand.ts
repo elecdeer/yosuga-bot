@@ -44,17 +44,17 @@ export class TestCommand extends CommandHandler {
           ],
         }),
         toggle: createToggleComponent<"happy" | "crying" | "thinking">({
-          button: () => {
-            const map = {
-              happy: "😀",
-              crying: "😢",
-              thinking: "🤔",
-            } as const;
-            const state: keyof typeof map = collector.getStatus().toggle.value ?? "happy";
+          button: {
+            emoji: () => {
+              const map = {
+                happy: "😀",
+                crying: "😢",
+                thinking: "🤔",
+              } as const;
+              const state: keyof typeof map = collector.getStatus().toggle.value ?? "happy";
 
-            return {
-              emoji: map[state],
-            };
+              return map[state];
+            },
           },
           toggleOptions: ["happy", "crying", "thinking"],
         }),
