@@ -7,6 +7,7 @@ import {
   MessageEmbed,
   MessageMentionOptions,
   TextChannel,
+  ThreadChannel,
 } from "discord.js";
 
 interface ReplyHelper {
@@ -29,6 +30,10 @@ export type ReplyDestination =
   | {
       type: "textChannel";
       destination: TextChannel;
+    }
+  | {
+      type: "thread";
+      destination: ThreadChannel;
     }
   | {
       type: "message";
@@ -79,39 +84,28 @@ const replyToDestination = (
   root: ReplyDestination,
   param: Omit<ReplyParam, "transferRoot">
 ): Promise<Message> => {
+  const sendParam = {
+    content: param.content,
+    embeds: param.embeds,
+    components: param.components,
+    attachments: param.attachments,
+    allowedMentions: param.allowedMentions,
+  };
   switch (root.type) {
     case "textChannel":
-      return root.destination.send({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-      });
+      return root.destination.send(sendParam);
+    case "thread":
+      return root.destination.send(sendParam);
     case "message":
-      return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
-      });
+      return root.destination.reply(sendParam);
     case "commandInteraction":
       return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
+        ...sendParam,
         fetchReply: true,
       });
     case "messageComponentInteraction":
       return root.destination.reply({
-        content: param.content,
-        embeds: param.embeds,
-        components: param.components,
-        attachments: param.attachments,
-        allowedMentions: param.allowedMentions,
+        ...sendParam,
         fetchReply: true,
       });
   }
