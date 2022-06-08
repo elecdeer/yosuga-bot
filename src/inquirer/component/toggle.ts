@@ -1,21 +1,21 @@
 import { MessageActionRow } from "discord.js";
 
-import { Lazy, resolveLazy } from "../../util/lazy";
+import { LazyParam, resolveLazyParam } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
-import { ButtonParam, createButton } from "./button";
+import { ButtonParam, createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
 
 export const createToggleComponent = <T>(param: {
-  button: Lazy<ButtonParam>;
+  button: LazyParam<ButtonParam>;
   toggleOptions: T[];
   customId?: string;
-  initial?: Lazy<T>;
+  initial?: T;
 }): PromptComponent<T> => {
   const customId = param.customId ?? "toggle";
 
   const calcInitialValue = () => {
     if (param.initial === undefined) return 0;
-    const index = param.toggleOptions.indexOf(resolveLazy(param.initial));
+    const index = param.toggleOptions.indexOf(param.initial);
     if (index === -1) return 0;
     return index;
   };
@@ -37,7 +37,9 @@ export const createToggleComponent = <T>(param: {
     },
     renderComponent: () => {
       return [
-        new MessageActionRow().addComponents(createButton(customId, resolveLazy(param.button))),
+        new MessageActionRow().addComponents(
+          createButton(customId, resolveLazyParam(param.button))
+        ),
       ];
     },
     hook: hook,

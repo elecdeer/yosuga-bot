@@ -1,9 +1,10 @@
-import { Lazy } from "../../util/lazy";
+import { LazyParam } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
-import { createMultiSelectComponent, SelectOption, SelectorParam } from "./multiSelect";
+import { SelectorParam } from "../wrapper/createSelectMenu";
+import { createMultiSelectComponent, SelectOption } from "./multiSelect";
 
 export const createSingleSelectComponent = <TOptionValue>(param: {
-  selector: Lazy<Omit<SelectorParam, "maxValues" | "minValues">>;
+  selector: LazyParam<Omit<SelectorParam, "maxValues" | "minValues">>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
   emptyAnswered?: boolean;
