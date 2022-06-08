@@ -1,7 +1,7 @@
 import { Collection, Formatters } from "discord.js";
 
-import { SpeakerBuildOption } from "../speaker/voiceProvider";
-import { UnifiedConfig } from "./typesConfig";
+import type { SpeakerBuildOption } from "../speaker/voiceProvider";
+import type { UnifiedConfig } from "./typesConfig";
 
 export const stringifyConfigEntry = <T extends keyof UnifiedConfig>(
   configKey: T,

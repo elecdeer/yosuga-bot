@@ -1,4 +1,8 @@
-import {
+import { resolveLazy } from "../../util/lazy";
+
+import type { Lazy } from "../../util/lazy";
+import type { PromptComponent } from "../promptTypes";
+import type {
   Awaitable,
   ButtonInteraction,
   MappedInteractionTypes,
@@ -7,9 +11,6 @@ import {
   ModalSubmitInteraction,
   SelectMenuInteraction,
 } from "discord.js";
-
-import { Lazy, resolveLazy } from "../../util/lazy";
-import { PromptComponent } from "../promptTypes";
 
 export const messageInteractionHook =
   <TComponent extends MessageComponentType>(componentType: TComponent) =>

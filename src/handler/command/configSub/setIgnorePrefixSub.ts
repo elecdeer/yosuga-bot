@@ -1,9 +1,9 @@
-import { CommandInteraction } from "discord.js";
-
-import { ConfigEachLevel, GuildLevel, MasterLevel } from "../../../config/typesConfig";
-import { YosugaClient } from "../../../yosugaClient";
 import { SetConfigSubCommandHandler } from "../../base/setConfigSubCommandHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+
+import type { ConfigEachLevel, GuildLevel, MasterLevel } from "../../../config/typesConfig";
+import type { YosugaClient } from "../../../yosugaClient";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { CommandInteraction } from "discord.js";
 
 export class SetIgnorePrefixSub extends SetConfigSubCommandHandler<
   MasterLevel | GuildLevel,

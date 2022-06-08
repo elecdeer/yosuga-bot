@@ -1,4 +1,4 @@
-import { SpeakerBuildOption } from "../speaker/voiceProvider";
+import type { SpeakerBuildOption } from "../speaker/voiceProvider";
 
 export type MasterLevelConfig = {
   speakerBuildOptions: Record<string, SpeakerBuildOption>;

@@ -1,7 +1,12 @@
-import { ApplicationCommandData, ChatInputApplicationCommandData, Client, Guild } from "discord.js";
 import { getLogger } from "log4js";
 
-import { CommandHandler } from "../handler/base/commandHandler";
+import type { CommandHandler } from "../handler/base/commandHandler";
+import type {
+  ApplicationCommandData,
+  ChatInputApplicationCommandData,
+  Client,
+  Guild,
+} from "discord.js";
 
 const logger = getLogger("CommandRegister");
 

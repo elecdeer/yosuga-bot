@@ -1,5 +1,6 @@
-import { Guild, GuildMember, Role } from "discord.js";
 import { getLogger } from "log4js";
+
+import type { Guild, GuildMember, Role } from "discord.js";
 
 export const CommandPermission = {
   Everyone: 0,

@@ -1,9 +1,10 @@
-import { Collection, Message } from "discord.js";
-
 import { resolveLazy } from "../util/lazy";
-import { createReplyHelper, ReplyDestination } from "../util/replyHelper";
-import { Awaited, TypedEventEmitter } from "../util/typedEventEmitter";
-import { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
+import { createReplyHelper } from "../util/replyHelper";
+
+import type { ReplyDestination } from "../util/replyHelper";
+import type { Awaited, TypedEventEmitter } from "../util/typedEventEmitter";
+import type { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
+import type { Collection, Message } from "discord.js";
 
 export const createPromptController = async <T extends Record<string, PromptComponent<unknown>>>(
   componentCollection: Collection<keyof T, T[keyof T]>,

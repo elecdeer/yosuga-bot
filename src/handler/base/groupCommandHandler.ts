@@ -1,10 +1,14 @@
-import { ApplicationCommandOptionData, ChatInputApplicationCommandData, Client } from "discord.js";
-
-import { CommandContext } from "../../commandContext";
-import { YosugaClient } from "../../yosugaClient";
 import { CommandHandler } from "./commandHandler";
-import { EventArgs, EventKeysUnion } from "./handler";
-import { SubCommandHandler } from "./subCommandHandler";
+
+import type { CommandContext } from "../../commandContext";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventArgs, EventKeysUnion } from "./handler";
+import type { SubCommandHandler } from "./subCommandHandler";
+import type {
+  ApplicationCommandOptionData,
+  ChatInputApplicationCommandData,
+  Client,
+} from "discord.js";
 
 export abstract class GroupCommandHandler extends CommandHandler {
   protected readonly subCommands: SubCommandHandler[];

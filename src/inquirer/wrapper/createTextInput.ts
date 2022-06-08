@@ -1,4 +1,6 @@
-import { TextInputComponent, TextInputComponentOptions } from "discord.js";
+import { TextInputComponent } from "discord.js";
+
+import type { TextInputComponentOptions } from "discord.js";
 
 export type TextInputParam = Partial<Omit<TextInputComponentOptions, "customId">>;
 

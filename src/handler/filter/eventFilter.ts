@@ -1,4 +1,4 @@
-import { Awaitable, ClientEvents } from "discord.js";
+import type { Awaitable, ClientEvents } from "discord.js";
 
 export type Listener<TEvent extends keyof ClientEvents> = (
   ...args: ClientEvents[TEvent]

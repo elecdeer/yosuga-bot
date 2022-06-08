@@ -1,5 +1,7 @@
-import { VoiceOrStageChannel } from "../../types";
-import { EventFilterGenerator, FilterCheckerGenerator, filterGenerator } from "./eventFilter";
+import { filterGenerator } from "./eventFilter";
+
+import type { VoiceOrStageChannel } from "../../types";
+import type { EventFilterGenerator, FilterCheckerGenerator } from "./eventFilter";
 
 /**
  * 呼び出されたイベントがvoiceChannelからの退室を示すものであるかどうか

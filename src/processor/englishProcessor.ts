@@ -1,5 +1,6 @@
 import { replaceEnglishRead } from "./englishRead/englishRead";
-import { ProcessorProvider } from "./processorChain";
+
+import type { ProcessorProvider } from "./processorChain";
 
 export const englishProcessor: ProcessorProvider<void> = () => async (speechText) => {
   return {

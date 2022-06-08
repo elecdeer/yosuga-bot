@@ -2,7 +2,9 @@
 
 import { Util } from "discord.js";
 
-import { processorLogger, ProcessorProvider } from "./processorChain";
+import { processorLogger } from "./processorChain";
+
+import type { ProcessorProvider } from "./processorChain";
 
 const guildEmojiReg = /<\w?:\w+:\d+>/g;
 export const guildEmojiProcessor: ProcessorProvider<void> = () => async (speechText) => {

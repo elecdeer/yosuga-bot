@@ -1,20 +1,18 @@
-import {
-  AudioPlayer,
-  createAudioPlayer,
-  NoSubscriberBehavior,
-  VoiceConnection,
-} from "@discordjs/voice";
-import { Guild, GuildMember, TextChannel } from "discord.js";
+import { createAudioPlayer, NoSubscriberBehavior } from "@discordjs/voice";
 import { getLogger } from "log4js";
-import { SetOptional } from "type-fest";
 
-import { UnifiedConfig } from "./config/typesConfig";
 import { hookSessionHandlers, loadSessionHandlers } from "./handler/sessionHandlerLoader";
 import { VoiceProvider } from "./speaker/voiceProvider";
-import { createSpeechQueue, SpeechQueue } from "./speechQueue";
-import { SpeechText, UserId, VoiceOrStageChannel } from "./types";
+import { createSpeechQueue } from "./speechQueue";
 import { constructEmbeds } from "./util/createEmbed";
-import { YosugaClient } from "./yosugaClient";
+
+import type { UnifiedConfig } from "./config/typesConfig";
+import type { SpeechQueue } from "./speechQueue";
+import type { SpeechText, UserId, VoiceOrStageChannel } from "./types";
+import type { YosugaClient } from "./yosugaClient";
+import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
+import type { Guild, GuildMember, TextChannel } from "discord.js";
+import type { SetOptional } from "type-fest";
 
 const logger = getLogger("session");
 

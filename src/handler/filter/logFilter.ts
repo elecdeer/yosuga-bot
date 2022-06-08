@@ -1,7 +1,8 @@
-import { ClientEvents } from "discord.js";
-import { Logger } from "log4js";
+import { filterGenerator } from "./eventFilter";
 
-import { FilterCheckerGenerator, filterGenerator } from "./eventFilter";
+import type { FilterCheckerGenerator } from "./eventFilter";
+import type { ClientEvents } from "discord.js";
+import type { Logger } from "log4js";
 
 type TapEventArgs<TEvent extends keyof ClientEvents> = {
   logger: Logger;

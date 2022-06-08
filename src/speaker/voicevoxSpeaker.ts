@@ -1,12 +1,16 @@
-import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
+import { createAudioResource, StreamType } from "@discordjs/voice";
 import { getLogger } from "log4js";
 
-import { Session } from "../session";
-import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
-import { failure, Result, success } from "../util/result";
+import { failure, success } from "../util/result";
 import { remap } from "../util/util";
-import { Speaker, SpeakerState } from "./speaker";
+import { Speaker } from "./speaker";
 import { createVoicevoxClient } from "./voicevoxApi";
+
+import type { Session } from "../session";
+import type { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
+import type { Result } from "../util/result";
+import type { SpeakerState } from "./speaker";
+import type { AudioResource } from "@discordjs/voice";
 
 const logger = getLogger("voicevoxSpeaker");
 

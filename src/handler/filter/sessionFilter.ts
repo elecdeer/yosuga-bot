@@ -1,5 +1,7 @@
-import { Session } from "../../session";
-import { EventFilterGenerator, filterer } from "./eventFilter";
+import { filterer } from "./eventFilter";
+
+import type { Session } from "../../session";
+import type { EventFilterGenerator } from "./eventFilter";
 
 export const voiceStatusSessionFilter: EventFilterGenerator<
   "voiceStateUpdate",

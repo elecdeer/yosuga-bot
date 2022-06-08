@@ -1,12 +1,16 @@
 //ラッパー
 
-import ss, { Socket } from "@sap_oss/node-socketio-stream";
+import ss from "@sap_oss/node-socketio-stream";
 import { getLogger } from "log4js";
-import { io, Socket as SIOSocket } from "socket.io-client";
-import { Readable } from "stream";
+import { io } from "socket.io-client";
 
 import { wait } from "../util/promiseUtil";
-import { failure, Result, success } from "../util/result";
+import { failure, success } from "../util/result";
+
+import type { Result } from "../util/result";
+import type { Socket } from "@sap_oss/node-socketio-stream";
+import type { Socket as SIOSocket } from "socket.io-client";
+import type { Readable } from "stream";
 
 const logger = getLogger("SIOAudioRecorder");
 

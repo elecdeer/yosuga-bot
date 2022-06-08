@@ -1,16 +1,18 @@
-import { Message } from "discord.js";
-
 import {
   constructApplicationCommandsData,
   registerApplicationCommands,
 } from "../../application/commandRegister";
 import { CommandPermission } from "../../application/permission";
 import { constructEmbeds } from "../../util/createEmbed";
-import { YosugaClient } from "../../yosugaClient";
-import { EventKeysUnion, Handler } from "../base/handler";
-import { composeFilter, EventFilterGenerator } from "../filter/eventFilter";
+import { Handler } from "../base/handler";
+import { composeFilter } from "../filter/eventFilter";
 import { textCommandFilter } from "../filter/textCommandFilter";
 import { loadCommands } from "../handlerLoader";
+
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventKeysUnion } from "../base/handler";
+import type { EventFilterGenerator } from "../filter/eventFilter";
+import type { Message } from "discord.js";
 
 export class DeployGuildHandler extends Handler<["messageCreate"]> {
   constructor(yosuga: YosugaClient) {

@@ -1,11 +1,13 @@
 import { getLogger } from "log4js";
-import { ReadonlyDeep } from "type-fest";
 
-import { UserId } from "../../types";
-import { resolveValue, ValueResolvable } from "../../util/resolvable";
-import { UserConfigStore } from "../store/userConfigStore";
-import { UserConfig } from "../typesConfig";
+import { resolveValue } from "../../util/resolvable";
 import { ConfigAccessor } from "./configAccessor";
+
+import type { UserId } from "../../types";
+import type { ValueResolvable } from "../../util/resolvable";
+import type { UserConfigStore } from "../store/userConfigStore";
+import type { UserConfig } from "../typesConfig";
+import type { ReadonlyDeep } from "type-fest";
 
 export type UserConfigAccessorProps = {
   store: UserConfigStore;

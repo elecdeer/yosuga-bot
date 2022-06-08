@@ -1,8 +1,9 @@
-import { Client } from "discord.js";
-
-import { VoiceOrStageChannel } from "../../types";
-import { composeFilter, EventFilterGenerator, filterer } from "./eventFilter";
+import { composeFilter, filterer } from "./eventFilter";
 import { leaveVoiceChannelFilter } from "./leaveVoiceChannelFilter";
+
+import type { VoiceOrStageChannel } from "../../types";
+import type { EventFilterGenerator } from "./eventFilter";
+import type { Client } from "discord.js";
 
 /**
  * セッションの終了時、すなわちYosugaがVCから退出した時のみ通過するイベントフィルタ

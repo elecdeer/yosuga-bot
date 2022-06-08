@@ -1,6 +1,7 @@
 import { CommandPermission } from "../../application/permission";
-import { CommandProps } from "../base/commandHandler";
 import { GroupCommandHandler } from "../base/groupCommandHandler";
+
+import type { CommandProps } from "../base/commandHandler";
 
 export class GuildConfigCommand extends GroupCommandHandler {
   protected initCommandProps(): CommandProps {

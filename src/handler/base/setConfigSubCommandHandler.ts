@@ -1,10 +1,12 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
 
-import { CommandContextSlash } from "../../commandContextSlash";
 import { stringifyConfigEntry } from "../../config/conifgUtil";
-import { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";
-import { YosugaClient } from "../../yosugaClient";
 import { ConfigSubCommandHandler } from "./configSubCommandHandler";
+
+import type { CommandContextSlash } from "../../commandContextSlash";
+import type { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";
+import type { YosugaClient } from "../../yosugaClient";
+import type { CommandInteraction } from "discord.js";
 
 export const levelString: Record<ConfigCommandLevel, string> = {
   MASTER: "Yosugaインスタンス",

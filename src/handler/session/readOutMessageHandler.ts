@@ -1,6 +1,3 @@
-import { Message } from "discord.js";
-
-import { UnifiedConfig } from "../../config/typesConfig";
 import { codeBlockProcessor } from "../../processor/codeBlockProcessor";
 import { emojiProcessor } from "../../processor/emojiProcessor";
 import { englishProcessor } from "../../processor/englishProcessor";
@@ -11,13 +8,17 @@ import { omitSymbolProcessor } from "../../processor/omitSymbolProcessor";
 import { ProcessorChain } from "../../processor/processorChain";
 import { tildeReplaceProcessor } from "../../processor/tildeReplaceProcessor";
 import { urlProcessor } from "../../processor/urlProcessor";
-import { Session } from "../../session";
-import { SpeechText } from "../../types";
-import { YosugaClient } from "../../yosugaClient";
-import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
-import { composeFilter, EventFilter, filterer } from "../filter/eventFilter";
+import { composeFilter, filterer } from "../filter/eventFilter";
 import { messageCreateSessionFilter } from "../filter/sessionFilter";
+
+import type { UnifiedConfig } from "../../config/typesConfig";
+import type { Session } from "../../session";
+import type { SpeechText } from "../../types";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventKeysUnion } from "../base/handler";
+import type { EventFilter } from "../filter/eventFilter";
+import type { Message } from "discord.js";
 
 export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate"]> {
   protected processorCache: {

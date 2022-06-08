@@ -1,5 +1,6 @@
 import { escapeRegexp } from "../util/util";
-import { ProcessorProvider } from "./processorChain";
+
+import type { ProcessorProvider } from "./processorChain";
 
 export const omitSymbolProcessor: ProcessorProvider<string> = (symbol) => {
   const symbolEscaped = escapeRegexp(symbol);

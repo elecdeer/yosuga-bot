@@ -1,8 +1,8 @@
-import { CommandInteraction } from "discord.js";
-
-import { ConfigEachLevel, MasterLevel } from "../../../config/typesConfig";
 import { AddSpeakerSubHandler } from "../../base/addSpeakerSubHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+
+import type { ConfigEachLevel, MasterLevel } from "../../../config/typesConfig";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { CommandInteraction } from "discord.js";
 
 export class AddSpeakerTtsSub extends AddSpeakerSubHandler {
   protected initCommandProps(): SubCommandProps {

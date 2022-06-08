@@ -4,7 +4,9 @@ import {
   getPronunciation,
 } from "@elecdeer/emoji-pronunciation-ja";
 
-import { processorLogger, ProcessorProvider } from "./processorChain";
+import { processorLogger } from "./processorChain";
+
+import type { ProcessorProvider } from "./processorChain";
 
 const emojiReg = getEmojiRegExp("g");
 
@@ -26,6 +28,7 @@ export const emojiProcessor: ProcessorProvider<void> = () => async (speechText) 
 };
 
 //emoji-pronunciation-jaの方直した方がいい気もする
+// noinspection NonAsciiCharacters
 const exceptionEmojis: Record<string, string> = {
   "{": "{",
   "‾": "‾",

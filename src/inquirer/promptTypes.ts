@@ -1,8 +1,7 @@
-import { Message, MessageActionRow, MessageEmbed } from "discord.js";
-
-import { Lazy } from "../util/lazy";
-import { ReplyDestination } from "../util/replyHelper";
-import { Awaited } from "../util/typedEventEmitter";
+import type { Lazy } from "../util/lazy";
+import type { ReplyDestination } from "../util/replyHelper";
+import type { Awaited } from "../util/typedEventEmitter";
+import type { Message, MessageActionRow, MessageEmbed } from "discord.js";
 
 //TODO AwaitedはTS標準の型と名前が被っているのでやめる
 //TODO Toggle, ModalTextInput,

@@ -1,11 +1,13 @@
-import { VoiceConnection } from "@discordjs/voice";
-import { Collection, TextChannel } from "discord.js";
+import { Collection } from "discord.js";
 import log4js from "log4js";
 
 import { endSessionFilter } from "./handler/filter/endSessionFilter";
 import { Session } from "./session";
-import { GuildId, VoiceOrStageChannel } from "./types";
-import { YosugaClient } from "./yosugaClient";
+
+import type { GuildId, VoiceOrStageChannel } from "./types";
+import type { YosugaClient } from "./yosugaClient";
+import type { VoiceConnection } from "@discordjs/voice";
+import type { TextChannel } from "discord.js";
 
 const logger = log4js.getLogger("sessionManager");
 

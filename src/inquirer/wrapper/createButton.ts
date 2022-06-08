@@ -1,4 +1,6 @@
-import { InteractionButtonOptions, MessageButton } from "discord.js";
+import { MessageButton } from "discord.js";
+
+import type { InteractionButtonOptions } from "discord.js";
 
 export type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
 

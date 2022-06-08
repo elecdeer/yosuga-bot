@@ -1,9 +1,11 @@
 import { generateDependencyReport } from "@discordjs/voice";
-import Discord, { Client, Intents } from "discord.js";
+import Discord, { Intents } from "discord.js";
 import log4js from "log4js";
 
 import { yosugaEnv } from "./environment";
 import { YosugaClient } from "./yosugaClient";
+
+import type { Client } from "discord.js";
 
 //最初にconfigureしないとenvironmentのログが出ない
 log4js.configure({

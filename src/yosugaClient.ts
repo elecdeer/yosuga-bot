@@ -1,4 +1,3 @@
-import { Client } from "discord.js";
 import { getLogger } from "log4js";
 import path from "path";
 
@@ -9,6 +8,8 @@ import { KvsUserConfigStore } from "./config/store/kvsUserConfigStore";
 import { yosugaEnv } from "./environment";
 import { hookHandlers, loadHandlers } from "./handler/handlerLoader";
 import { SessionManager } from "./sessionManager";
+
+import type { Client } from "discord.js";
 
 const logger = getLogger("yosugaClient");
 

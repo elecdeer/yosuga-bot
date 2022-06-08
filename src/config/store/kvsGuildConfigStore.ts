@@ -1,7 +1,9 @@
-import { GuildId } from "../../types";
-import { GuildConfig, GuildConfigRecord } from "../typesConfig";
-import { GuildConfigStore } from "./guildConfigStore";
-import { KvsStoreBase, StoreProps } from "./kvsStoreBase";
+import { KvsStoreBase } from "./kvsStoreBase";
+
+import type { GuildId } from "../../types";
+import type { GuildConfig, GuildConfigRecord } from "../typesConfig";
+import type { GuildConfigStore } from "./guildConfigStore";
+import type { StoreProps } from "./kvsStoreBase";
 
 export class KvsGuildConfigStore
   extends KvsStoreBase<GuildConfigRecord>

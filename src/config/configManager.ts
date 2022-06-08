@@ -1,20 +1,21 @@
 import assert from "assert";
-import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
-import { Speaker } from "../speaker/speaker";
-import { GuildId, UserId } from "../types";
-import { YosugaClient } from "../yosugaClient";
-import { ConfigAccessor } from "./accessor/configAccessor";
 import { GuildConfigAccessor } from "./accessor/guildConfigAccessor";
 import { MasterConfigAccessor } from "./accessor/masterConfigAccessor";
 import { UnifiedConfigAccessor } from "./accessor/unifiedConfigAccessor";
 import { UserConfigAccessor } from "./accessor/userConfigAccessor";
 import { ValidVoiceConfigAccessor } from "./accessor/validVoiceConfigAccessor";
-import { GuildConfigStore } from "./store/guildConfigStore";
-import { MasterConfigStore } from "./store/masterConfigStore";
-import { UserConfigStore } from "./store/userConfigStore";
-import { GuildConfig, MasterConfig, UserConfig } from "./typesConfig";
+
+import type { Speaker } from "../speaker/speaker";
+import type { GuildId, UserId } from "../types";
+import type { YosugaClient } from "../yosugaClient";
+import type { ConfigAccessor } from "./accessor/configAccessor";
+import type { GuildConfigStore } from "./store/guildConfigStore";
+import type { MasterConfigStore } from "./store/masterConfigStore";
+import type { UserConfigStore } from "./store/userConfigStore";
+import type { GuildConfig, MasterConfig, UserConfig } from "./typesConfig";
+import type { Collection } from "discord.js";
 
 const logger = getLogger("configManager");
 

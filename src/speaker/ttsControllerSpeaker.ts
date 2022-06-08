@@ -1,17 +1,21 @@
-import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
+import { createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
 import { getLogger } from "log4js";
 import { opus } from "prism-media";
-import { Readable } from "stream";
 
 import { endSessionFilter } from "../handler/filter/endSessionFilter";
-import { Session } from "../session";
-import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
 import { wait } from "../util/promiseUtil";
-import { Result, success } from "../util/result";
+import { success } from "../util/result";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
-import { Speaker, SpeakerState } from "./speaker";
+import { Speaker } from "./speaker";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
+
+import type { Session } from "../session";
+import type { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
+import type { Result } from "../util/result";
+import type { SpeakerState } from "./speaker";
+import type { AudioResource } from "@discordjs/voice";
+import type { Readable } from "stream";
 
 export type TtsSpeakerBuildOption = {
   type: "ttsController";

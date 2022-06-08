@@ -1,4 +1,6 @@
-import { MessageSelectMenu, MessageSelectMenuOptions } from "discord.js";
+import { MessageSelectMenu } from "discord.js";
+
+import type { MessageSelectMenuOptions } from "discord.js";
 
 export type SelectorParam = Partial<
   Omit<MessageSelectMenuOptions, "customId" | "type" | "options">

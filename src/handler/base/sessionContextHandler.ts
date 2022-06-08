@@ -1,9 +1,10 @@
-import { Client } from "discord.js";
-
-import { Session } from "../../session";
-import { YosugaClient } from "../../yosugaClient";
 import { endSessionFilter } from "../filter/endSessionFilter";
-import { EventArgs, EventKeysTuple, EventKeysUnion, Handler } from "./handler";
+import { Handler } from "./handler";
+
+import type { Session } from "../../session";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventArgs, EventKeysTuple, EventKeysUnion } from "./handler";
+import type { Client } from "discord.js";
 
 export abstract class SessionContextHandler<
   TEventTuple extends EventKeysTuple

@@ -1,10 +1,11 @@
-import { ReadonlyDeep } from "type-fest";
-
-import { GuildId } from "../../types";
-import { resolveValue, ValueResolvable } from "../../util/resolvable";
-import { GuildConfigStore } from "../store/guildConfigStore";
-import { GuildConfig } from "../typesConfig";
+import { resolveValue } from "../../util/resolvable";
 import { ConfigAccessor } from "./configAccessor";
+
+import type { GuildId } from "../../types";
+import type { ValueResolvable } from "../../util/resolvable";
+import type { GuildConfigStore } from "../store/guildConfigStore";
+import type { GuildConfig } from "../typesConfig";
+import type { ReadonlyDeep } from "type-fest";
 
 export type GuildConfigAccessorProps = {
   store: GuildConfigStore;

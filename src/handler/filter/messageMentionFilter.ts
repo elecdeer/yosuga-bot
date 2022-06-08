@@ -1,6 +1,5 @@
-import { User } from "discord.js";
-
-import { FilterCheckerGenerator } from "./eventFilter";
+import type { FilterCheckerGenerator } from "./eventFilter";
+import type { User } from "discord.js";
 
 export const isMessageMentionedCall: FilterCheckerGenerator<"messageCreate", Readonly<User>> = (
   targetUser

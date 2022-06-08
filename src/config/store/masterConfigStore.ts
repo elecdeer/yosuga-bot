@@ -1,5 +1,5 @@
-import { AppId } from "../../types";
-import { MasterConfig } from "../typesConfig";
+import type { AppId } from "../../types";
+import type { MasterConfig } from "../typesConfig";
 
 export interface MasterConfigStore {
   save(appId: AppId, value: Partial<MasterConfig>): Promise<Readonly<Partial<MasterConfig>>>;

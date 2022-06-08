@@ -1,8 +1,10 @@
-import { Collection, Snowflake } from "discord.js";
+import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
 import { endSessionFilter } from "../handler/filter/endSessionFilter";
-import { Session } from "../session";
+
+import type { Session } from "../session";
+import type { Snowflake } from "discord.js";
 
 const logger = getLogger("ttsControllerOccupier");
 

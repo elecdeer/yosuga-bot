@@ -1,13 +1,14 @@
-import { VoiceState } from "discord.js";
-
-import { Session } from "../../session";
 import { createYosugaEmbed } from "../../util/createEmbed";
-import { YosugaClient } from "../../yosugaClient";
-import { EventKeysUnion } from "../base/handler";
 import { SessionContextHandler } from "../base/sessionContextHandler";
 import { enterVoiceChannelFilter } from "../filter/enterVoiceChannelFilter";
-import { composeFilter, EventFilterGenerator, filterer } from "../filter/eventFilter";
+import { composeFilter, filterer } from "../filter/eventFilter";
 import { leaveVoiceChannelFilter } from "../filter/leaveVoiceChannelFilter";
+
+import type { Session } from "../../session";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventKeysUnion } from "../base/handler";
+import type { EventFilterGenerator } from "../filter/eventFilter";
+import type { VoiceState } from "discord.js";
 
 export class AutoLeaveHandler extends SessionContextHandler<["voiceStateUpdate"]> {
   private timer: NodeJS.Timeout | null = null;

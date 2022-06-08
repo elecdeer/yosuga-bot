@@ -1,8 +1,9 @@
-import { Client, ClientEvents } from "discord.js";
-import { getLogger, Logger } from "log4js";
+import { getLogger } from "log4js";
 
-import { YosugaClient } from "../../yosugaClient";
-import { EventFilter, Listener } from "../filter/eventFilter";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventFilter, Listener } from "../filter/eventFilter";
+import type { Client, ClientEvents } from "discord.js";
+import type { Logger } from "log4js";
 
 export type EventKeysTuple = [...(keyof ClientEvents)[]];
 export type EventKeysUnion<TEventTuple extends EventKeysTuple> = TEventTuple[number];
