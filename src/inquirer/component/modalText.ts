@@ -1,31 +1,23 @@
-import {
-  Collection,
-  MessageActionRow,
-  MessageEmbed,
-  Modal,
-  ModalActionRowComponent,
-  ModalOptions,
-  TextInputComponent,
-  TextInputComponentOptions,
-} from "discord.js";
+import { Collection, MessageActionRow, MessageEmbed, ModalActionRowComponent } from "discord.js";
 import { getLogger } from "log4js";
 
-import { Lazy, resolveLazy } from "../../util/lazy";
+import { LazyParam, resolveLazyParam } from "../../util/lazy";
 import { PromptComponent, ValidateResult, ValidateResultReject } from "../promptTypes";
-import { ButtonParam, createButton } from "./button";
+import { ButtonParam, createButton } from "../wrapper/createButton";
+import { createModal, ModalParam } from "../wrapper/createModal";
+import { createTextInput, TextInputParam } from "../wrapper/createTextInput";
 
-type ModalParam = Partial<Omit<ModalOptions, "customId">>;
-type TextInputParam = Partial<Omit<TextInputComponentOptions, "customId">>;
-type TextInputParamWithValidate = TextInputParam & {
+type TextInputParamLazy = LazyParam<TextInputParam, Exclude<keyof TextInputParam, "value">>;
+type TextInputParamWithValidate = TextInputParamLazy & {
   validation?: (input: string) => ValidateResult;
 };
 
 const logger = getLogger("modalText");
 
 export const createModalTextComponent = <TKey extends string>(param: {
-  openButton: Lazy<ButtonParam>;
-  textInputs: Lazy<Record<TKey, TextInputParamWithValidate>>;
-  modal: Lazy<ModalParam>;
+  openButton: LazyParam<ButtonParam>;
+  textInputs: Record<TKey, TextInputParamWithValidate>;
+  modal: LazyParam<ModalParam>;
   customId?: string;
   formatErrorMessage?: (reasons: string[]) => string | MessageEmbed[];
 }): PromptComponent<Record<TKey, string>> => {
@@ -34,10 +26,10 @@ export const createModalTextComponent = <TKey extends string>(param: {
 
   // //ここでresolveするのよくない？
   const getFormCollection = () => {
-    return new Collection<TKey, TextInputParamWithValidate>(
-      Object.entries(resolveLazy(param.textInputs)) as [TKey, TextInputParamWithValidate][]
+    return new Collection(
+      Object.entries(param.textInputs) as [TKey, TextInputParamWithValidate][]
     ).mapValues((item, key) => ({
-      ...item,
+      ...resolveLazyParam(item),
       value: result[key],
       validation:
         item.validation ??
@@ -48,9 +40,9 @@ export const createModalTextComponent = <TKey extends string>(param: {
   };
 
   const constructModal = () => {
-    const modal = createModal(customId, resolveLazy(param.modal));
+    const modal = createModal(customId, resolveLazyParam(param.modal, ["title", "title"]));
     const inputs = getFormCollection()
-      .map((item, key) => createTextInput(`${customId}-${key}`, item))
+      .map((item, key) => createTextInput(`${customId}-${key}`, resolveLazyParam(item)))
       .map((item) => new MessageActionRow<ModalActionRowComponent>().addComponents(item));
     modal.setComponents(...inputs);
     return modal;
@@ -58,9 +50,10 @@ export const createModalTextComponent = <TKey extends string>(param: {
 
   let validateErrors: ValidateResultReject[] = [];
   let result: Record<TKey, string> = Object.fromEntries(
-    Object.entries<TextInputParamWithValidate>(resolveLazy(param.textInputs)).map(
-      ([key, value]) => [key, value.value ?? ""]
-    )
+    Object.entries<TextInputParamWithValidate>(param.textInputs).map(([key, value]) => [
+      key,
+      value.value ?? "",
+    ])
   ) as Record<TKey, string>;
 
   return {
@@ -145,31 +138,11 @@ export const createModalTextComponent = <TKey extends string>(param: {
     renderComponent: () => {
       return [
         new MessageActionRow().addComponents(
-          createButton(openButtonCustomId, resolveLazy(param.openButton))
+          createButton(openButtonCustomId, resolveLazyParam(param.openButton))
         ),
       ];
     },
   };
-};
-
-const createModal = (customId: string, param: ModalParam): Modal => {
-  const modal = new Modal();
-  modal.setCustomId(customId);
-  modal.setTitle(param.title ?? "Text Input");
-  return modal;
-};
-
-const createTextInput = (customId: string, param: TextInputParam): TextInputComponent => {
-  const textInput = new TextInputComponent();
-  textInput.setCustomId(customId);
-  if (param.label !== undefined) textInput.setLabel(param.label);
-  textInput.setRequired(param.required ?? false);
-  if (param.maxLength !== undefined) textInput.setMaxLength(param.maxLength);
-  if (param.minLength !== undefined) textInput.setMinLength(param.minLength);
-  if (param.placeholder !== undefined) textInput.setPlaceholder(param.placeholder);
-  textInput.setStyle(param.style ?? "SHORT");
-  if (param.value !== undefined) textInput.setValue(param.value);
-  return textInput;
 };
 
 const formatErrorMessage = (

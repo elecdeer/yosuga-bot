@@ -1,18 +1,9 @@
-import {
-  Collection,
-  EmojiIdentifierResolvable,
-  MessageActionRow,
-  MessageSelectMenu,
-  MessageSelectMenuOptions,
-} from "discord.js";
+import { Collection, EmojiIdentifierResolvable, MessageActionRow } from "discord.js";
 
-import { Lazy, resolveLazy } from "../../util/lazy";
+import { Lazy, LazyParam, resolveLazy, resolveLazyParam } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
+import { createSelectMenu, SelectorParam } from "../wrapper/createSelectMenu";
 import { selectMenuInteractionHook } from "./messageInteractionHook";
-
-export type SelectorParam = Partial<
-  Omit<MessageSelectMenuOptions, "customId" | "type" | "options">
->;
 
 export type SelectOption<T> = {
   label: Lazy<string>;
@@ -24,7 +15,7 @@ export type SelectOption<T> = {
 };
 
 export const createMultiSelectComponent = <TOptionValue>(param: {
-  selector: Lazy<SelectorParam>;
+  selector: LazyParam<SelectorParam>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
   emptyAnswered?: boolean;
@@ -60,7 +51,7 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
     },
     hook: hook,
     renderComponent: () => {
-      const component = createSelectMenu(customId, resolveLazy(param.selector));
+      const component = createSelectMenu(customId, resolveLazyParam(param.selector));
 
       component.setOptions(
         options
@@ -96,14 +87,4 @@ const createValueRelation = <TOptionValue>(options: SelectOption<TOptionValue>[]
     options: optionsWithIndexKey,
     relationCollection: new Collection<string, TOptionValue>(relationEntries),
   };
-};
-
-const createSelectMenu = (customId: string, param: SelectorParam): MessageSelectMenu => {
-  const selectMenu = new MessageSelectMenu();
-  selectMenu.setCustomId(customId);
-  if (param.disabled) selectMenu.setDisabled(param.disabled);
-  if (param.minValues) selectMenu.setMinValues(param.minValues);
-  if (param.maxValues) selectMenu.setMaxValues(param.maxValues);
-  if (param.placeholder) selectMenu.setPlaceholder(param.placeholder);
-  return selectMenu;
 };

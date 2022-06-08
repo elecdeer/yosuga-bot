@@ -1,13 +1,12 @@
-import { InteractionButtonOptions, MessageActionRow, MessageButton } from "discord.js";
+import { MessageActionRow } from "discord.js";
 
-import { Lazy, resolveLazy } from "../../util/lazy";
+import { Lazy, LazyParam, resolveLazyParam } from "../../util/lazy";
 import { PromptComponent } from "../promptTypes";
+import { ButtonParam, createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
 
-export type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "type">>;
-
 export const createButtonComponent = (param: {
-  button: Lazy<ButtonParam>;
+  button: LazyParam<ButtonParam>;
   customId?: string;
   initial?: Lazy<boolean>;
 }): PromptComponent<true> => {
@@ -21,19 +20,14 @@ export const createButtonComponent = (param: {
     getStatus: getStatus,
     renderComponent: () => {
       return [
-        new MessageActionRow().addComponents(createButton(customId, resolveLazy(param.button))),
+        new MessageActionRow().addComponents(
+          createButton(
+            customId,
+            resolveLazyParam(param.button, ["label", "emoji", "style", "disabled"])
+          )
+        ),
       ];
     },
     hook: hook,
   };
-};
-
-export const createButton = (customId: string, param: ButtonParam): MessageButton => {
-  const button = new MessageButton();
-  button.setCustomId(customId);
-  if (param.disabled) button.setDisabled(param.disabled);
-  if (param.emoji) button.setEmoji(param.emoji);
-  button.setLabel(param.label ?? "");
-  button.setStyle(param.style ?? "PRIMARY");
-  return button;
 };
