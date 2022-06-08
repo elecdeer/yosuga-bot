@@ -28,7 +28,7 @@
   "author": "",
   "license": "MIT",
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "devDependencies": {
     "@types/async": "^3.2.13",
