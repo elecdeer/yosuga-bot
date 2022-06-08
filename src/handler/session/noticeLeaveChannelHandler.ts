@@ -20,7 +20,7 @@ export class NoticeLeaveChannelHandler extends SessionContextHandler<["voiceStat
       super.filter(eventName),
       voiceStatusSessionFilter(this.session),
       leaveVoiceChannelFilter(this.session.voiceChannel),
-      filterer((oldState, newState) => {
+      filterer<"voiceStateUpdate">((oldState, newState) => {
         const member = newState.member!;
         return member.id !== this.yosuga.client.user.id;
       })

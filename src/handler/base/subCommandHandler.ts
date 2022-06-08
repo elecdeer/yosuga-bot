@@ -27,7 +27,7 @@ export abstract class SubCommandHandler extends CommandHandler<SubCommandProps> 
   ): EventFilter<EventKeysUnion<["interactionCreate"]>> {
     return composeFilter(
       this.groupCommand!.getGroupFilter(),
-      filterer((interaction) => {
+      filterer<"interactionCreate">((interaction) => {
         const commandInteraction = interaction as CommandInteraction;
         const subCommandName = commandInteraction.options.getSubcommand(true);
 

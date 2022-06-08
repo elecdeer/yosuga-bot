@@ -69,8 +69,8 @@ export class ReadOutMessageHandler extends SessionContextHandler<["messageCreate
     return composeFilter(
       super.filter(eventName),
       messageCreateSessionFilter(this.session),
-      filterer((message) => message.channelId === this.session.textChannel.id),
-      filterer(async (message) => {
+      filterer<"messageCreate">((message) => message.channelId === this.session.textChannel.id),
+      filterer<"messageCreate">(async (message) => {
         const config = await this.session.getConfig();
         if (message.cleanContent.startsWith(config.ignorePrefix)) {
           return false;
