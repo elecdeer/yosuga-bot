@@ -29,7 +29,15 @@ export const createModalTextComponent = <TKey extends string>(param: {
     return new Collection(
       Object.entries(param.textInputs) as [TKey, TextInputParamWithValidate][]
     ).mapValues((item, key) => ({
-      ...resolveLazyParam(item),
+      ...resolveLazyParam(item, [
+        "type",
+        "label",
+        "maxLength",
+        "minLength",
+        "placeholder",
+        "required",
+        "style",
+      ]),
       value: result[key],
       validation:
         item.validation ??
