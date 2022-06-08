@@ -14,7 +14,7 @@ export const endSessionFilter: EventFilterGenerator<
 > = (voiceChannel) =>
   composeFilter(
     leaveVoiceChannelFilter(voiceChannel),
-    filterer((oldState, newState) => {
+    filterer<"voiceStateUpdate">((oldState, newState) => {
       const client: Client = oldState.client;
       if (!client.isReady()) return false;
       //抜けたのはyosuga自身
