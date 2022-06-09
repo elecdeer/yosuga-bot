@@ -3,7 +3,7 @@ import { getLogger } from "log4js";
 
 import { resolveLazyParam } from "../../util/lazy";
 import { createButton } from "../wrapper/createButton";
-import { buttonInteractionHook } from "./messageInteractionHook";
+import { buttonInteractionHookValue } from "./componentHookWithValue";
 
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
@@ -28,7 +28,7 @@ export const createToggleComponent = <T>(param: {
     return index;
   };
 
-  const { getRawValue, hook } = buttonInteractionHook<number>({
+  const { getRawValue, hook } = buttonInteractionHookValue<number>({
     customId: customId,
     reducer: (_, prevStatus) => {
       return ((prevStatus ?? 0) + 1) % param.toggleOptions.length;

@@ -12,7 +12,7 @@ import type {
   SelectMenuInteraction,
 } from "discord.js";
 
-export const messageInteractionHook =
+export const componentHookWithValue =
   <TComponent extends MessageComponentType>(componentType: TComponent) =>
   <TValue>(param: {
     customId: string;
@@ -73,9 +73,9 @@ export const messageInteractionHook =
     };
   };
 
-export const buttonInteractionHook = messageInteractionHook("BUTTON");
-export const selectMenuInteractionHook = messageInteractionHook("SELECT_MENU");
-export const textInputInteractionHook = messageInteractionHook("TEXT_INPUT");
+export const buttonInteractionHookValue = componentHookWithValue("BUTTON");
+export const selectMenuInteractionHookValue = componentHookWithValue("SELECT_MENU");
+export const textInputInteractionHookValue = componentHookWithValue("TEXT_INPUT");
 
 const isMappedInteractionType = <T extends MessageComponentType>(
   componentType: T,
