@@ -60,7 +60,7 @@ export const buttonInteractionHook = componentHook("BUTTON");
 export const selectMenuInteractionHook = componentHook("SELECT_MENU");
 export const textInputInteractionHook = componentHook("TEXT_INPUT");
 
-const isMappedInteractionType = <T extends MessageComponentType>(
+export const isMappedInteractionType = <T extends MessageComponentType>(
   componentType: T,
   interaction:
     | MessageComponentInteraction
