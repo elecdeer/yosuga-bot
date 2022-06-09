@@ -15,50 +15,48 @@ export const componentHook =
     customId: string;
     onInteraction: (interaction: MappedInteractionTypes[TComponent]) => Awaitable<boolean>;
     onEnd: (reason: string) => Awaitable<boolean>;
-  }): Pick<PromptComponent<unknown>, "hook"> => {
+  }): PromptComponent<unknown>["hook"] => {
     const { customId, onInteraction, onEnd } = param;
 
-    return {
-      hook: (message, hookParam, updateCallback) => {
-        const collector = message.createMessageComponentCollector({
-          time: hookParam.time,
-          idle: hookParam.idle,
-          componentType: componentType,
-        });
+    return (message, hookParam, updateCallback) => {
+      const collector = message.createMessageComponentCollector({
+        time: hookParam.time,
+        idle: hookParam.idle,
+        componentType: componentType,
+      });
 
-        collector.on("collect", async (interaction) => {
-          if (interaction.customId !== customId) return;
-          if (!isMappedInteractionType(componentType, interaction)) return;
+      collector.on("collect", async (interaction) => {
+        if (interaction.customId !== customId) return;
+        if (!isMappedInteractionType(componentType, interaction)) return;
 
-          const shouldUpdate = await onInteraction(interaction);
-          if (!interaction.deferred && !interaction.replied) await interaction.deferUpdate();
-          if (shouldUpdate) {
-            updateCallback();
-          }
-        });
+        const shouldUpdate = await onInteraction(interaction);
+        if (!interaction.deferred && !interaction.replied) await interaction.deferUpdate();
+        if (shouldUpdate) {
+          updateCallback();
+        }
+      });
 
-        const stopReason = `${customId}-cleanHook`;
-        collector.on("end", async (_, reason) => {
-          if (reason === stopReason) {
-            return;
-          }
+      const stopReason = `${customId}-cleanHook`;
+      collector.on("end", async (_, reason) => {
+        if (reason === stopReason) {
+          return;
+        }
 
-          const shouldUpdate = await onEnd(reason);
-          if (shouldUpdate) {
-            updateCallback();
-          }
-        });
+        const shouldUpdate = await onEnd(reason);
+        if (shouldUpdate) {
+          updateCallback();
+        }
+      });
 
-        return () => {
-          collector.stop(stopReason);
-        };
-      },
+      return () => {
+        collector.stop(stopReason);
+      };
     };
   };
 
-export const buttonInteractionHook = componentHook("BUTTON");
-export const selectMenuInteractionHook = componentHook("SELECT_MENU");
-export const textInputInteractionHook = componentHook("TEXT_INPUT");
+export const buttonComponentHook = componentHook("BUTTON");
+export const selectMenuComponentHook = componentHook("SELECT_MENU");
+export const textInputComponentHook = componentHook("TEXT_INPUT");
 
 export const isMappedInteractionType = <T extends MessageComponentType>(
   componentType: T,

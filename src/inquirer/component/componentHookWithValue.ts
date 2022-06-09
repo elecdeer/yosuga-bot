@@ -27,7 +27,7 @@ export const componentHookWithValue =
         return true;
       },
       onEnd: () => true,
-    }).hook;
+    });
 
     return {
       hook: hook,
