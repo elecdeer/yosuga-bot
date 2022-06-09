@@ -1,7 +1,8 @@
 import assert from "assert";
 import EventEmitter from "events";
 
-export type Awaited = PromiseLike<void> | void;
+import type { Awaitable } from "discord.js";
+
 export type EventsBase = Record<string, Record<string, unknown>>;
 
 type Cast<T, U> = T extends U ? T : U;
@@ -12,31 +13,40 @@ export class TypedEventEmitter<
 > extends EventEmitter {
   override addListener<K extends TEventName>(
     eventName: K,
-    listener: (arg: TEvents[K]) => Awaited
+    listener: (arg: TEvents[K]) => Awaitable<void>
   ): this {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return super.addListener(eventName, listener);
   }
 
-  override on<K extends TEventName>(eventName: K, listener: (arg: TEvents[K]) => Awaited): this {
+  override on<K extends TEventName>(
+    eventName: K,
+    listener: (arg: TEvents[K]) => Awaitable<void>
+  ): this {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return super.on(eventName, listener);
   }
 
-  override once<K extends TEventName>(eventName: K, listener: (arg: TEvents[K]) => Awaited): this {
+  override once<K extends TEventName>(
+    eventName: K,
+    listener: (arg: TEvents[K]) => Awaitable<void>
+  ): this {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return super.once(eventName, listener);
   }
 
   override removeListener<K extends TEventName>(
     eventName: K,
-    listener: (arg: TEvents[K]) => Awaited
+    listener: (arg: TEvents[K]) => Awaitable<void>
   ): this {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return super.removeListener(eventName, listener);
   }
 
-  override off<K extends TEventName>(eventName: K, listener: (arg: TEvents[K]) => Awaited): this {
+  override off<K extends TEventName>(
+    eventName: K,
+    listener: (arg: TEvents[K]) => Awaitable<void>
+  ): this {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return super.off(eventName, listener);
   }
@@ -45,12 +55,14 @@ export class TypedEventEmitter<
     return super.removeAllListeners(event);
   }
 
-  override listeners<K extends TEventName>(eventName: K): ((arg: TEvents[K]) => Awaited)[] {
-    return super.listeners(eventName) as ((arg: TEvents[K]) => Awaited)[];
+  override listeners<K extends TEventName>(eventName: K): ((arg: TEvents[K]) => Awaitable<void>)[] {
+    return super.listeners(eventName) as ((arg: TEvents[K]) => Awaitable<void>)[];
   }
 
-  override rawListeners<K extends TEventName>(eventName: K): ((arg: TEvents[K]) => Awaited)[] {
-    return super.rawListeners(eventName) as ((arg: TEvents[K]) => Awaited)[];
+  override rawListeners<K extends TEventName>(
+    eventName: K
+  ): ((arg: TEvents[K]) => Awaitable<void>)[] {
+    return super.rawListeners(eventName) as ((arg: TEvents[K]) => Awaitable<void>)[];
   }
 
   override emit<K extends TEventName>(eventName: K, arg: TEvents[K]): true {

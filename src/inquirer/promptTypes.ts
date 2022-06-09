@@ -1,10 +1,6 @@
 import type { Lazy } from "../util/lazy";
 import type { ReplyDestination } from "../util/replyHelper";
-import type { Awaited } from "../util/typedEventEmitter";
-import type { Message, MessageActionRow, MessageEmbed } from "discord.js";
-
-//TODO AwaitedはTS標準の型と名前が被っているのでやめる
-//TODO Toggle, ModalTextInput,
+import type { Message, MessageActionRow, MessageEmbed, Awaitable } from "discord.js";
 
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
   update: {
@@ -55,14 +51,14 @@ export interface PromptCollector<T extends Record<string, PromptComponent<unknow
   /**
    * 任意のコンポーネントの回答状態変化時のイベントをセット
    */
-  onUpdateAny: (callback: (status: PromptStatus<T>, key: keyof T) => Awaited) => void;
+  onUpdateAny: (callback: (status: PromptStatus<T>, key: keyof T) => Awaitable<void>) => void;
 
   /**
    * 特定のコンポーネントの回答状態変化時のイベントをセット
    */
   onUpdateOne: <TKey extends keyof T>(
     key: TKey,
-    callback: (status: PromptStatus<T>[TKey], key: TKey) => Awaited
+    callback: (status: PromptStatus<T>[TKey], key: TKey) => Awaitable<void>
   ) => void;
 
   /**
@@ -111,7 +107,7 @@ export interface PromptComponent<TValue> {
     message: Message;
     promptParam: PromptParamHook;
     updateCallback: () => void;
-  }) => void | (() => Awaited);
+  }) => void | (() => Awaitable<void>);
 
   getStatus: () => AnswerStatus<TValue>;
 }

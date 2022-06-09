@@ -2,9 +2,9 @@ import { resolveLazy } from "../util/lazy";
 import { createReplyHelper } from "../util/replyHelper";
 
 import type { ReplyDestination } from "../util/replyHelper";
-import type { Awaited, TypedEventEmitter } from "../util/typedEventEmitter";
+import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
-import type { Collection, Message } from "discord.js";
+import type { Awaitable, Collection, Message } from "discord.js";
 
 export const createPromptController = async <T extends Record<string, PromptComponent<unknown>>>(
   componentCollection: Collection<keyof T, T[keyof T]>,
@@ -18,7 +18,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
     return componentCollection.map((item) => item.renderComponent()).flat();
   };
 
-  let hooksCleaner: (() => Awaited)[];
+  let hooksCleaner: (() => Awaitable<void>)[];
   const hookComponents = async (message: Message) => {
     if (hooksCleaner) {
       await Promise.all(hooksCleaner.map((item) => item()));
@@ -36,7 +36,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
           },
         });
       })
-      .filter((item) => !!item) as (() => Awaited)[];
+      .filter((item) => !!item) as (() => Awaitable<void>)[];
   };
 
   const post = async (destination?: ReplyDestination) => {
@@ -107,9 +107,11 @@ export const createPromptController = async <T extends Record<string, PromptComp
     void post(replyDestination);
   });
 
-  return {
+  const controller = {
     repost,
     edit,
     close,
   };
+
+  return controller;
 };
