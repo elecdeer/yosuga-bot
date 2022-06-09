@@ -9,7 +9,9 @@ export const isInRange = (value: number, min: number, max: number): boolean => {
 };
 
 export const minMax = (value: number, min: number, max: number): number => {
-  return Math.min(min, Math.min(value, max));
+  if (value < min) return min;
+  if (max < value) return max;
+  return value;
 };
 
 export const remap = (
