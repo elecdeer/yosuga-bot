@@ -34,6 +34,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
               status: com.getStatus() as PromptEvent<T>["update"]["status"],
             });
           },
+          controller: controller,
         });
       })
       .filter((item) => !!item) as (() => Awaitable<void>)[];

@@ -107,6 +107,7 @@ export interface PromptComponent<TValue> {
     message: Message;
     promptParam: PromptParamHook;
     updateCallback: () => void;
+    controller: PromptController;
   }) => void | (() => Awaitable<void>);
 
   getStatus: () => AnswerStatus<TValue>;
