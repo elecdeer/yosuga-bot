@@ -2,9 +2,9 @@ import { resolveLazy } from "../util/lazy";
 import { createReplyHelper } from "../util/replyHelper";
 
 import type { ReplyDestination } from "../util/replyHelper";
-import type { Awaited, TypedEventEmitter } from "../util/typedEventEmitter";
+import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
-import type { Collection, Message } from "discord.js";
+import type { Awaitable, Collection, Message } from "discord.js";
 
 export const createPromptController = async <T extends Record<string, PromptComponent<unknown>>>(
   componentCollection: Collection<keyof T, T[keyof T]>,
@@ -18,23 +18,26 @@ export const createPromptController = async <T extends Record<string, PromptComp
     return componentCollection.map((item) => item.renderComponent()).flat();
   };
 
-  let hookCleaner: (() => Awaited)[];
+  let hooksCleaner: (() => Awaitable<void>)[];
   const hookComponents = async (message: Message) => {
-    if (hookCleaner) {
-      await Promise.all(hookCleaner.map((item) => item()));
+    if (hooksCleaner) {
+      await Promise.all(hooksCleaner.map((item) => item()));
     }
-    hookCleaner = componentCollection.map(
-      (com, key) =>
-        com.hook(message, param, () => {
-          event.emit("update", {
-            key: key,
-            status: com.getStatus() as PromptEvent<T>["update"]["status"],
-          });
-        }) ??
-        (() => {
-          return;
-        })
-    );
+    hooksCleaner = componentCollection
+      .map((com, key) => {
+        return com.hook({
+          message: message,
+          promptParam: param,
+          updateCallback: () => {
+            event.emit("update", {
+              key: key,
+              status: com.getStatus() as PromptEvent<T>["update"]["status"],
+            });
+          },
+          controller: controller,
+        });
+      })
+      .filter((item) => !!item) as (() => Awaitable<void>)[];
   };
 
   const post = async (destination?: ReplyDestination) => {
@@ -105,9 +108,11 @@ export const createPromptController = async <T extends Record<string, PromptComp
     void post(replyDestination);
   });
 
-  return {
+  const controller = {
     repost,
     edit,
     close,
   };
+
+  return controller;
 };

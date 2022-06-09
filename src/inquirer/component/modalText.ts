@@ -89,12 +89,12 @@ export const createModalTextComponent = <TKey extends string>(param: {
         };
       }
     },
-    hook: (message, hookParam, updateCallback) => {
+    hook: ({ message, promptParam, updateCallback }) => {
       const formCollection = getFormCollection();
 
       const collector = message.createMessageComponentCollector({
-        time: hookParam.time,
-        idle: hookParam.idle,
+        time: promptParam.time,
+        idle: promptParam.idle,
         componentType: "BUTTON",
       });
 
@@ -107,8 +107,8 @@ export const createModalTextComponent = <TKey extends string>(param: {
         const modalRes = await interaction
           .awaitModalSubmit({
             filter: (modalInteraction) => modalInteraction.customId === customId,
-            time: hookParam.time ?? 10 * 60 * 1000,
-            idle: hookParam.idle,
+            time: promptParam.time ?? 10 * 60 * 1000,
+            idle: promptParam.idle,
           })
           .catch(() => null);
 

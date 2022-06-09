@@ -2,7 +2,7 @@ import { MessageActionRow } from "discord.js";
 
 import { resolveLazyParam } from "../../util/lazy";
 import { createButton } from "../wrapper/createButton";
-import { buttonInteractionHook } from "./messageInteractionHook";
+import { buttonComponentHookValue } from "./componentHookWithValue";
 
 import type { Lazy, LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
@@ -17,7 +17,7 @@ export const createButtonComponent = (param: {
   initial?: Lazy<boolean>;
 }): PromptComponent<true> => {
   const customId = param.customId ?? "button";
-  const { getStatus, hook } = buttonInteractionHook<true>({
+  const { getStatus, hook } = buttonComponentHookValue<true>({
     customId: customId,
     reducer: () => true,
   });
