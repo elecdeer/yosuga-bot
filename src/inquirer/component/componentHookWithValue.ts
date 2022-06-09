@@ -47,6 +47,6 @@ export const componentHookWithValue =
     };
   };
 
-export const buttonInteractionHookValue = componentHookWithValue("BUTTON");
-export const selectMenuInteractionHookValue = componentHookWithValue("SELECT_MENU");
-export const textInputInteractionHookValue = componentHookWithValue("TEXT_INPUT");
+export const buttonComponentHookValue = componentHookWithValue("BUTTON");
+export const selectMenuComponentHookValue = componentHookWithValue("SELECT_MENU");
+export const textInputComponentHookValue = componentHookWithValue("TEXT_INPUT");

@@ -2,7 +2,7 @@ import { Collection, MessageActionRow } from "discord.js";
 
 import { resolveLazy, resolveLazyParam } from "../../util/lazy";
 import { createSelectMenu } from "../wrapper/createSelectMenu";
-import { selectMenuInteractionHookValue } from "./componentHookWithValue";
+import { selectMenuComponentHookValue } from "./componentHookWithValue";
 
 import type { Lazy, LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
@@ -31,7 +31,7 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
   const { options, relationCollection } = createValueRelation(param.options);
 
   const initState = options.filter((item) => item.default === true).map((item) => item.indexKey);
-  const { getRawValue, hook } = selectMenuInteractionHookValue<string[]>({
+  const { getRawValue, hook } = selectMenuComponentHookValue<string[]>({
     customId: customId,
     reducer: (interaction) => interaction.values,
     initialState: initState.length > 0 ? initState : param.emptyAnswered ? [] : null,
