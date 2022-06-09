@@ -1,19 +1,20 @@
-import {
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-  MessageSelectMenu,
-  MessageSelectOptionData,
-} from "discord.js";
+import { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from "discord.js";
 
-import { CommandContextSlash } from "../../../commandContextSlash";
-import { ConfigAccessor } from "../../../config/accessor/configAccessor";
-import { ConfigEachLevel, GuildLevel, MasterLevel, UserLevel } from "../../../config/typesConfig";
 import { createYosugaEmbed } from "../../../util/createEmbed";
 import { range } from "../../../util/range";
-import { YosugaClient } from "../../../yosugaClient";
 import { ConfigSubCommandHandler } from "../../base/configSubCommandHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+
+import type { CommandContextSlash } from "../../../commandContextSlash";
+import type { ConfigAccessor } from "../../../config/accessor/configAccessor";
+import type {
+  ConfigEachLevel,
+  GuildLevel,
+  MasterLevel,
+  UserLevel,
+} from "../../../config/typesConfig";
+import type { YosugaClient } from "../../../yosugaClient";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { MessageSelectOptionData } from "discord.js";
 
 type SpeakerParams = {
   name: string | null;

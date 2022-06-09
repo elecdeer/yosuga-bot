@@ -1,10 +1,13 @@
 import { MessageActionRow } from "discord.js";
 import { getLogger } from "log4js";
 
-import { LazyParam, resolveLazyParam } from "../../util/lazy";
-import { PromptComponent } from "../promptTypes";
-import { ButtonParam, createButton } from "../wrapper/createButton";
+import { resolveLazyParam } from "../../util/lazy";
+import { createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
+
+import type { LazyParam } from "../../util/lazy";
+import type { PromptComponent } from "../promptTypes";
+import type { ButtonParam } from "../wrapper/createButton";
 
 const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
   resolveLazyParam(param, ["label", "emoji", "style", "disabled"]);

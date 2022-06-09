@@ -1,8 +1,3 @@
-import { Client } from "discord.js";
-
-import { YosugaClient } from "../yosugaClient";
-import { CommandHandler } from "./base/commandHandler";
-import { Handler } from "./base/handler";
 import { ClearCommand } from "./command/clearCommand";
 import { AddSpeakerDaemonSub } from "./command/configSub/addSpeakerDaemonSub";
 import { AddSpeakerTtsSub } from "./command/configSub/addSpeakerTtsSub";
@@ -29,6 +24,11 @@ import { DeployGlobalHandler } from "./global/deployGlobalHandler";
 import { DeployGuildHandler } from "./global/deployGuildHandler";
 import { UndeployGlobalHandler } from "./global/undeployGlobalHandler";
 import { UndeployGuildHandler } from "./global/undeployGuildHandler";
+
+import type { YosugaClient } from "../yosugaClient";
+import type { CommandHandler } from "./base/commandHandler";
+import type { Handler } from "./base/handler";
+import type { Client } from "discord.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type HandlerList = Handler<any>[];

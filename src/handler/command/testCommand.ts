@@ -1,12 +1,14 @@
 import { CommandPermission } from "../../application/permission";
-import { CommandContextSlash } from "../../commandContextSlash";
 import { createButtonComponent } from "../../inquirer/component/button";
 import { createModalTextComponent } from "../../inquirer/component/modalText";
 import { createMultiSelectComponent } from "../../inquirer/component/multiSelect";
 import { createToggleComponent } from "../../inquirer/component/toggle";
 import { prompt } from "../../inquirer/prompt";
 import { createYosugaEmbed } from "../../util/createEmbed";
-import { CommandHandler, CommandProps } from "../base/commandHandler";
+import { CommandHandler } from "../base/commandHandler";
+
+import type { CommandContextSlash } from "../../commandContextSlash";
+import type { CommandProps } from "../base/commandHandler";
 
 export class TestCommand extends CommandHandler {
   protected initCommandProps(): CommandProps {

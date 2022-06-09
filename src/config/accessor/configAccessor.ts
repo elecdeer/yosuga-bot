@@ -1,5 +1,6 @@
-import { ValueResolvable } from "../../util/resolvable";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
+
+import type { ValueResolvable } from "../../util/resolvable";
 
 export abstract class ConfigAccessor<
   TRecord extends Record<string, unknown>,

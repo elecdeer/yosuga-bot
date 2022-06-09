@@ -1,9 +1,10 @@
 import { CommandPermission } from "../../application/permission";
-import { CommandContext } from "../../commandContext";
-import { ConfigAccessor } from "../../config/accessor/configAccessor";
-import { ConfigCommandLevel, ConfigEachLevel } from "../../config/typesConfig";
-import { YosugaClient } from "../../yosugaClient";
 import { SubCommandHandler } from "./subCommandHandler";
+
+import type { CommandContext } from "../../commandContext";
+import type { ConfigAccessor } from "../../config/accessor/configAccessor";
+import type { ConfigCommandLevel, ConfigEachLevel } from "../../config/typesConfig";
+import type { YosugaClient } from "../../yosugaClient";
 
 export abstract class ConfigSubCommandHandler<
   TConfigLevels extends ConfigCommandLevel

@@ -1,10 +1,11 @@
-import { ReadonlyDeep } from "type-fest";
-
-import { AppId } from "../../types";
-import { resolveValue, ValueResolvable } from "../../util/resolvable";
-import { MasterConfigStore } from "../store/masterConfigStore";
-import { MasterConfig } from "../typesConfig";
+import { resolveValue } from "../../util/resolvable";
 import { ConfigAccessor } from "./configAccessor";
+
+import type { AppId } from "../../types";
+import type { ValueResolvable } from "../../util/resolvable";
+import type { MasterConfigStore } from "../store/masterConfigStore";
+import type { MasterConfig } from "../typesConfig";
+import type { ReadonlyDeep } from "type-fest";
 
 export type MasterConfigAccessorProps = {
   store: MasterConfigStore;

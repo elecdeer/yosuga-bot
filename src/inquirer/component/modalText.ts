@@ -1,11 +1,17 @@
-import { Collection, MessageActionRow, MessageEmbed, ModalActionRowComponent } from "discord.js";
+import { Collection, MessageActionRow } from "discord.js";
 import { getLogger } from "log4js";
 
-import { LazyParam, resolveLazyParam } from "../../util/lazy";
-import { PromptComponent, ValidateResult, ValidateResultReject } from "../promptTypes";
-import { ButtonParam, createButton } from "../wrapper/createButton";
-import { createModal, ModalParam } from "../wrapper/createModal";
-import { createTextInput, TextInputParam } from "../wrapper/createTextInput";
+import { resolveLazyParam } from "../../util/lazy";
+import { createButton } from "../wrapper/createButton";
+import { createModal } from "../wrapper/createModal";
+import { createTextInput } from "../wrapper/createTextInput";
+
+import type { LazyParam } from "../../util/lazy";
+import type { PromptComponent, ValidateResult, ValidateResultReject } from "../promptTypes";
+import type { ButtonParam } from "../wrapper/createButton";
+import type { ModalParam } from "../wrapper/createModal";
+import type { TextInputParam } from "../wrapper/createTextInput";
+import type { MessageEmbed, ModalActionRowComponent } from "discord.js";
 
 type TextInputParamLazy = LazyParam<TextInputParam, Exclude<keyof TextInputParam, "value">>;
 type TextInputParamWithValidate = TextInputParamLazy & {

@@ -1,13 +1,11 @@
-import { CommandInteraction } from "discord.js";
+import { SetConfigSubCommandHandler } from "../../base/setConfigSubCommandHandler";
 
-import { CommandContextSlash } from "../../../commandContextSlash";
-import { ConfigEachLevel, GuildLevel, MasterLevel } from "../../../config/typesConfig";
-import { YosugaClient } from "../../../yosugaClient";
-import {
-  SetConfigSubCommandHandler,
-  ValidationResult,
-} from "../../base/setConfigSubCommandHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+import type { CommandContextSlash } from "../../../commandContextSlash";
+import type { ConfigEachLevel, GuildLevel, MasterLevel } from "../../../config/typesConfig";
+import type { YosugaClient } from "../../../yosugaClient";
+import type { ValidationResult } from "../../base/setConfigSubCommandHandler";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { CommandInteraction } from "discord.js";
 
 export class SetAutoLeaveSecSub extends SetConfigSubCommandHandler<
   MasterLevel | GuildLevel,

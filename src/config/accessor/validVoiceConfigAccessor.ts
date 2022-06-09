@@ -1,18 +1,19 @@
-import { Collection } from "discord.js";
 import { getLogger } from "log4js";
-import { ReadonlyDeep, SetOptional } from "type-fest";
 
-import { Speaker } from "../../speaker/speaker";
-import { AppId, GuildId, UserId } from "../../types";
-import { GuildConfigStore } from "../store/guildConfigStore";
-import { MasterConfigStore } from "../store/masterConfigStore";
-import { UserConfigStore } from "../store/userConfigStore";
-import { UnifiedConfig, VoiceConfigKey } from "../typesConfig";
-import { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import { MasterConfigAccessorProps } from "./masterConfigAccessor";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
 import { UnifiedConfigAccessor } from "./unifiedConfigAccessor";
-import { UserConfigAccessorProps } from "./userConfigAccessor";
+
+import type { Speaker } from "../../speaker/speaker";
+import type { AppId, GuildId, UserId } from "../../types";
+import type { GuildConfigStore } from "../store/guildConfigStore";
+import type { MasterConfigStore } from "../store/masterConfigStore";
+import type { UserConfigStore } from "../store/userConfigStore";
+import type { UnifiedConfig, VoiceConfigKey } from "../typesConfig";
+import type { GuildConfigAccessorProps } from "./guildConfigAccessor";
+import type { MasterConfigAccessorProps } from "./masterConfigAccessor";
+import type { UserConfigAccessorProps } from "./userConfigAccessor";
+import type { Collection } from "discord.js";
+import type { ReadonlyDeep, SetOptional } from "type-fest";
 
 export type ValidVoiceConfigAccessorProps = {
   master: MasterConfigAccessorProps;

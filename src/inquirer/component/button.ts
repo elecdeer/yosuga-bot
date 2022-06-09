@@ -1,9 +1,12 @@
 import { MessageActionRow } from "discord.js";
 
-import { Lazy, LazyParam, resolveLazyParam } from "../../util/lazy";
-import { PromptComponent } from "../promptTypes";
-import { ButtonParam, createButton } from "../wrapper/createButton";
+import { resolveLazyParam } from "../../util/lazy";
+import { createButton } from "../wrapper/createButton";
 import { buttonInteractionHook } from "./messageInteractionHook";
+
+import type { Lazy, LazyParam } from "../../util/lazy";
+import type { PromptComponent } from "../promptTypes";
+import type { ButtonParam } from "../wrapper/createButton";
 
 const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
   resolveLazyParam(param, ["label", "emoji", "style", "disabled"]);

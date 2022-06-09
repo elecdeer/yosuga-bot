@@ -1,11 +1,12 @@
-import { ApplicationCommandSubCommandData, CommandInteraction } from "discord.js";
-
-import { CommandPermission } from "../../application/permission";
-import { YosugaClient } from "../../yosugaClient";
-import { composeFilter, EventFilter, filterer } from "../filter/eventFilter";
+import { composeFilter, filterer } from "../filter/eventFilter";
 import { CommandHandler } from "./commandHandler";
-import { GroupCommandHandler } from "./groupCommandHandler";
-import { EventKeysUnion } from "./handler";
+
+import type { CommandPermission } from "../../application/permission";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventFilter } from "../filter/eventFilter";
+import type { GroupCommandHandler } from "./groupCommandHandler";
+import type { EventKeysUnion } from "./handler";
+import type { ApplicationCommandSubCommandData, CommandInteraction } from "discord.js";
 
 export type SubCommandProps = Omit<ApplicationCommandSubCommandData, "type"> & {
   permission: CommandPermission;

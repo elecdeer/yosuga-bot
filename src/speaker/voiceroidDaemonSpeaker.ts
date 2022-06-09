@@ -1,12 +1,16 @@
-import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
+import { createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
 import { getLogger } from "log4js";
-import { Readable } from "stream";
 
-import { Session } from "../session";
-import { SpeechText, VoiceParam } from "../types";
-import { failure, Result, success } from "../util/result";
-import { Speaker, SpeakerState } from "./speaker";
+import { failure, success } from "../util/result";
+import { Speaker } from "./speaker";
+
+import type { Session } from "../session";
+import type { SpeechText, VoiceParam } from "../types";
+import type { Result } from "../util/result";
+import type { SpeakerState } from "./speaker";
+import type { AudioResource } from "@discordjs/voice";
+import type { Readable } from "stream";
 
 export type DaemonSpeakerBuildOption = {
   type: "voiceroidDaemon";

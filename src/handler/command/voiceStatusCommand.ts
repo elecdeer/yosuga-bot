@@ -2,9 +2,11 @@ import assert from "assert";
 import { MessageEmbed } from "discord.js";
 
 import { CommandPermission } from "../../application/permission";
-import { CommandContext } from "../../commandContext";
-import { YosugaClient } from "../../yosugaClient";
-import { CommandHandler, CommandProps } from "../base/commandHandler";
+import { CommandHandler } from "../base/commandHandler";
+
+import type { CommandContext } from "../../commandContext";
+import type { YosugaClient } from "../../yosugaClient";
+import type { CommandProps } from "../base/commandHandler";
 
 export class VoiceStatusCommand extends CommandHandler {
   constructor(yosuga: YosugaClient) {

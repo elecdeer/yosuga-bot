@@ -1,18 +1,15 @@
-import {
-  DiscordGatewayAdapterCreator,
-  entersState,
-  joinVoiceChannel,
-  VoiceConnection,
-  VoiceConnectionStatus,
-} from "@discordjs/voice";
-import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 
 import { CommandPermission } from "../../application/permission";
-import { CommandContext } from "../../commandContext";
-import { VoiceOrStageChannel } from "../../types";
 import { constructEmbeds } from "../../util/createEmbed";
-import { YosugaClient } from "../../yosugaClient";
-import { CommandHandler, CommandProps } from "../base/commandHandler";
+import { CommandHandler } from "../base/commandHandler";
+
+import type { CommandContext } from "../../commandContext";
+import type { VoiceOrStageChannel } from "../../types";
+import type { YosugaClient } from "../../yosugaClient";
+import type { CommandProps } from "../base/commandHandler";
+import type { DiscordGatewayAdapterCreator, VoiceConnection } from "@discordjs/voice";
+import type { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 export class StartCommand extends CommandHandler {
   constructor(yosuga: YosugaClient) {

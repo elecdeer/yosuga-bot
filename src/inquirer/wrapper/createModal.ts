@@ -1,4 +1,6 @@
-import { Modal, ModalOptions } from "discord.js";
+import { Modal } from "discord.js";
+
+import type { ModalOptions } from "discord.js";
 
 export type ModalParam = Partial<Omit<ModalOptions, "customId">>;
 

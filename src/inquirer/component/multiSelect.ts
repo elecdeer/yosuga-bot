@@ -1,9 +1,13 @@
-import { Collection, EmojiIdentifierResolvable, MessageActionRow } from "discord.js";
+import { Collection, MessageActionRow } from "discord.js";
 
-import { Lazy, LazyParam, resolveLazy, resolveLazyParam } from "../../util/lazy";
-import { PromptComponent } from "../promptTypes";
-import { createSelectMenu, SelectorParam } from "../wrapper/createSelectMenu";
+import { resolveLazy, resolveLazyParam } from "../../util/lazy";
+import { createSelectMenu } from "../wrapper/createSelectMenu";
 import { selectMenuInteractionHook } from "./messageInteractionHook";
+
+import type { Lazy, LazyParam } from "../../util/lazy";
+import type { PromptComponent } from "../promptTypes";
+import type { SelectorParam } from "../wrapper/createSelectMenu";
+import type { EmojiIdentifierResolvable } from "discord.js";
 
 export type SelectOption<T> = {
   label: Lazy<string>;

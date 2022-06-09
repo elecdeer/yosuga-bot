@@ -1,10 +1,11 @@
 import { Collection } from "discord.js";
 
-import { ReplyDestination } from "../util/replyHelper";
 import { TypedEventEmitter } from "../util/typedEventEmitter";
 import { createPromptCollector } from "./promptCollector";
 import { createPromptController } from "./promptController";
-import {
+
+import type { ReplyDestination } from "../util/replyHelper";
+import type {
   AnswerStatus,
   PromptCollector,
   PromptComponent,

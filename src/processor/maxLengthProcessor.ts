@@ -1,4 +1,4 @@
-import { ProcessorProvider } from "./processorChain";
+import type { ProcessorProvider } from "./processorChain";
 
 export const maxLengthProcessor: ProcessorProvider<number> =
   (max: number) => async (speechText) => {

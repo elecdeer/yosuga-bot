@@ -1,5 +1,16 @@
 import assert from "assert";
-import {
+import { getLogger } from "log4js";
+
+import { CommandContext } from "./commandContext";
+import { splitArrayPerNum } from "./util/arrayUtil";
+import { constructEmbeds } from "./util/createEmbed";
+import { allSerial } from "./util/promiseUtil";
+
+import type { ConfigManager } from "./config/configManager";
+import type { Session } from "./session";
+import type { ReplyType } from "./util/createEmbed";
+import type { YosugaClient } from "./yosugaClient";
+import type {
   CommandInteraction,
   Guild,
   GuildMember,
@@ -8,15 +19,6 @@ import {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
-import { getLogger } from "log4js";
-
-import { CommandContext } from "./commandContext";
-import { ConfigManager } from "./config/configManager";
-import { Session } from "./session";
-import { splitArrayPerNum } from "./util/arrayUtil";
-import { constructEmbeds, ReplyType } from "./util/createEmbed";
-import { allSerial } from "./util/promiseUtil";
-import { YosugaClient } from "./yosugaClient";
 
 const logger = getLogger("commandContextSlash");
 

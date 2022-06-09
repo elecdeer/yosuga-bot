@@ -1,4 +1,4 @@
-import { ProcessorProvider } from "./processorChain";
+import type { ProcessorProvider } from "./processorChain";
 
 const nlRegex = /\r\n|\n/;
 

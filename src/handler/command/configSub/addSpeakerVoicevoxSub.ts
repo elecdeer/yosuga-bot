@@ -1,18 +1,14 @@
-import {
-  Collection,
-  MessageActionRow,
-  MessageButton,
-  MessageSelectMenu,
-  MessageSelectOptionData,
-} from "discord.js";
+import { Collection, MessageActionRow, MessageButton, MessageSelectMenu } from "discord.js";
 
-import { CommandContextSlash } from "../../../commandContextSlash";
-import { MasterLevel } from "../../../config/typesConfig";
-import { SpeakerBuildOption } from "../../../speaker/voiceProvider";
 import { createVoicevoxClient } from "../../../speaker/voicevoxApi";
-import { VoicevoxSpeakerBuildOption } from "../../../speaker/voicevoxSpeaker";
 import { ConfigSubCommandHandler } from "../../base/configSubCommandHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+
+import type { CommandContextSlash } from "../../../commandContextSlash";
+import type { MasterLevel } from "../../../config/typesConfig";
+import type { SpeakerBuildOption } from "../../../speaker/voiceProvider";
+import type { VoicevoxSpeakerBuildOption } from "../../../speaker/voicevoxSpeaker";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { MessageSelectOptionData } from "discord.js";
 
 export class AddSpeakerVoicevoxSub extends ConfigSubCommandHandler<MasterLevel> {
   protected override initCommandProps(): SubCommandProps {

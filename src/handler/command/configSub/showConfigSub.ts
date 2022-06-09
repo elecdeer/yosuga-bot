@@ -1,11 +1,17 @@
 import { Collection, MessageEmbed } from "discord.js";
-import { ValueOf } from "type-fest";
 
-import { CommandContext } from "../../../commandContext";
 import { stringifyConfigEntry } from "../../../config/conifgUtil";
-import { GuildLevel, MasterLevel, UnifiedConfig, UserLevel } from "../../../config/typesConfig";
 import { ConfigSubCommandHandler } from "../../base/configSubCommandHandler";
-import { SubCommandProps } from "../../base/subCommandHandler";
+
+import type { CommandContext } from "../../../commandContext";
+import type {
+  GuildLevel,
+  MasterLevel,
+  UnifiedConfig,
+  UserLevel,
+} from "../../../config/typesConfig";
+import type { SubCommandProps } from "../../base/subCommandHandler";
+import type { ValueOf } from "type-fest";
 
 export class ShowConfigSub extends ConfigSubCommandHandler<MasterLevel | GuildLevel | UserLevel> {
   protected initCommandProps(): SubCommandProps {

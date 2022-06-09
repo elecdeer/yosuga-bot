@@ -1,7 +1,8 @@
-import { ClientEvents } from "discord.js";
+import { filterGenerator } from "./eventFilter";
 
-import { VoiceOrStageChannel } from "../../types";
-import { EventFilterGenerator, filterGenerator } from "./eventFilter";
+import type { VoiceOrStageChannel } from "../../types";
+import type { EventFilterGenerator } from "./eventFilter";
+import type { ClientEvents } from "discord.js";
 
 /**
  * 呼び出されたイベントがGoLive開始を示すものであるかどうか

@@ -1,5 +1,5 @@
-import { UserId } from "../../types";
-import { UserConfig } from "../typesConfig";
+import type { UserId } from "../../types";
+import type { UserConfig } from "../typesConfig";
 
 export interface UserConfigStore {
   save(userId: UserId, value: Partial<UserConfig>): Promise<Readonly<Partial<UserConfig>>>;

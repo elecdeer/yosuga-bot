@@ -1,9 +1,9 @@
-import { AudioResource } from "@discordjs/voice";
 import { getLogger } from "log4js";
 
-import { Session } from "../session";
-import { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
-import { Result } from "../util/result";
+import type { Session } from "../session";
+import type { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
+import type { Result } from "../util/result";
+import type { AudioResource } from "@discordjs/voice";
 
 export type SpeakerState = "active" | "pendingInactive" | "inactive" | "checking";
 

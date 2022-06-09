@@ -2,8 +2,8 @@ import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import async from "async";
 import { getLogger } from "log4js";
 
-import { Session } from "./session";
-import { SpeechTask } from "./types";
+import type { Session } from "./session";
+import type { SpeechTask } from "./types";
 
 const logger = getLogger("speechQueue");
 

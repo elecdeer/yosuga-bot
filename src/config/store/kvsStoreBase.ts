@@ -1,5 +1,7 @@
-import { kvsLocalStorage, KvsLocalStorageSchema } from "@kvs/node-localstorage";
-import { KVS, StoreNames, StoreValue } from "@kvs/types";
+import { kvsLocalStorage } from "@kvs/node-localstorage";
+
+import type { KvsLocalStorageSchema } from "@kvs/node-localstorage";
+import type { KVS, StoreNames, StoreValue } from "@kvs/types";
 
 export type StoreProps = {
   name: string;

@@ -1,4 +1,9 @@
-import {
+import type { UnifiedConfigAccessor } from "./config/accessor/unifiedConfigAccessor";
+import type { ConfigManager } from "./config/configManager";
+import type { Session } from "./session";
+import type { ReplyType } from "./util/createEmbed";
+import type { YosugaClient } from "./yosugaClient";
+import type {
   CommandInteraction,
   Guild,
   GuildMember,
@@ -7,12 +12,6 @@ import {
   MessageEmbed,
   TextChannel,
 } from "discord.js";
-
-import { UnifiedConfigAccessor } from "./config/accessor/unifiedConfigAccessor";
-import { ConfigManager } from "./config/configManager";
-import { Session } from "./session";
-import { ReplyType } from "./util/createEmbed";
-import { YosugaClient } from "./yosugaClient";
 
 export abstract class CommandContext {
   abstract readonly yosuga: YosugaClient;

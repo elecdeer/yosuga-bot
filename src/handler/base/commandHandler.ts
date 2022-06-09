@@ -1,12 +1,15 @@
-import { ChatInputApplicationCommandData, CommandInteraction, Interaction } from "discord.js";
-
-import { CommandPermission, hasMemberPermission } from "../../application/permission";
+import { hasMemberPermission } from "../../application/permission";
 import { CommandContextSlash, isValidCommandInteraction } from "../../commandContextSlash";
-import { YosugaClient } from "../../yosugaClient";
 import { commandFilter } from "../filter/commandFilter";
-import { composeFilter, EventFilter } from "../filter/eventFilter";
+import { composeFilter } from "../filter/eventFilter";
 import { tapLogFilter } from "../filter/logFilter";
-import { EventKeysUnion, Handler } from "./handler";
+import { Handler } from "./handler";
+
+import type { CommandPermission } from "../../application/permission";
+import type { YosugaClient } from "../../yosugaClient";
+import type { EventFilter } from "../filter/eventFilter";
+import type { EventKeysUnion } from "./handler";
+import type { ChatInputApplicationCommandData, CommandInteraction, Interaction } from "discord.js";
 
 export type CommandProps = Omit<ChatInputApplicationCommandData, "type"> & {
   permission: CommandPermission;

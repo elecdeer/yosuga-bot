@@ -1,4 +1,4 @@
-import { Snowflake, StageChannel, VoiceChannel } from "discord.js";
+import type { Snowflake, StageChannel, VoiceChannel } from "discord.js";
 
 // ====================
 // General
