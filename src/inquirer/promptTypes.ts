@@ -107,11 +107,11 @@ export interface PromptComponent<TValue> {
   /**
    * MessageへのInteractionを拾うhookを掛ける
    */
-  hook: (
-    message: Message,
-    param: PromptParamHook,
-    updateCallback: () => void
-  ) => void | (() => Awaited);
+  hook: (hookParam: {
+    message: Message;
+    promptParam: PromptParamHook;
+    updateCallback: () => void;
+  }) => void | (() => Awaited);
 
   getStatus: () => AnswerStatus<TValue>;
 }

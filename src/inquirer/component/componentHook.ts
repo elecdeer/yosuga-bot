@@ -18,10 +18,10 @@ export const componentHook =
   }): PromptComponent<unknown>["hook"] => {
     const { customId, onInteraction, onEnd } = param;
 
-    return (message, hookParam, updateCallback) => {
+    return ({ message, promptParam, updateCallback }) => {
       const collector = message.createMessageComponentCollector({
-        time: hookParam.time,
-        idle: hookParam.idle,
+        time: promptParam.time,
+        idle: promptParam.idle,
         componentType: componentType,
       });
 
