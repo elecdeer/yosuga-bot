@@ -12,9 +12,9 @@
     "test": "jest",
     "check": "npm-run-all check:*",
     "check:type": "tsc",
-    "check:format": "prettier --check src/**/*.ts src/*.ts",
-    "check:lint": "eslint src/**/*.ts src/*.ts --max-warnings 0",
-    "format": "prettier src/**/*.ts src/*.ts --write",
+    "check:format": "prettier --check 'src/**/*.ts' 'src/*.ts'",
+    "check:lint": "eslint 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
+    "format": "prettier 'src/**/*.ts' 'src/*.ts' --write",
     "prepare": "husky install",
     "lint-staged": "lint-staged"
   },
