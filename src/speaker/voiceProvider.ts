@@ -71,7 +71,7 @@ export class VoiceProvider {
     return result;
   }
 
-  async getSpeakersStatus(waitAllLoaded?: boolean): Promise<{ name: string; status: string }[]> {
+  async getSpeakersStatus(waitAllLoaded = false): Promise<{ name: string; status: string }[]> {
     const collection = waitAllLoaded
       ? await this.speakerCollectionAllLoaded
       : await this.speakerCollection;

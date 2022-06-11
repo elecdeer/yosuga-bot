@@ -33,6 +33,6 @@ export class SetReadStatusUpdateSub extends SetConfigSubCommandHandler<
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<MasterLevel | GuildLevel>["readStatusUpdate"]> | undefined
   ): Promise<ConfigEachLevel<MasterLevel | GuildLevel>["readStatusUpdate"] | undefined> {
-    return options.getBoolean("enable") || undefined;
+    return options.getBoolean("enable") ?? undefined;
   }
 }

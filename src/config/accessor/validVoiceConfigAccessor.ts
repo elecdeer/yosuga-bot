@@ -64,7 +64,7 @@ export class ValidVoiceConfigAccessor extends ReadOnlyConfigAccessor<
     const logger = getLogger("validVoiceConfigAccessor");
     logger.debug(unifiedConfig);
 
-    if (this.userId) {
+    if (this.userId !== undefined) {
       const userConfig = await this.userStore.read(this.userId);
 
       if (this.isActiveSpeaker(userConfig?.speakerName)) {
@@ -75,7 +75,7 @@ export class ValidVoiceConfigAccessor extends ReadOnlyConfigAccessor<
       }
     }
 
-    if (this.guildId) {
+    if (this.guildId !== undefined) {
       const guildConfig = await this.guildStore.read(this.guildId);
       if (this.isActiveSpeaker(guildConfig?.speakerName)) {
         return {
@@ -99,7 +99,7 @@ export class ValidVoiceConfigAccessor extends ReadOnlyConfigAccessor<
   }
 
   isActiveSpeaker(speakerName: string | undefined): speakerName is string {
-    if (!speakerName) return false;
+    if (speakerName === undefined) return false;
     const speaker = this.speakerCollection.get(speakerName);
     return speaker?.status === "active";
   }

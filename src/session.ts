@@ -132,14 +132,15 @@ export class Session {
 
     this.lastPushedSpeech = {
       timestamp: timestamp ?? Date.now(),
-      author: userId
-        ? {
-            type: "member",
-            memberId: userId,
-          }
-        : {
-            type: "yosuga",
-          },
+      author:
+        userId !== undefined
+          ? {
+              type: "member",
+              memberId: userId,
+            }
+          : {
+              type: "yosuga",
+            },
     };
 
     // logger.debug(this.speechQueue);

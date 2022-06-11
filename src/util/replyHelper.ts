@@ -64,7 +64,7 @@ export const createReplyHelper = (
       };
 
       const message = await replyToDestination(replyRoot, applyParam);
-      if (param.transferRoot) {
+      if (param.transferRoot ?? false) {
         replyRoot = {
           type: "message",
           destination: message,

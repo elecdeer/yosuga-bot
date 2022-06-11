@@ -35,17 +35,19 @@ export class SetMaxLengthSub extends SetConfigSubCommandHandler<
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<MasterLevel | GuildLevel>["maxStringLength"]> | undefined
   ): Promise<ConfigEachLevel<MasterLevel | GuildLevel>["maxStringLength"] | undefined> {
-    return options.getNumber("value") || undefined;
+    const num = options.getNumber("value");
+    if (num === null) return undefined;
+    return num;
   }
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["maxStringLength"] | undefined,
     context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
-    if (value && value < 0) {
+    if (value !== undefined && value < 0) {
       return {
         status: "error",
-        message: "設定する値は整数である必要があります.",
+        message: "設定する値は正の整数である必要があります.",
       };
     }
     return super.validateValue(value, context);

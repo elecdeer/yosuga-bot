@@ -33,6 +33,8 @@ export class SetIgnorePrefixSub extends SetConfigSubCommandHandler<
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<MasterLevel | GuildLevel>["ignorePrefix"]> | undefined
   ): Promise<ConfigEachLevel<MasterLevel | GuildLevel>["ignorePrefix"] | undefined> {
-    return options.getString("value") || undefined;
+    const str = options.getString("value");
+    if (str === null) return undefined;
+    return str;
   }
 }

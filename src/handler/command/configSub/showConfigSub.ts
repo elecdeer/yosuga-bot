@@ -42,7 +42,7 @@ export class ShowConfigSub extends ConfigSubCommandHandler<MasterLevel | GuildLe
     configEmbed.addFields(
       configEntriesWithoutSpeaker
         .map((value, key) => stringifyConfigEntry(key, value))
-        .filter((item) => !!item && item.value.length > 0)
+        .filter((item) => item.value.length > 0)
     );
 
     const configSpeaker = config.speakerBuildOptions ?? {};

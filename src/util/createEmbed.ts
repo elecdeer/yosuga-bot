@@ -23,7 +23,7 @@ export const createYosugaEmbed = ({
 }: YosugaEmbedOption): MessageEmbed => {
   const embed = new MessageEmbed(base);
   embed.setColor(0xffb6c1);
-  if (message) {
+  if (message !== undefined) {
     embed.setDescription(type === "plain" ? message : `${REPLY_TYPE_EMOJI[type]} ${message}`);
   }
   if (!isContinuation) {

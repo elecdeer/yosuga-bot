@@ -36,14 +36,16 @@ export class SetSpeedSub extends SetConfigSubCommandHandler<
     options: CommandInteraction["options"],
     oldValue: Readonly<ConfigEachLevel<MasterLevel | GuildLevel>["masterSpeed"]> | undefined
   ): Promise<ConfigEachLevel<MasterLevel | GuildLevel>["masterSpeed"] | undefined> {
-    return options.getNumber("value") || undefined;
+    const num = options.getNumber("value");
+    if (num === null) return undefined;
+    return num;
   }
 
   protected override async validateValue(
     value: ConfigEachLevel<MasterLevel | GuildLevel>["masterSpeed"] | undefined,
     context: Omit<CommandContextSlash, "replyMulti">
   ): Promise<ValidationResult> {
-    if (value && !isInRange(value, 0, 2)) {
+    if (value !== undefined && !isInRange(value, 0, 2)) {
       return {
         status: "error",
         message: "設定する値は0 ~ 2の範囲内である必要があります.",

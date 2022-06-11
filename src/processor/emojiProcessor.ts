@@ -15,7 +15,7 @@ export const emojiProcessor: ProcessorProvider<void> = () => async (speechText) 
   return {
     ...speechText,
     text: speechText.text.replace(emojiReg, (match) => {
-      if (exceptionEmojis[match]) {
+      if (exceptionEmojis[match] !== undefined) {
         return match;
       }
 

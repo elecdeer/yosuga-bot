@@ -7,8 +7,8 @@ export type ButtonParam = Partial<Omit<InteractionButtonOptions, "customId" | "t
 export const createButton = (customId: string, param: ButtonParam): MessageButton => {
   const button = new MessageButton();
   button.setCustomId(customId);
-  if (param.disabled) button.setDisabled(param.disabled);
-  if (param.emoji) button.setEmoji(param.emoji);
+  if (param.disabled !== undefined) button.setDisabled(param.disabled);
+  if (param.emoji !== undefined) button.setEmoji(param.emoji);
   button.setLabel(param.label ?? "");
   button.setStyle(param.style ?? "PRIMARY");
   return button;

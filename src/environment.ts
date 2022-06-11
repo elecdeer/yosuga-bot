@@ -26,8 +26,8 @@ const initEnv = (): YosugaEnv => {
     discordPublicKey: process.env.DISCORD_PUB_KEY,
   };
 
-  if (!env.configPath) env.configPath = "./config";
-  if (!env.discordToken) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
+  env.configPath ??= "./config";
+  if (env.discordToken === undefined) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
 
   console.info(env);
 

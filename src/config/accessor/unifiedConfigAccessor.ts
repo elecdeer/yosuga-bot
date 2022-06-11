@@ -49,18 +49,14 @@ export class UnifiedConfigAccessor extends ReadOnlyConfigAccessor<UnifiedConfig,
     const masterConfig = await this.masterStore.read(this.appId);
     unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, masterConfig);
 
-    if (this.guildId) {
+    if (this.guildId !== undefined) {
       const guildConfig = await this.guildStore.read(this.guildId);
-      if (guildConfig) {
-        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, guildConfig);
-      }
+      unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, guildConfig);
     }
 
-    if (this.userId) {
+    if (this.userId !== undefined) {
       const userConfig = await this.userStore.read(this.userId);
-      if (userConfig) {
-        unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, userConfig);
-      }
+      unifiedConfig = deepmerge<UnifiedConfig>(unifiedConfig, userConfig);
     }
 
     return unifiedConfig;
