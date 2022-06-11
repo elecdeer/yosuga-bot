@@ -12,7 +12,7 @@ import type { EmojiIdentifierResolvable } from "discord.js";
 export type SelectOption<T> = {
   label: Lazy<string>;
   value: T;
-  default?: Lazy<boolean>;
+  default?: boolean;
   description?: Lazy<string>;
   emoji?: Lazy<EmojiIdentifierResolvable>;
   inactive?: Lazy<boolean>;
@@ -30,7 +30,7 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
 
   const { options, relationCollection } = createValueRelation(param.options);
 
-  const initState = options.filter((item) => item.default === true).map((item) => item.indexKey);
+  const initState = options.filter((item) => item.default).map((item) => item.indexKey);
   const { getRawValue, hook } = selectMenuComponentHookValue<string[]>({
     customId: customId,
     reducer: (interaction) => interaction.values,
