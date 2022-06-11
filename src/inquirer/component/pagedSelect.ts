@@ -73,6 +73,12 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
   const eachPageValues: string[][] = range(0, pageNum).map((i) =>
     options.filter((opt) => opt.page === page && opt.default).map((opt) => opt.indexKey)
   );
+  const getSelectableNumCurPage = () => {
+    const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? options.length;
+    const selectedOtherPage = eachPageValues.flat().length - eachPageValues[page].length;
+    //今のページで選択できる上限数は、全体の選択上限 - 他のページで選択済み
+    return maxSelectNumWhole - selectedOtherPage;
+  };
 
   const hooks = [
     buttonComponentHook({
@@ -95,8 +101,14 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
     }),
     selectMenuComponentHook({
       customId: customId,
-      onInteraction: ({ interaction }) => {
-        eachPageValues[page] = interaction.values;
+      onInteraction: async ({ interaction, controller }) => {
+        const maxSelectNum = getSelectableNumCurPage();
+        if (maxSelectNum < interaction.values.length) {
+          //選択上限を超えてたらロールバック
+          await controller.edit();
+        } else {
+          eachPageValues[page] = interaction.values;
+        }
         return true;
       },
       onEnd: () => true,
@@ -131,15 +143,10 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
       };
     },
     renderComponent: () => {
-      const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? options.length;
-      const selectedOtherPage = (eachPageValues.flat().length = eachPageValues[page].length);
-      //今のページで選択できる上限数は、全体の選択上限 - 他のページで選択済み
-      const maxSelectNum = maxSelectNumWhole - selectedOtherPage;
-
       const component = createSelectMenu(customId, {
         ...resolveSelectorLazyParam(param.selector),
         minValues: 0,
-        maxValues: maxSelectNum,
+        maxValues: getSelectableNumCurPage(),
       });
       component.setOptions(
         options
