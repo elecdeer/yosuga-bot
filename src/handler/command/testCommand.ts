@@ -1,10 +1,11 @@
 import { CommandPermission } from "../../application/permission";
 import { createButtonComponent } from "../../inquirer/component/button";
 import { createModalTextComponent } from "../../inquirer/component/modalText";
-import { createMultiSelectComponent } from "../../inquirer/component/multiSelect";
+import { createPagedSelectComponent } from "../../inquirer/component/pagedSelect";
 import { createToggleComponent } from "../../inquirer/component/toggle";
 import { prompt } from "../../inquirer/prompt";
 import { createYosugaEmbed } from "../../util/createEmbed";
+import { range } from "../../util/range";
 import { CommandHandler } from "../base/commandHandler";
 
 import type { CommandContextSlash } from "../../commandContextSlash";
@@ -27,23 +28,20 @@ export class TestCommand extends CommandHandler {
             label: "Test",
           },
         }),
-        select: createMultiSelectComponent({
-          selector: {},
-          options: [
-            {
-              label: "AAAStr",
-              value: "AAA",
-              default: true,
-            },
-            {
-              label: "BBBStr",
-              value: "BBB",
-            },
-            {
-              label: "CCCStr",
-              value: "CCC",
-            },
-          ],
+        select: createPagedSelectComponent({
+          selector: {
+            minValues: 0,
+            maxValues: 3,
+          },
+          options: {
+            type: "balance",
+            numPerPageMax: 10,
+            options: range(0, 18).map((num) => ({
+              label: num.toString(),
+              value: num,
+            })),
+          },
+          pageTorus: false,
         }),
         toggle: createToggleComponent<"happy" | "crying" | "thinking">({
           button: {

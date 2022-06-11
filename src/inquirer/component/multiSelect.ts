@@ -24,7 +24,6 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<SelectorParam>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
-  emptyAnswered?: boolean;
 }): PromptComponent<TOptionValue[]> => {
   const customId = param.customId ?? "select";
 
@@ -34,14 +33,14 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
   const { getRawValue, hook } = selectMenuComponentHookValue<string[]>({
     customId: customId,
     reducer: (interaction) => interaction.values,
-    initialState: initState.length > 0 ? initState : param.emptyAnswered ? [] : null,
+    initialState: initState,
   });
 
   return {
     getStatus: () => {
       const keys = getRawValue();
 
-      if (keys == null || (keys.length === 0 && !param.emptyAnswered)) {
+      if (keys == null || (keys.length === 0 && resolveLazy(param.selector.minValues) !== 0)) {
         return {
           status: "unanswered",
         };
