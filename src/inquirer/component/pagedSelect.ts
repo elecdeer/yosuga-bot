@@ -146,8 +146,9 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
       const component = createSelectMenu(customId, {
         ...resolveSelectorLazyParam(param.selector),
         minValues: 0,
-        maxValues: getSelectableNumCurPage(),
+        maxValues: Math.max(1, getSelectableNumCurPage()),
       });
+
       component.setOptions(
         options
           .filter((opt) => opt.page === page)
