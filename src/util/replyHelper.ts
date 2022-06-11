@@ -90,6 +90,7 @@ const replyToDestination = (
     components: param.components,
     attachments: param.attachments,
     allowedMentions: param.allowedMentions,
+    ephemeral: param.ephemeral,
   };
   switch (root.type) {
     case "textChannel":

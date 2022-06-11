@@ -94,6 +94,7 @@ export class TestCommand extends CommandHandler {
         messageContent: createYosugaEmbed({
           message: "toggle test",
         }),
+        ephemeral: true,
       }
     );
 
