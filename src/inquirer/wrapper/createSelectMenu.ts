@@ -9,9 +9,9 @@ export type SelectorParam = Partial<
 export const createSelectMenu = (customId: string, param: SelectorParam): MessageSelectMenu => {
   const selectMenu = new MessageSelectMenu();
   selectMenu.setCustomId(customId);
-  if (param.disabled) selectMenu.setDisabled(param.disabled);
-  if (param.minValues) selectMenu.setMinValues(param.minValues);
-  if (param.maxValues) selectMenu.setMaxValues(param.maxValues);
-  if (param.placeholder) selectMenu.setPlaceholder(param.placeholder);
+  if (param.disabled !== undefined) selectMenu.setDisabled(param.disabled);
+  if (param.minValues !== undefined) selectMenu.setMinValues(param.minValues);
+  if (param.maxValues !== undefined) selectMenu.setMaxValues(param.maxValues);
+  if (param.placeholder !== undefined) selectMenu.setPlaceholder(param.placeholder);
   return selectMenu;
 };

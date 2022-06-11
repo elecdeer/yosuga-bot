@@ -89,12 +89,20 @@ export const createPromptController = async <T extends Record<string, PromptComp
     if (!lastMessage) {
       return;
     }
-    const editMessage = await lastMessage.edit({
-      embeds: [resolveLazy(param.messageContent)],
-      components: actionRows,
-    });
 
-    await hookComponents(editMessage);
+    if (param.ephemeral && replyDestination.type === "commandInteraction") {
+      const editMessage = await replyDestination.destination.editReply({
+        embeds: [resolveLazy(param.messageContent)],
+        components: actionRows,
+      });
+      await hookComponents(editMessage);
+    } else {
+      const editMessage = await lastMessage.edit({
+        embeds: [resolveLazy(param.messageContent)],
+        components: actionRows,
+      });
+      await hookComponents(editMessage);
+    }
   };
 
   const repost = async (destination: ReplyDestination, rerender?: boolean) => {

@@ -9,7 +9,6 @@ export const createSingleSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<Omit<SelectorParam, "maxValues" | "minValues">>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
-  emptyAnswered?: boolean;
 }): PromptComponent<TOptionValue> => {
   const { getStatus, renderComponent, hook } = createMultiSelectComponent(param);
   return {

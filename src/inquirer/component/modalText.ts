@@ -136,7 +136,10 @@ export const createModalTextComponent = <TKey extends string>(param: {
 
         if (validateErrors.length > 0) {
           const errorTexts = validateErrors.map((value) => value.reason);
-          await modalRes.reply(formatErrorMessage(errorTexts, param.formatErrorMessage));
+          await modalRes.reply({
+            ...formatErrorMessage(errorTexts, param.formatErrorMessage),
+            ephemeral: promptParam.ephemeral,
+          });
         } else {
           await modalRes.deferUpdate();
         }

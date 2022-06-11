@@ -12,7 +12,7 @@ import type { EmojiIdentifierResolvable } from "discord.js";
 export type SelectOption<T> = {
   label: Lazy<string>;
   value: T;
-  default?: Lazy<boolean>;
+  default?: boolean;
   description?: Lazy<string>;
   emoji?: Lazy<EmojiIdentifierResolvable>;
   inactive?: Lazy<boolean>;
@@ -24,24 +24,24 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<SelectorParam>;
   options: SelectOption<TOptionValue>[];
   customId?: string;
-  emptyAnswered?: boolean;
 }): PromptComponent<TOptionValue[]> => {
   const customId = param.customId ?? "select";
 
   const { options, relationCollection } = createValueRelation(param.options);
 
-  const initState = options.filter((item) => item.default === true).map((item) => item.indexKey);
+  const initState = options.filter((item) => item.default).map((item) => item.indexKey);
   const { getRawValue, hook } = selectMenuComponentHookValue<string[]>({
     customId: customId,
     reducer: (interaction) => interaction.values,
-    initialState: initState.length > 0 ? initState : param.emptyAnswered ? [] : null,
+    initialState: initState,
   });
 
   return {
     getStatus: () => {
       const keys = getRawValue();
 
-      if (keys == null || (keys.length === 0 && !param.emptyAnswered)) {
+      const minSelectNum = resolveLazy(param.selector.minValues) ?? 1;
+      if (keys == null || keys.length < minSelectNum) {
         return {
           status: "unanswered",
         };

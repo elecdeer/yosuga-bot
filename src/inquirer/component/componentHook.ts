@@ -1,4 +1,4 @@
-import type { PromptComponent } from "../promptTypes";
+import type { PromptComponent, PromptController } from "../promptTypes";
 import type {
   Awaitable,
   ButtonInteraction,
@@ -13,12 +13,16 @@ export const componentHook =
   <TComponent extends MessageComponentType>(componentType: TComponent) =>
   (param: {
     customId: string;
-    onInteraction: (interaction: MappedInteractionTypes[TComponent]) => Awaitable<boolean>;
+    onInteraction: (param: {
+      interaction: MappedInteractionTypes[TComponent];
+      updateCallback: () => void;
+      controller: PromptController;
+    }) => Awaitable<boolean>;
     onEnd: (reason: string) => Awaitable<boolean>;
   }): PromptComponent<unknown>["hook"] => {
     const { customId, onInteraction, onEnd } = param;
 
-    return ({ message, promptParam, updateCallback }) => {
+    return ({ message, promptParam, updateCallback, controller }) => {
       const collector = message.createMessageComponentCollector({
         time: promptParam.time,
         idle: promptParam.idle,
@@ -29,7 +33,11 @@ export const componentHook =
         if (interaction.customId !== customId) return;
         if (!isMappedInteractionType(componentType, interaction)) return;
 
-        const shouldUpdate = await onInteraction(interaction);
+        const shouldUpdate = await onInteraction({
+          interaction: interaction,
+          updateCallback: updateCallback,
+          controller: controller,
+        });
         if (!interaction.deferred && !interaction.replied) await interaction.deferUpdate();
         if (shouldUpdate) {
           updateCallback();

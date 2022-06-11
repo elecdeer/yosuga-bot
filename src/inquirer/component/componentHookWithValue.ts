@@ -22,7 +22,7 @@ export const componentHookWithValue =
 
     const hook = componentHook(componentType)({
       customId: customId,
-      onInteraction: async (interaction) => {
+      onInteraction: async ({ interaction }) => {
         status = await reducer(interaction, status);
         return true;
       },
