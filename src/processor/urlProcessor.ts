@@ -25,7 +25,7 @@ const urlReg = new RegExp(urlRegStr, "iu");
 const urlRegGrouped = new RegExp(`(${urlRegStr})`, urlReg.flags);
 
 export const urlProcessor: ProcessorProvider<number> = (fastSpeedScale) => async (speechText) => {
-  const split = speechText.text.split(urlRegGrouped).filter((str) => str && str !== "");
+  const split = speechText.text.split(urlRegGrouped).filter((str) => str !== "");
 
   const splitReplaced = await Promise.all(
     split.map(async (item) => {
@@ -67,7 +67,7 @@ const tenorOmitRegex = / -.*$/;
 
 const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> = async (url) => {
   processorLogger.debug(`checkUrlType: ${url}`);
-  if (!url) return { type: LinkType.InvalidUrl };
+  if (url === "") return { type: LinkType.InvalidUrl };
 
   processorLogger.debug(`check: ${url}`);
 

@@ -33,8 +33,7 @@ export const isValidCommandInteraction = (
 ): interaction is ValidCommandInteraction => {
   return (
     interaction.inCachedGuild() &&
-    !!interaction.member &&
-    !!interaction.channel &&
+    interaction.channel !== null &&
     interaction.isCommand() &&
     interaction.channel.isText()
   );

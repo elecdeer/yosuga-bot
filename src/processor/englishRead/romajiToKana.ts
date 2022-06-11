@@ -106,12 +106,12 @@ export const romajiToJpRead = (
   kana: string;
   complete: boolean;
 } => {
-  const split = romajiStr.split(regex).filter((item) => !!item);
+  const split = romajiStr.split(regex).filter((item) => item !== "");
   let complete = true;
   const kana = split
     .map((item) => {
       const kanaChar = romajiMap[item];
-      if (kanaChar) {
+      if (kanaChar !== undefined) {
         return kanaChar;
       } else {
         complete = false;

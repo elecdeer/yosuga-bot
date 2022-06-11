@@ -12,12 +12,12 @@ export const isTurnOnCameraCall =
   (voiceChannel: Readonly<VoiceOrStageChannel>) =>
   (...args: ClientEvents["voiceStateUpdate"]): boolean => {
     const [oldState, newState] = args;
-    if (!newState.guild.id) return false;
+    if (newState.guild.id === "") return false;
     if (!oldState.member || !newState.member) return false;
     if (oldState.member !== newState.member) return false;
 
     if (voiceChannel.id === oldState.channelId && voiceChannel.id === newState.channelId) {
-      if (!oldState.selfVideo && newState.selfVideo) {
+      if (oldState.selfVideo !== true && newState.selfVideo === true) {
         return true;
       }
     }

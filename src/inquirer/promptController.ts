@@ -20,7 +20,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
 
   let hooksCleaner: (() => Awaitable<void>)[];
   const hookComponents = async (message: Message) => {
-    if (hooksCleaner) {
+    if (hooksCleaner !== null) {
       await Promise.all(hooksCleaner.map((item) => item()));
     }
     hooksCleaner = componentCollection
@@ -63,7 +63,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
         .filter((msg) => msg.components.length > 0)
         .map(async (msg) => {
           await msg.edit(
-            rerender
+            rerender === true
               ? {
                   embeds: [resolveLazy(param.messageContent)],
                   components: [],
@@ -90,7 +90,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
       return;
     }
 
-    if (param.ephemeral && replyDestination.type === "commandInteraction") {
+    if (param.ephemeral === true && replyDestination.type === "commandInteraction") {
       const editMessage = await replyDestination.destination.editReply({
         embeds: [resolveLazy(param.messageContent)],
         components: actionRows,

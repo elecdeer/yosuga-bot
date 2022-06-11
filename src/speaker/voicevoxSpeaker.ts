@@ -73,7 +73,7 @@ export class VoicevoxSpeaker extends Speaker {
     speechText: SpeechText,
     voiceParam: VoiceParam<AdditionalVoiceParam>
   ): Promise<Result<AudioResource, Error>> {
-    if (!this.speakerId) return failure(new Error("speakerIdが取得できていません"));
+    if (this.speakerId == null) return failure(new Error("speakerIdが取得できていません"));
 
     try {
       const audioQueryBase = await this.voicevoxClient.audio_query.$post({

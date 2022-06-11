@@ -23,7 +23,8 @@ export const isTextCommandCall: FilterCheckerGenerator<
   async (message) => {
     if (!message.member) return false;
     if (message.author.bot) return false;
-    if (!isMessageMentionedCall(yosugaUser)(message)) return false;
+
+    if (!(await isMessageMentionedCall(yosugaUser)(message))) return false;
     if (!removeMentionInMessageContent(message.content).startsWith(prefix)) return false;
 
     return await hasMemberPermission(message.member, permission);

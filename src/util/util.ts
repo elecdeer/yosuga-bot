@@ -1,7 +1,7 @@
 const regexp = /[\\^$.*+?()[\]{}|]/;
 const regexpGlobal = /[\\^$.*+?()[\]{}|]/g;
 export const escapeRegexp = (str: string): string => {
-  return str && regexp.test(str) ? str.replace(regexpGlobal, "\\$&") : str;
+  return str !== "" && regexp.test(str) ? str.replace(regexpGlobal, "\\$&") : str;
 };
 
 export const isInRange = (value: number, min: number, max: number): boolean => {

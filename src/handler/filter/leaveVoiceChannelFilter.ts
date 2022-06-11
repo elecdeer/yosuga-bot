@@ -14,7 +14,7 @@ export const isLeaveVoiceChannelCall: FilterCheckerGenerator<
   (voiceChannel) =>
   (...args) => {
     const [oldState, newState] = args;
-    if (!newState.guild.id) return false;
+    if (newState.guild.id === "") return false;
     if (!oldState.member || !newState.member) return false;
     if (oldState.member !== newState.member) return false;
 

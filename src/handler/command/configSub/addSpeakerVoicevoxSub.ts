@@ -77,7 +77,7 @@ export class AddSpeakerVoicevoxSub extends ConfigSubCommandHandler<MasterLevel> 
   protected async inquireUrl(context: CommandContextSlash): Promise<string | null> {
     try {
       const urlOption = context.getOptions().getString("url");
-      if (urlOption) {
+      if (urlOption !== "" && urlOption !== null) {
         return urlOption;
       }
 

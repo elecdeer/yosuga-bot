@@ -12,7 +12,7 @@ export const isEnterVoiceChannelCall =
   (voiceChannel: Readonly<VoiceOrStageChannel>) =>
   (...args: ClientEvents["voiceStateUpdate"]): boolean => {
     const [oldState, newState] = args;
-    if (!newState.guild.id) return false;
+    if (newState.guild.id === "") return false;
     if (!oldState.member || !newState.member) return false;
     if (oldState.member !== newState.member) return false;
 

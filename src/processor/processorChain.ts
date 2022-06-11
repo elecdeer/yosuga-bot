@@ -19,10 +19,7 @@ export class ProcessorChain {
     return this;
   }
 
-  async process(
-    text: SpeechText | SpeechText[],
-    collectSameParams?: boolean
-  ): Promise<SpeechText[]> {
+  async process(text: SpeechText | SpeechText[], collectSameParams = false): Promise<SpeechText[]> {
     //reduceでもう少しうまく書ける気もする
 
     let prevTexts: SpeechText[] = ([] as SpeechText[]).concat(text);
@@ -39,7 +36,11 @@ export class ProcessorChain {
     if (collectSameParams) {
       prevTexts = prevTexts.reduce((acc: SpeechText[], cur: SpeechText) => {
         const prevLast = acc[acc.length - 1];
-        if (prevLast && prevLast.volume === cur.volume && prevLast.speed === cur.speed) {
+        if (
+          prevLast !== undefined &&
+          prevLast.volume === cur.volume &&
+          prevLast.speed === cur.speed
+        ) {
           prevLast.text = `${prevLast.text}、${cur.text}`;
         } else {
           acc.push(cur);
