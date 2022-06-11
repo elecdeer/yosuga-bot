@@ -110,7 +110,8 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
         .map((key) => relationCollection.get(key))
         .filter((value) => value !== undefined) as TOptionValue[];
 
-      if (rawValues.length === 0 && resolveLazy(param.selector.minValues) !== 0) {
+      const minSelectNum = resolveLazy(param.selector.minValues) ?? 1;
+      if (rawValues.length < minSelectNum) {
         return {
           status: "unanswered",
         };
@@ -130,7 +131,16 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
       };
     },
     renderComponent: () => {
-      const component = createSelectMenu(customId, resolveSelectorLazyParam(param.selector));
+      const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? options.length;
+      const selectedOtherPage = (eachPageValues.flat().length = eachPageValues[page].length);
+      //今のページで選択できる上限数は、全体の選択上限 - 他のページで選択済み
+      const maxSelectNum = maxSelectNumWhole - selectedOtherPage;
+
+      const component = createSelectMenu(customId, {
+        ...resolveSelectorLazyParam(param.selector),
+        minValues: 0,
+        maxValues: maxSelectNum,
+      });
       component.setOptions(
         options
           .filter((opt) => opt.page === page)

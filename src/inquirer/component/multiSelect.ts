@@ -40,7 +40,8 @@ export const createMultiSelectComponent = <TOptionValue>(param: {
     getStatus: () => {
       const keys = getRawValue();
 
-      if (keys == null || (keys.length === 0 && resolveLazy(param.selector.minValues) !== 0)) {
+      const minSelectNum = resolveLazy(param.selector.minValues) ?? 1;
+      if (keys == null || keys.length < minSelectNum) {
         return {
           status: "unanswered",
         };
