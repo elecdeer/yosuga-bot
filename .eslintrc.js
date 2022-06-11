@@ -22,6 +22,13 @@ module.exports = {
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/strict-boolean-expressions": [
+      "error",
+      {
+        allowString: false,
+        allowNumber: false,
+      },
+    ],
     "import/order": [
       "error",
       {
