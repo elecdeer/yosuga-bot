@@ -10,7 +10,7 @@ import { buttonComponentHook, selectMenuComponentHook } from "./componentHook";
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
 import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { SelectOption } from "./multiSelect";
+import type { SelectOption } from "./select";
 import type { Awaitable } from "discord.js";
 
 export type PagedSelectOption<T> = Omit<SelectOption<T>, "inactive">;
