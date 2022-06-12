@@ -1,16 +1,17 @@
-import { createSelectComponent } from "./select";
+import { createPagedSelectComponent } from "./pagedSelect";
 
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
 import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { SelectOption } from "./select";
+import type { PagedOption } from "./pagedSelect";
 
-export const createSingleSelectComponent = <TOptionValue>(param: {
-  selector: LazyParam<Omit<SelectorParam, "maxValues" | "minValues">>;
-  options: SelectOption<TOptionValue>[];
+export const createPagedSingleSelectComponent = <TOptionValue>(param: {
+  selector: LazyParam<Omit<SelectorParam, "minValues" | "maxValues">>;
+  options: PagedOption<TOptionValue>;
+  pageTorus?: boolean;
   customId?: string;
 }): PromptComponent<TOptionValue> => {
-  const { getStatus, renderComponent, hook } = createSelectComponent(param);
+  const { getStatus, renderComponent, hook } = createPagedSelectComponent(param);
   return {
     renderComponent,
     hook,

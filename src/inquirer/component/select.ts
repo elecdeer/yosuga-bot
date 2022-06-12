@@ -20,7 +20,7 @@ export type SelectOption<T> = {
 
 const resolveSelectorLazyParam = (param: LazyParam<SelectorParam>) => resolveLazyParam(param);
 
-export const createMultiSelectComponent = <TOptionValue>(param: {
+export const createSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<SelectorParam>;
   options: SelectOption<TOptionValue>[];
   customId?: string;

@@ -10,7 +10,7 @@ import { buttonComponentHook, selectMenuComponentHook } from "./componentHook";
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
 import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { SelectOption } from "./multiSelect";
+import type { SelectOption } from "./select";
 import type { Awaitable } from "discord.js";
 
 export type PagedSelectOption<T> = Omit<SelectOption<T>, "inactive">;
@@ -21,7 +21,7 @@ export type PagedSelectOptionWithMeta<T> = PagedSelectOptionWithPage<T> & {
   indexKey: string;
 };
 
-type PagedOption<T> =
+export type PagedOption<T> =
   | {
       type: "balance";
       options: PagedSelectOption<T>[];
@@ -74,7 +74,7 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
     options.filter((opt) => opt.page === page && opt.default).map((opt) => opt.indexKey)
   );
   const getSelectableNumCurPage = () => {
-    const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? options.length;
+    const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? 1;
     const selectedOtherPage = eachPageValues.flat().length - eachPageValues[page].length;
     //今のページで選択できる上限数は、全体の選択上限 - 他のページで選択済み
     return maxSelectNumWhole - selectedOtherPage;
