@@ -74,7 +74,7 @@ export const createPagedSelectComponent = <TOptionValue>(param: {
     options.filter((opt) => opt.page === page && opt.default).map((opt) => opt.indexKey)
   );
   const getSelectableNumCurPage = () => {
-    const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? options.length;
+    const maxSelectNumWhole = resolveLazy(param.selector.maxValues) ?? 1;
     const selectedOtherPage = eachPageValues.flat().length - eachPageValues[page].length;
     //今のページで選択できる上限数は、全体の選択上限 - 他のページで選択済み
     return maxSelectNumWhole - selectedOtherPage;
