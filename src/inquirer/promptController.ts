@@ -20,7 +20,7 @@ export const createPromptController = async <T extends Record<string, PromptComp
 
   let hooksCleaner: (() => Awaitable<void>)[];
   const hookComponents = async (message: Message) => {
-    if (hooksCleaner !== null) {
+    if (hooksCleaner !== undefined) {
       await Promise.all(hooksCleaner.map((item) => item()));
     }
     hooksCleaner = componentCollection
