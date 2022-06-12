@@ -21,7 +21,7 @@ export type PagedSelectOptionWithMeta<T> = PagedSelectOptionWithPage<T> & {
   indexKey: string;
 };
 
-type PagedOption<T> =
+export type PagedOption<T> =
   | {
       type: "balance";
       options: PagedSelectOption<T>[];
