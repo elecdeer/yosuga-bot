@@ -1,3 +1,5 @@
+import { test, expect } from "vitest";
+
 import { romajiToJpRead } from "./romajiToKana";
 
 test("ローマ字→かな#1", () => {
