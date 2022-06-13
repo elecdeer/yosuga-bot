@@ -1,3 +1,5 @@
+import { test, expect } from "vitest";
+
 import { replaceEnglishRead } from "./englishRead";
 
 test("replaceEnglishReadによる変換", () => {

@@ -1,3 +1,5 @@
+import { test, expect, describe } from "vitest";
+
 import { resolveLazy, resolveLazyParam } from "./lazy";
 
 describe("resolveLazyが正しく動作するか", () => {
