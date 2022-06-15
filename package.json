@@ -46,10 +46,10 @@
     "lint-staged": "^13.0.1",
     "nodemon": "^2.0.16",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.0",
     "ts-jest": "^28.0.4",
     "ts-node": "^10.8.1",
-    "type-fest": "^2.13.0",
+    "type-fest": "^2.13.1",
     "typescript": "4.7.3"
   },
   "dependencies": {
@@ -66,7 +66,7 @@
     "bufferutil": "^4.0.6",
     "charset": "^1.0.1",
     "deepmerge": "^4.2.2",
-    "discord-api-types": "^0.33.5",
+    "discord-api-types": "^0.34.0",
     "discord.js": "^13.8.0",
     "dotenv": "^16.0.1",
     "emoji-regex": "^10.1.0",
