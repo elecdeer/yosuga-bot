@@ -11,8 +11,6 @@ RUN npm ci
 COPY src src
 COPY imageenv.json ./
 
-RUN npm run build
-
 FROM gcr.io/distroless/nodejs:18
 COPY --from=build /app /app
 WORKDIR /app
@@ -20,5 +18,5 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-CMD ["dist/index.js"]
+CMD ["node_modules/vite-node/vite-node.mjs", "src/index.ts"]
 
