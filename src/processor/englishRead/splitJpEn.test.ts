@@ -1,3 +1,5 @@
+import { test, expect } from "vitest";
+
 import { splitJpEn } from "./splitJpEn";
 
 test("splitJpEnによる単語分割", () => {
