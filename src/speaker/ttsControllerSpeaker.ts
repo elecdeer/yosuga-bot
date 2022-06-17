@@ -1,11 +1,11 @@
 import { createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
 import { getLogger } from "log4js";
-import { opus } from "prism-media";
 
 import { endSessionFilter } from "../handler/filter/endSessionFilter";
 import { wait } from "../util/promiseUtil";
 import { success } from "../util/result";
+import { OpusEncodeStream } from "./opusEncodeStream";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker } from "./speaker";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
@@ -171,7 +171,7 @@ export class TtsControllerSpeaker extends Speaker {
     }
 
     const opusStream = streamResult.value.pipe(
-      new opus.Encoder({
+      new OpusEncodeStream({
         channels: 1,
         rate: 48000,
         frameSize: 960,
