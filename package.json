@@ -2,18 +2,16 @@
   "name": "yosuga-bot",
   "version": "1.2.4",
   "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "npm run build:live",
+    "start": "vite-node src/index.ts",
     "dev": "vite-node src/index.ts",
-    "dev:watch": "npm run build:live",
-    "build": "tsc -p .",
-    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "dev:watch": "vite-node -w src/index.ts",
     "test": "vitest",
     "test:watch": "vitest watch",
     "check": "npm-run-all check:*",
     "check:type": "tsc",
-    "check:format": "prettier --check 'src/**/*.ts' 'src/*.ts'",
+    "check:format": "prettier --cache --check 'src/**/*.ts' 'src/*.ts'",
     "check:lint": "eslint 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
     "format": "prettier 'src/**/*.ts' 'src/*.ts' --write",
     "prepare": "husky install",
@@ -81,6 +79,6 @@
     "utf-8-validate": "^5.0.9"
   },
   "eslintIgnore": [
-    "/.eslintrc.js"
+    "/.eslintrc.cjs"
   ]
 }
