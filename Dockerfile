@@ -6,7 +6,7 @@ WORKDIR /app
 COPY tsconfig.json ./
 COPY package*.json ./
 
-RUN npm ci
+RUN npm ci --omit=dev --ignore-scripts=true
 
 COPY src src
 COPY imageenv.json ./
