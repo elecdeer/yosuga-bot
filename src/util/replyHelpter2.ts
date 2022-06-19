@@ -3,7 +3,11 @@ import type {
   BaseCommandInteraction,
   DMChannel,
   Message,
+  MessageActionRow,
+  MessageAttachment,
   MessageComponentInteraction,
+  MessageEmbed,
+  MessageMentionOptions,
   TextChannel,
   ThreadChannel,
   ThreadCreateOptions,
@@ -14,11 +18,16 @@ export interface ReplyHelper {
   postedMessages: readonly Message[];
 }
 
-type ReplyParam = {
+export type ReplyParam = {
   content?: string;
+  embeds?: MessageEmbed[];
+  components?: MessageActionRow[];
+  attachments?: MessageAttachment[];
+  ephemeral?: boolean;
+  allowedMentions?: MessageMentionOptions;
 };
 
-type ReplyScene =
+export type ReplyScene =
   | {
       type: "textChannel";
       channel: TextChannel;
@@ -30,9 +39,14 @@ type ReplyScene =
   | {
       type: "dmChannel";
       channel: DMChannel;
+    }
+  | {
+      type: "newThread";
+      channel: TextChannel;
+      option: ThreadCreateOptions<AllowedThreadTypeForTextChannel>;
     };
 
-type ReplyTarget =
+export type ReplyTarget =
   | {
       type: "channel";
     }
@@ -49,15 +63,7 @@ type ReplyTarget =
       interaction: MessageComponentInteraction<"cached">;
     };
 
-export const createReplyHelper = async (
-  scene:
-    | ReplyScene
-    | {
-        type: "newThread";
-        channel: TextChannel;
-        option: ThreadCreateOptions<AllowedThreadTypeForTextChannel>;
-      }
-): Promise<ReplyHelper> => {
+export const createReplyHelper = async (scene: ReplyScene): Promise<ReplyHelper> => {
   if (scene.type === "newThread") {
     const thread = await scene.channel.threads.create(scene.option);
 
@@ -70,22 +76,27 @@ export const createReplyHelper = async (
   const messages: Message[] = [];
 
   const reply = async (param: ReplyParam, target: ReplyTarget) => {
+    const sendParam = {
+      content: param.content,
+      embeds: param.embeds,
+      components: param.components,
+      attachments: param.attachments,
+      allowedMentions: param.allowedMentions,
+      ephemeral: param.ephemeral,
+    };
+
     if (target.type === "channel") {
-      return await scene.channel.send({
-        content: param.content,
-      });
+      return await scene.channel.send(sendParam);
     }
 
     if (target.type === "message") {
-      return await target.message.reply({
-        content: param.content,
-      });
+      return await target.message.reply(sendParam);
     }
 
     if (target.type === "commandInteraction" || target.type === "messageComponentInteraction") {
       const threadIdParam = scene.type === "threadChannel" ? { threadId: scene.channel.id } : {};
       return await target.interaction.reply({
-        content: param.content,
+        ...sendParam,
         fetchReply: true,
         ...threadIdParam,
       });
