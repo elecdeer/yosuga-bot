@@ -4,7 +4,6 @@ import { TypedEventEmitter } from "../util/typedEventEmitter";
 import { createPromptCollector } from "./promptCollector";
 import { createPromptController } from "./promptController";
 
-import type { ReplyDestination } from "../util/replyHelper";
 import type {
   AnswerStatus,
   PromptCollector,
@@ -17,7 +16,6 @@ import type {
 
 export const prompt = async <T extends Record<string, PromptComponent<unknown>>>(
   components: T | [keyof T, T[keyof T]][],
-  replyDestination: ReplyDestination,
   param: PromptParam
 ): Promise<{
   controller: PromptController;
@@ -38,12 +36,7 @@ export const prompt = async <T extends Record<string, PromptComponent<unknown>>>
     answerStatus.set(key, status);
   });
 
-  const controller = await createPromptController(
-    componentCollection,
-    event,
-    replyDestination,
-    param
-  );
+  const controller = await createPromptController(componentCollection, event, param);
   const collector = createPromptCollector(answerStatus, event);
 
   return {

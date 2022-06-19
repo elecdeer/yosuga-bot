@@ -87,14 +87,18 @@ export class TestCommand extends CommandHandler {
         }),
       },
       {
-        type: "commandInteraction",
-        destination: context.interaction,
-      },
-      {
         messageContent: createYosugaEmbed({
           message: "toggle test",
         }),
         ephemeral: true,
+        scene: {
+          type: "textChannel",
+          channel: context.textChannel,
+        },
+        rootTarget: {
+          type: "commandInteraction",
+          interaction: context.interaction,
+        },
       }
     );
 

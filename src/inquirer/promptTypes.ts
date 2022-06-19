@@ -1,5 +1,5 @@
 import type { Lazy } from "../util/lazy";
-import type { ReplyDestination } from "../util/replyHelper";
+import type { ReplyScene, ReplyTarget } from "../util/replyHelpter2";
 import type { Message, MessageActionRow, MessageEmbed, Awaitable } from "discord.js";
 
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
@@ -32,13 +32,23 @@ export type PromptParamMessage = {
    * 送信するMessageに含まれるコンテント
    */
   messageContent: Lazy<MessageEmbed>;
+
+  /**
+   * promptの送信先
+   */
+  scene: ReplyScene;
+
+  /**
+   * 最初のMessageの送信先
+   */
+  rootTarget: ReplyTarget;
 };
 
 export type PromptParam = PromptParamHook & PromptParamMessage;
 
 export interface PromptController {
   close: (rerender?: boolean) => Promise<void>;
-  repost: (destination: ReplyDestination, rerender?: boolean) => Promise<void>;
+  repost: (target: ReplyTarget, rerender?: boolean) => Promise<void>;
   edit: () => Promise<void>;
 }
 
