@@ -12,28 +12,25 @@ import type {
   ThreadChannel,
 } from "discord.js";
 
-const createSendableChannelMock = <T>() => {
+const createSendableChannelMock = <T>(): T => {
   return {
-    send: vi.fn(),
+    send: vi.fn(async () => createMessageMock()),
   } as unknown as T;
 };
 
-const createMessageMock = () => {
-  return {
-    reply: vi.fn(),
+const createMessageMock = (): Message => {
+  const thisMessage = {
+    reply: vi.fn(async () => createMessageMock()),
+    edit: vi.fn(async () => thisMessage),
   } as unknown as Message;
+  return thisMessage;
 };
 
-const createCommandInteractionMock = () => {
+const createInteractionMock = <T>(): T => {
   return {
-    reply: vi.fn(),
-  } as unknown as BaseCommandInteraction<"cached">;
-};
-
-const createMessageInteractionMock = () => {
-  return {
-    reply: vi.fn(),
-  } as unknown as MessageComponentInteraction<"cached">;
+    reply: vi.fn(async () => createMessageMock()),
+    editReply: vi.fn(async () => createMessageMock()),
+  } as unknown as T;
 };
 
 describe("replyHelper", () => {
@@ -57,7 +54,7 @@ describe("replyHelper", () => {
     });
   });
 
-  describe("reply引数無し", () => {
+  describe("channelへのreply", () => {
     it("scene.typeがtextChannelのとき", async () => {
       const textChannel = createSendableChannelMock<TextChannel>();
 
@@ -73,8 +70,7 @@ describe("replyHelper", () => {
         content: "hello",
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      expect(replyHelper.postedMessages.at(-1)).toBe(message);
+      expect(replyHelper.postedMessages().at(-1)).toBe(message);
     });
 
     it("scene.typeがthreadChannelのとき", async () => {
@@ -92,8 +88,7 @@ describe("replyHelper", () => {
       expect(threadChannel.send).toHaveBeenCalledWith({
         content: "hello",
       });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      expect(replyHelper.postedMessages.at(-1)).toBe(message);
+      expect(replyHelper.postedMessages().at(-1)).toBe(message);
     });
 
     it("scene.typeがdmChannelのとき", async () => {
@@ -110,8 +105,7 @@ describe("replyHelper", () => {
       expect(dmChannel.send).toHaveBeenCalledWith({
         content: "hello",
       });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      expect(replyHelper.postedMessages.at(-1)).toBe(message);
+      expect(replyHelper.postedMessages().at(-1)).toBe(message);
     });
   });
 
@@ -167,7 +161,7 @@ describe("replyHelper", () => {
   describe("commandInteractionへのreply", () => {
     it("scene.typeがtextChannelのとき", async () => {
       const textChannel = createSendableChannelMock<TextChannel>();
-      const interaction = createCommandInteractionMock();
+      const interaction = createInteractionMock<BaseCommandInteraction<"cached">>();
 
       const replyHelper = await createReplyHelper({
         type: "textChannel",
@@ -191,7 +185,7 @@ describe("replyHelper", () => {
 
     it("scene.typeがthreadChannelのとき", async () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
-      const interaction = createCommandInteractionMock();
+      const interaction = createInteractionMock<BaseCommandInteraction<"cached">>();
 
       const replyHelper = await createReplyHelper({
         type: "threadChannel",
@@ -219,7 +213,7 @@ describe("replyHelper", () => {
   describe("messageComponentInteractionへのreply", () => {
     it("scene.typeがtextChannelのとき", async () => {
       const textChannel = createSendableChannelMock<TextChannel>();
-      const interaction = createMessageInteractionMock();
+      const interaction = createInteractionMock<MessageComponentInteraction<"cached">>();
 
       const replyHelper = await createReplyHelper({
         type: "textChannel",
@@ -243,7 +237,7 @@ describe("replyHelper", () => {
 
     it("scene.typeがthreadChannelのとき", async () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
-      const interaction = createMessageInteractionMock();
+      const interaction = createInteractionMock<MessageComponentInteraction<"cached">>();
 
       const replyHelper = await createReplyHelper({
         type: "threadChannel",
@@ -264,6 +258,106 @@ describe("replyHelper", () => {
         content: "hello",
         threadId: threadChannel.id,
         fetchReply: true,
+      });
+    });
+  });
+
+  describe("messageにreplyされたmessageのedit", () => {
+    it("scene.typeがtextChannelのとき", async () => {
+      const textChannel = createSendableChannelMock<TextChannel>();
+      const message = createMessageMock();
+
+      const replyHelper = await createReplyHelper({
+        type: "textChannel",
+        channel: textChannel,
+      });
+      const replyMessage = await replyHelper.reply(
+        {
+          content: "hello",
+        },
+        {
+          type: "message",
+          message: message,
+        }
+      );
+      expect(message.reply).toHaveBeenCalledWith({
+        content: "hello",
+      });
+
+      await replyHelper.edit(
+        {
+          content: "world",
+        },
+        -1
+      );
+      expect(replyMessage.edit).toHaveBeenCalledWith({
+        content: "world",
+      });
+    });
+
+    it("scene.typeがcommandInteractionのとき", async () => {
+      const textChannel = createSendableChannelMock<TextChannel>();
+      const interaction = createInteractionMock<BaseCommandInteraction<"cached">>();
+
+      const replyHelper = await createReplyHelper({
+        type: "textChannel",
+        channel: textChannel,
+      });
+      const replyMessage = await replyHelper.reply(
+        {
+          content: "hello",
+        },
+        {
+          type: "commandInteraction",
+          interaction: interaction,
+        }
+      );
+      expect(interaction.reply).toHaveBeenCalledWith({
+        content: "hello",
+        fetchReply: true,
+      });
+
+      await replyHelper.edit(
+        {
+          content: "world",
+        },
+        -1
+      );
+      expect(interaction.editReply).toHaveBeenCalledWith({
+        content: "world",
+      });
+    });
+
+    it("scene.typeがmessageComponentInteractionのとき", async () => {
+      const textChannel = createSendableChannelMock<TextChannel>();
+      const interaction = createInteractionMock<MessageComponentInteraction<"cached">>();
+
+      const replyHelper = await createReplyHelper({
+        type: "textChannel",
+        channel: textChannel,
+      });
+      const replyMessage = await replyHelper.reply(
+        {
+          content: "hello",
+        },
+        {
+          type: "messageComponentInteraction",
+          interaction: interaction,
+        }
+      );
+      expect(interaction.reply).toHaveBeenCalledWith({
+        content: "hello",
+        fetchReply: true,
+      });
+
+      await replyHelper.edit(
+        {
+          content: "world",
+        },
+        -1
+      );
+      expect(interaction.editReply).toHaveBeenCalledWith({
+        content: "world",
       });
     });
   });
