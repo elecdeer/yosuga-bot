@@ -1,7 +1,7 @@
 import { resolveLazy } from "../util/lazy";
-import { createReplyHelper } from "../util/replyHelper";
+import { createReplyHelper } from "../util/replyHelpter";
 
-import type { ReplyDestination } from "../util/replyHelper";
+import type { ReplyTarget } from "../util/replyHelpter";
 import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
 import type { Awaitable, Collection, Message } from "discord.js";
@@ -9,10 +9,9 @@ import type { Awaitable, Collection, Message } from "discord.js";
 export const createPromptController = async <T extends Record<string, PromptComponent<unknown>>>(
   componentCollection: Collection<keyof T, T[keyof T]>,
   event: TypedEventEmitter<PromptEvent<T>>,
-  replyDestination: ReplyDestination,
   param: PromptParam
 ): Promise<PromptController> => {
-  const replyHelper = createReplyHelper(replyDestination, {});
+  const replyHelper = await createReplyHelper(param.scene);
 
   const renderActionRows = () => {
     return componentCollection.map((item) => item.renderComponent()).flat();
@@ -40,18 +39,17 @@ export const createPromptController = async <T extends Record<string, PromptComp
       .filter((item) => !!item) as (() => Awaitable<void>)[];
   };
 
-  const post = async (destination?: ReplyDestination) => {
+  const post = async (target?: ReplyTarget) => {
     const actionRows = renderActionRows();
 
-    if (destination) {
-      replyHelper.changeDestination(destination);
-    }
-
-    const message = await replyHelper.reply({
-      embeds: [resolveLazy(param.messageContent)],
-      components: actionRows,
-      ephemeral: param.ephemeral,
-    });
+    const message = await replyHelper.reply(
+      {
+        embeds: [resolveLazy(param.messageContent)],
+        components: actionRows,
+        ephemeral: param.ephemeral,
+      },
+      target
+    );
 
     await hookComponents(message);
   };
@@ -59,7 +57,8 @@ export const createPromptController = async <T extends Record<string, PromptComp
   //これまでに送ったMessageからcomponentsを削除
   const removeComponentsFromSendMessages = async (rerender?: boolean) => {
     await Promise.all(
-      replyHelper.postedMessages
+      replyHelper
+        .postedMessages()
         .filter((msg) => msg.components.length > 0)
         .map(async (msg) => {
           await msg.edit(
@@ -85,35 +84,23 @@ export const createPromptController = async <T extends Record<string, PromptComp
   const edit = async () => {
     const actionRows = renderActionRows();
 
-    const lastMessage = replyHelper.postedMessages.at(-1);
-    if (!lastMessage) {
-      return;
-    }
+    const editMessage = await replyHelper.edit({
+      embeds: [resolveLazy(param.messageContent)],
+      components: actionRows,
+    });
 
-    if (param.ephemeral === true && replyDestination.type === "commandInteraction") {
-      const editMessage = await replyDestination.destination.editReply({
-        embeds: [resolveLazy(param.messageContent)],
-        components: actionRows,
-      });
-      await hookComponents(editMessage);
-    } else {
-      const editMessage = await lastMessage.edit({
-        embeds: [resolveLazy(param.messageContent)],
-        components: actionRows,
-      });
-      await hookComponents(editMessage);
-    }
+    await hookComponents(editMessage);
   };
 
-  const repost = async (destination: ReplyDestination, rerender?: boolean) => {
+  const repost = async (target: ReplyTarget, rerender?: boolean) => {
     await removeComponentsFromSendMessages(rerender);
-    await post(destination);
+    await post(target);
   };
 
   //初回post
   //コンポーネントのlazyでpromptの返り値を使えるようにするため、lazyの解決をpromptが返った後にする
   setImmediate(() => {
-    void post(replyDestination);
+    void post(param.rootTarget);
   });
 
   const controller = {
