@@ -1,7 +1,7 @@
 import { resolveLazy } from "../util/lazy";
-import { createReplyHelper } from "../util/replyHelpter2";
+import { createReplyHelper } from "../util/replyHelpter";
 
-import type { ReplyTarget } from "../util/replyHelpter2";
+import type { ReplyTarget } from "../util/replyHelpter";
 import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type { PromptComponent, PromptController, PromptEvent, PromptParam } from "./promptTypes";
 import type { Awaitable, Collection, Message } from "discord.js";

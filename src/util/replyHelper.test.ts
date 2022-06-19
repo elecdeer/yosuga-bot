@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { describe, expect, it, vi } from "vitest";
 
-import { createReplyHelper } from "./replyHelpter2";
+import { createReplyHelper } from "./replyHelpter";
 
 import type {
   BaseCommandInteraction,

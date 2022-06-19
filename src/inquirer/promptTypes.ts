@@ -1,5 +1,5 @@
 import type { Lazy } from "../util/lazy";
-import type { ReplyScene, ReplyTarget } from "../util/replyHelpter2";
+import type { ReplyScene, ReplyTarget } from "../util/replyHelpter";
 import type { Message, MessageActionRow, MessageEmbed, Awaitable } from "discord.js";
 
 export type PromptEvent<T extends Record<string, PromptComponent<unknown>>> = {
