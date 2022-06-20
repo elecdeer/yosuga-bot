@@ -1,37 +1,16 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { describe, expect, it, vi } from "vitest";
 
+import { createInteractionMock, createMessageMock, createSendableChannelMock } from "../mock";
 import { createReplyHelper } from "./replyHelpter";
 
 import type {
   BaseCommandInteraction,
   DMChannel,
-  Message,
   MessageComponentInteraction,
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-
-const createSendableChannelMock = <T>(): T => {
-  return {
-    send: vi.fn(async () => createMessageMock()),
-  } as unknown as T;
-};
-
-const createMessageMock = (): Message => {
-  const thisMessage = {
-    reply: vi.fn(async () => createMessageMock()),
-    edit: vi.fn(async () => thisMessage),
-  } as unknown as Message;
-  return thisMessage;
-};
-
-const createInteractionMock = <T>(): T => {
-  return {
-    reply: vi.fn(async () => createMessageMock()),
-    editReply: vi.fn(async () => createMessageMock()),
-  } as unknown as T;
-};
 
 describe("replyHelper", () => {
   it("scene.typeでnewThreadを指定した際", async () => {
