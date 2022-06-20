@@ -71,7 +71,7 @@
     "ffmpeg-static": "^5.0.0",
     "http-status": "^1.5.2",
     "log4js": "^6.5.2",
-    "open-graph-scraper": "^4.11.0",
+    "open-graph-scraper": "^4.11.1",
     "socket.io-client": "^4.5.1",
     "sodium-native": "^3.3.0",
     "url-regex-safe": "^3.0.0",
