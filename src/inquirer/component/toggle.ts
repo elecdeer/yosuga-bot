@@ -6,7 +6,7 @@ import { createButton } from "../wrapper/createButton";
 import { buttonComponentHookValue } from "./componentHookWithValue";
 
 import type { LazyParam } from "../../util/lazy";
-import type { PromptComponent } from "../promptTypes";
+import type { PromptComponent, AnswerStatus } from "../promptTypes";
 import type { ButtonParam } from "../wrapper/createButton";
 
 const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
@@ -50,3 +50,90 @@ export const createToggleComponent = <T>(param: {
     hook: hook,
   };
 };
+
+type Action =
+  | {
+      type: "toggle";
+    }
+  | {
+      type: "end";
+    };
+
+export const booleanToggleReducer = (prev: boolean, action: Action) => {
+  if (action.type === "toggle") {
+    return !prev;
+  }
+  return prev;
+};
+
+export const outputToggleState = (value: boolean): AnswerStatus<boolean> => {
+  return {
+    status: "answered",
+    value,
+  };
+};
+
+export const outputComponentParam =
+  (customId: string, param: (value: boolean) => ButtonParam) => (value: boolean) => {
+    return [
+      [
+        {
+          type: "button",
+          customId: customId,
+          ...param(value),
+        },
+      ],
+    ];
+  };
+
+//
+// type Action =
+//   | {
+//       type: "toggle";
+//     }
+//   | {
+//       type: "end";
+//     };
+// export const hookInteraction =
+//   (customId: string, hookParam: PromptParamHook, emitAction: (action: Action) => void) =>
+//   (message: Message) => {
+//     const collector = message.createMessageComponentCollector({
+//       time: hookParam.time,
+//       idle: hookParam.idle,
+//       componentType: "BUTTON",
+//     });
+//
+//     collector.on("collect", (interaction) => {
+//       if (interaction.id !== customId) return;
+//       emitAction({ type: "toggle" });
+//     });
+//
+//     const stopReason = `${customId}-cleanHook`;
+//     collector.on("end", (collected, reason) => {
+//       if (reason === stopReason) return;
+//       emitAction({ type: "end" });
+//     });
+//   };
+//
+// const createHook = (
+//   customId: string,
+//   hookParam: PromptParamHook,
+//   emitAction: (action: { type: "toggle" }) => void
+// ) => {
+//   return (message: Message) => {
+//     const collector = message.createMessageComponentCollector({
+//       time: hookParam.time,
+//       idle: hookParam.idle,
+//       componentType: "BUTTON",
+//     });
+//
+//     collector.on("collect", (interaction) => {
+//       if (interaction.id !== customId) return;
+//     });
+//
+//     const stopReason = `${customId}-cleanHook`;
+//     collector.on("end", (collected, reason) => {
+//       if (reason === stopReason) return;
+//     });
+//   };
+// };
