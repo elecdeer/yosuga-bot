@@ -7,6 +7,7 @@ describe("toggleコンポーネント", () => {
     it("toggleAction - false", () => {
       const result = booleanToggleReducer(false, {
         type: "click",
+        customId: "hoge",
       });
       expect(result).toBe(true);
     });
@@ -14,6 +15,7 @@ describe("toggleコンポーネント", () => {
     it("toggleAction - true", () => {
       const result = booleanToggleReducer(true, {
         type: "click",
+        customId: "huga",
       });
       expect(result).toBe(false);
     });

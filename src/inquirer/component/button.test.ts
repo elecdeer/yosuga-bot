@@ -6,11 +6,11 @@ import { outputButtonComponent } from "./buttonPart/outputButtonComponent";
 describe("buttonコンポーネント", () => {
   describe("stateReducer", () => {
     it("未クリック状態でクリック", () => {
-      expect(buttonReducer(false, { type: "click" })).toBe(true);
+      expect(buttonReducer(false, { type: "click", customId: "hoge" })).toBe(true);
     });
 
     it("既クリック状態でクリック", () => {
-      expect(buttonReducer(true, { type: "click" })).toBe(true);
+      expect(buttonReducer(true, { type: "click", customId: "huga" })).toBe(true);
     });
   });
 

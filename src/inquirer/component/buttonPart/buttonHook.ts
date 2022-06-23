@@ -4,6 +4,7 @@ import type { PromptParamHook } from "../../promptTypes";
 
 export type ButtonAction = {
   type: "click";
+  customId: string;
 };
 
 export const buttonHook = (customId: string, hookParam: PromptParamHook) => {
@@ -11,7 +12,7 @@ export const buttonHook = (customId: string, hookParam: PromptParamHook) => {
     customId,
     hookParam,
     async (interaction, emitAction) => {
-      emitAction({ type: "click" });
+      emitAction({ type: "click", customId });
       await interaction.deferUpdate();
     }
   );
