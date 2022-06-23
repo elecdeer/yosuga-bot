@@ -1,36 +1,76 @@
-import { MessageActionRow } from "discord.js";
+import { compositeComponentParts } from "./compositeComponent";
+import { hookButtonInteraction } from "./hookInteraction";
 
-import { resolveLazyParam } from "../../util/lazy";
-import { createButton } from "../wrapper/createButton";
-import { buttonComponentHookValue } from "./componentHookWithValue";
-
-import type { Lazy, LazyParam } from "../../util/lazy";
-import type { PromptComponent } from "../promptTypes";
+import type {
+  OutputComponentParam,
+  OutputResult,
+  PromptFactory,
+  PromptParamHook,
+  StateReducer,
+} from "../promptTypes";
 import type { ButtonParam } from "../wrapper/createButton";
 
-const resolveButtonParamLazy = (param: LazyParam<ButtonParam>) =>
-  resolveLazyParam(param, ["label", "emoji", "style", "disabled"]);
-
-export const createButtonComponent = (param: {
-  button: LazyParam<ButtonParam>;
+export const createButton = (param: {
   customId?: string;
-  initial?: Lazy<boolean>;
-}): PromptComponent<true> => {
-  const customId = param.customId ?? "button";
-  const { getStatus, hook } = buttonComponentHookValue<true>({
-    customId: customId,
-    reducer: () => true,
-  });
-
-  return {
-    getStatus: getStatus,
-    renderComponent: () => {
-      return [
-        new MessageActionRow().addComponents(
-          createButton(customId, resolveButtonParamLazy(param.button))
-        ),
-      ];
-    },
-    hook: hook,
-  };
+  button: (value: boolean) => Omit<ButtonParam, "customId" | "type">;
+  initialAnswered?: boolean;
+}): PromptFactory<void> => {
+  const { customId = "button", button, initialAnswered } = param;
+  return compositeComponentParts((hookParam) => ({
+    initialState: initialAnswered ?? false,
+    hookMessages: [buttonHook(customId, hookParam)],
+    stateReducer: buttonReducer,
+    outputResult: outputButtonState,
+    outputComponentParam: outputButtonComponent(customId, button),
+  }));
 };
+
+type State = boolean;
+
+type Action = {
+  type: "click";
+};
+
+const buttonHook = (customId: string, hookParam: PromptParamHook) => {
+  return hookButtonInteraction<Action>(customId, hookParam, async (interaction, emitAction) => {
+    await interaction.deferUpdate();
+    emitAction({ type: "click" });
+  });
+};
+
+export const buttonReducer: StateReducer<State, Action> = (state, action) => {
+  if (action.type === "click") {
+    return true;
+  }
+  return state;
+};
+
+export const outputButtonState: OutputResult<State, void> = (state: State) => {
+  if (state) {
+    return {
+      status: "answered",
+      value: undefined,
+    };
+  } else {
+    return {
+      status: "unanswered",
+    };
+  }
+};
+
+export const outputButtonComponent =
+  <TState>(
+    customId: string,
+    param: (value: TState) => Omit<ButtonParam, "customId" | "type">
+  ): OutputComponentParam<TState> =>
+  (value) => {
+    return [
+      [
+        {
+          ...param(value),
+          type: "BUTTON",
+          customId: customId,
+        },
+      ],
+    ];
+  };
