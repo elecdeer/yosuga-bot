@@ -1,14 +1,10 @@
+import { buttonHook } from "./buttonPart/buttonHook";
+import { outputButtonComponent } from "./buttonPart/outputButtonComponent";
 import { compositeComponentParts } from "./compositeComponent";
-import { hookButtonInteraction } from "./hookInteraction";
 
-import type {
-  OutputComponentParam,
-  OutputResult,
-  PromptFactory,
-  PromptParamHook,
-  StateReducer,
-} from "../promptTypes";
+import type { OutputResult, PromptFactory, StateReducer } from "../promptTypes";
 import type { ButtonParam } from "../wrapper/createButton";
+import type { ButtonAction } from "./buttonPart/buttonHook";
 
 export const createButton = (param: {
   customId?: string;
@@ -21,22 +17,12 @@ export const createButton = (param: {
     hookMessages: [buttonHook(customId, hookParam)],
     stateReducer: buttonReducer,
     outputResult: outputButtonState,
-    outputComponentParam: outputButtonComponent(customId, button),
+    outputComponentParam: outputButtonComponent<boolean>(customId, button),
   }));
 };
 
 type State = boolean;
-
-type Action = {
-  type: "click";
-};
-
-const buttonHook = (customId: string, hookParam: PromptParamHook) => {
-  return hookButtonInteraction<Action>(customId, hookParam, async (interaction, emitAction) => {
-    await interaction.deferUpdate();
-    emitAction({ type: "click" });
-  });
-};
+type Action = ButtonAction;
 
 export const buttonReducer: StateReducer<State, Action> = (state, action) => {
   if (action.type === "click") {
@@ -57,20 +43,3 @@ export const outputButtonState: OutputResult<State, void> = (state: State) => {
     };
   }
 };
-
-export const outputButtonComponent =
-  <TState>(
-    customId: string,
-    param: (value: TState) => Omit<ButtonParam, "customId" | "type">
-  ): OutputComponentParam<TState> =>
-  (value) => {
-    return [
-      [
-        {
-          ...param(value),
-          type: "BUTTON",
-          customId: customId,
-        },
-      ],
-    ];
-  };

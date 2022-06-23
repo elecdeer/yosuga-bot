@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { buttonReducer, outputButtonComponent, outputButtonState } from "./button";
+import { buttonReducer, outputButtonState } from "./button";
+import { outputButtonComponent } from "./buttonPart/outputButtonComponent";
 
 describe("buttonコンポーネント", () => {
   describe("stateReducer", () => {

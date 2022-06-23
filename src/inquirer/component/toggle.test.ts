@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { booleanToggleReducer, outputToggleComponentParam, outputToggleState } from "./toggle";
+import { booleanToggleReducer, outputToggleState } from "./toggle";
 
 describe("toggleコンポーネント", () => {
-  describe("actionReducer", () => {
+  describe("toggleReducer", () => {
     it("toggleAction - false", () => {
       const result = booleanToggleReducer(false, {
-        type: "toggle",
+        type: "click",
       });
       expect(result).toBe(true);
     });
 
     it("toggleAction - true", () => {
       const result = booleanToggleReducer(true, {
-        type: "toggle",
+        type: "click",
       });
       expect(result).toBe(false);
     });
@@ -34,23 +34,6 @@ describe("toggleコンポーネント", () => {
         status: "answered",
         value: true,
       });
-    });
-  });
-
-  describe("outputComponentParam", () => {
-    it("true", () => {
-      const result = outputToggleComponentParam("thisIsCustomId", (value) => ({
-        label: value ? "true" : "false",
-      }))(true);
-      expect(result).toEqual([
-        [
-          {
-            type: "BUTTON",
-            customId: "thisIsCustomId",
-            label: "true",
-          },
-        ],
-      ]);
     });
   });
 });
