@@ -5,11 +5,16 @@ import type { PromptParamHook } from "../../promptTypes";
 export type SelectAction = {
   type: "select";
   selectedItems: string[];
+  customId: string;
 };
 
 export const selectHook = (customId: string, hookParam: PromptParamHook) => {
-  return hookSelectInteraction(customId, hookParam, async (interaction, emitAction) => {
-    emitAction({ type: "select", selectedItems: interaction.values });
-    await interaction.deferUpdate();
-  });
+  return hookSelectInteraction<SelectAction>(
+    customId,
+    hookParam,
+    async (interaction, emitAction) => {
+      emitAction({ type: "select", selectedItems: interaction.values, customId });
+      await interaction.deferUpdate();
+    }
+  );
 };
