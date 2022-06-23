@@ -1,12 +1,15 @@
 import { TextInputComponent } from "discord.js";
 
 import type { TextInputComponentOptions } from "discord.js";
+import type { SetRequired } from "type-fest";
 
-export type TextInputParam = Partial<Omit<TextInputComponentOptions, "customId">>;
+export type TextInputParam = SetRequired<TextInputComponentOptions, "customId"> & {
+  type: "TEXT_INPUT";
+};
 
-export const createTextInput = (customId: string, param: TextInputParam): TextInputComponent => {
+export const createTextInput = (param: TextInputParam): TextInputComponent => {
   const textInput = new TextInputComponent();
-  textInput.setCustomId(customId);
+  textInput.setCustomId(param.customId);
   if (param.label !== undefined) textInput.setLabel(param.label);
   textInput.setRequired(param.required ?? false);
   if (param.maxLength !== undefined) textInput.setMaxLength(param.maxLength);
