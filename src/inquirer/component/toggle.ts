@@ -1,5 +1,3 @@
-import { getLogger } from "log4js";
-
 import { compositeComponentParts } from "./compositeComponent";
 import { hookButtonInteraction } from "./hookInteraction";
 
@@ -12,8 +10,6 @@ import type {
   StateReducer,
 } from "../promptTypes";
 import type { ButtonParam } from "../wrapper/createButton";
-
-const logger = getLogger("toggle");
 
 type Action =
   | {
@@ -41,18 +37,10 @@ export const createToggle = (param: {
 type State = boolean;
 
 export const toggleHook = (customId: string, hookParam: PromptParamHook) => {
-  return hookButtonInteraction<Action>(
-    customId,
-    hookParam,
-    async (interaction, emitAction) => {
-      logger.debug(`toggleInteraction: ${interaction.id}`);
-      await interaction.deferUpdate();
-      emitAction({ type: "toggle" });
-    },
-    async (emitAction) => {
-      emitAction({ type: "end" });
-    }
-  );
+  return hookButtonInteraction<Action>(customId, hookParam, async (interaction, emitAction) => {
+    await interaction.deferUpdate();
+    emitAction({ type: "toggle" });
+  });
 };
 
 export const booleanToggleReducer: StateReducer<State, Action> = (prev, action) => {

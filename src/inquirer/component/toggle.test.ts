@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { booleanToggleReducer, outputComponentParam, outputToggleState } from "./toggle";
+import { booleanToggleReducer, outputToggleComponentParam, outputToggleState } from "./toggle";
 
 describe("toggleコンポーネント", () => {
   describe("actionReducer", () => {
@@ -39,13 +39,13 @@ describe("toggleコンポーネント", () => {
 
   describe("outputComponentParam", () => {
     it("true", () => {
-      const result = outputComponentParam("thisIsCustomId", (value) => ({
+      const result = outputToggleComponentParam("thisIsCustomId", (value) => ({
         label: value ? "true" : "false",
       }))(true);
       expect(result).toEqual([
         [
           {
-            type: "button",
+            type: "BUTTON",
             customId: "thisIsCustomId",
             label: "true",
           },

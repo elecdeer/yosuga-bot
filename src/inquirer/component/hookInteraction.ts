@@ -10,7 +10,7 @@ export const hookInteraction =
       interaction: MappedInteractionTypes[TComponent],
       emitAction: (action: TAction) => void
     ) => Awaitable<void>,
-    onEnd: (emitAction: (action: TAction) => void) => Awaitable<void>
+    onEnd?: (emitAction: (action: TAction) => void) => Awaitable<void>
   ): HookMessage<TAction> =>
   (message, emitAction) => {
     const collector = message.createMessageComponentCollector({
@@ -27,7 +27,9 @@ export const hookInteraction =
     const stopReason = `${customId}-cleanHook`;
     collector.on("end", async (collected, reason) => {
       if (reason === stopReason) return;
-      await onEnd(emitAction);
+      if (onEnd !== undefined) {
+        await onEnd(emitAction);
+      }
     });
 
     return () => {
