@@ -30,7 +30,7 @@
     "node": "18.x"
   },
   "devDependencies": {
-    "@types/async": "^3.2.13",
+    "@types/async": "^3.2.14",
     "@types/charset": "^1.0.2",
     "@types/node": "^18.0.0",
     "@types/open-graph-scraper": "^4.8.1",
