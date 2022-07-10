@@ -32,9 +32,9 @@ describe("buttonコンポーネント", () => {
     it("未クリック状態", () => {
       const customId = "thisIsCustomId";
       expect(
-        outputButtonComponent<boolean>(customId, (value) => ({
-          label: value ? "true" : "false",
-        }))(false)
+        outputButtonComponent<boolean>(customId, {
+          label: (value) => (value ? "true" : "false"),
+        })(false)
       ).toEqual([
         [
           {

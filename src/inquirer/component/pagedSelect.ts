@@ -9,7 +9,7 @@ import { buttonComponentHook, selectMenuComponentHook } from "./componentHook";
 
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
-import type { SelectorParam } from "../wrapper/createSelectMenu";
+import type { MessageSelectParam } from "../wrapper/createSelectMenu";
 import type { SelectOption } from "./select";
 import type { Awaitable } from "discord.js";
 
@@ -37,10 +37,10 @@ export type PagedOption<T> =
       options: PagedSelectOption<T>[][];
     };
 
-const resolveSelectorLazyParam = (param: LazyParam<SelectorParam>) => resolveLazyParam(param);
+const resolveSelectorLazyParam = (param: LazyParam<MessageSelectParam>) => resolveLazyParam(param);
 
 export const createPagedSelectComponent = <TOptionValue>(param: {
-  selector: LazyParam<SelectorParam>;
+  selector: LazyParam<MessageSelectParam>;
   // buttons: LazyParam<Omit<ButtonParam, "disabled">>;
   options: PagedOption<TOptionValue>;
   pageTorus?: boolean;

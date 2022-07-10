@@ -3,11 +3,11 @@ import { MessageButton } from "discord.js";
 import type { InteractionButtonOptions } from "discord.js";
 import type { SetRequired } from "type-fest";
 
-export type ButtonParam = SetRequired<Partial<InteractionButtonOptions>, "customId"> & {
+export type MessageButtonParam = SetRequired<Partial<InteractionButtonOptions>, "customId"> & {
   type: "BUTTON";
 };
 
-export const createButton = (param: ButtonParam): MessageButton => {
+export const createButton = (param: MessageButtonParam): MessageButton => {
   const button = new MessageButton();
   button.setCustomId(param.customId);
   if (param.disabled !== undefined) button.setDisabled(param.disabled);

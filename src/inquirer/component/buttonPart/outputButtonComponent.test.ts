@@ -6,10 +6,10 @@ describe("outputButtonComponent", () => {
   it("正しくコンポーネントデータが出力されるか", () => {
     const customId = "thisIsCustomId";
     expect(
-      outputButtonComponent<boolean>(customId, (value) => ({
-        label: value ? "true" : "false",
+      outputButtonComponent<boolean>(customId, {
+        label: (value) => (value ? "true" : "false"),
         style: "SUCCESS",
-      }))(false)
+      })(false)
     ).toEqual([
       [
         {

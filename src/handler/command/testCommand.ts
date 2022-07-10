@@ -1,4 +1,5 @@
 import { CommandPermission } from "../../application/permission";
+import { createSelect } from "../../inquirer/component/select";
 import { createToggle } from "../../inquirer/component/toggle";
 import { inquire } from "../../inquirer/inquire";
 import { createYosugaEmbed } from "../../util/createEmbed";
@@ -20,9 +21,31 @@ export class TestCommand extends CommandHandler {
     const { controller, collector } = await inquire(
       {
         toggle: createToggle({
-          button: (value) => ({
-            label: value ? "ON" : "OFF",
-          }),
+          button: {
+            label: (value) => (value ? "ON" : "OFF"),
+          },
+        }),
+        select: createSelect({
+          select: {
+            options: [
+              {
+                label: "label0",
+                value: "value0",
+              },
+              {
+                label: "label1",
+                value: "value1",
+                default: true,
+              },
+              {
+                label: (value) => `${value.length} selected`,
+                value: "selected",
+              },
+            ],
+            placeholder: "please select",
+            maxValues: 2,
+            minValues: 2,
+          },
         }),
       },
       {
@@ -43,6 +66,11 @@ export class TestCommand extends CommandHandler {
 
     collector.onUpdateOne("toggle", async (status) => {
       this.logger.log(`toggled: ${JSON.stringify(status)}`);
+      await controller.edit();
+    });
+
+    collector.onUpdateOne("select", async (status) => {
+      this.logger.log(`selected: ${JSON.stringify(status)}`);
       await controller.edit();
     });
 

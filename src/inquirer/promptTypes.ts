@@ -1,7 +1,7 @@
 import type { Lazy } from "../util/lazy";
 import type { ReplyScene, ReplyTarget } from "../util/replyHelpter";
-import type { ButtonParam } from "./wrapper/createButton";
-import type { SelectorParam } from "./wrapper/createSelectMenu";
+import type { MessageButtonParam } from "./wrapper/createButton";
+import type { MessageSelectParam } from "./wrapper/createSelectMenu";
 import type { Message, MessageEmbed, Awaitable } from "discord.js";
 
 export type PromptEvent<T extends Record<string, Prompt<unknown>>> = {
@@ -121,7 +121,7 @@ export type AnswerStatus<T> =
     };
 
 //==============
-export type ComponentParam = ButtonParam | SelectorParam;
+export type ComponentParam = MessageButtonParam | MessageSelectParam;
 
 export type ComponentRow = ComponentParam[];
 export type ComponentRowList = ComponentRow[];
@@ -139,6 +139,7 @@ export type OutputResult<TState, TResult> = (state: TState) => AnswerStatus<TRes
 
 export type OutputComponentParam<TState> = (state: TState) => ComponentRowList;
 
+//TODO hookからsubscribeに命名変更
 export interface PromptParts<TResult, TAction, TState> {
   initialState: TState;
   hookMessages: HookMessage<TAction>[];

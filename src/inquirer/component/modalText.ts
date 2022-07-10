@@ -8,7 +8,7 @@ import { createTextInput } from "../wrapper/createTextInput";
 
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent, ValidateResult, ValidateResultReject } from "../promptTypes";
-import type { ButtonParam } from "../wrapper/createButton";
+import type { MessageButtonParam } from "../wrapper/createButton";
 import type { ModalParam } from "../wrapper/createModal";
 import type { TextInputParam } from "../wrapper/createTextInput";
 import type { MessageEmbed, ModalActionRowComponent } from "discord.js";
@@ -35,7 +35,7 @@ const resolveModalParamLazy = (param: LazyParam<ModalParam>) =>
 const logger = getLogger("modalText");
 
 export const createModalTextComponent = <TKey extends string>(param: {
-  openButton: LazyParam<ButtonParam>;
+  openButton: LazyParam<MessageButtonParam>;
   textInputs: Record<TKey, TextInputParamWithValidate>;
   modal: LazyParam<ModalParam>;
   customId?: string;

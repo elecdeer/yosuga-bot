@@ -2,13 +2,14 @@ import { buttonHook } from "./buttonPart/buttonHook";
 import { outputButtonComponent } from "./buttonPart/outputButtonComponent";
 import { compositeComponentParts } from "./compositeComponent";
 
+import type { LazyParam } from "../../util/lazy";
 import type { OutputResult, PromptFactory, StateReducer } from "../promptTypes";
-import type { ButtonParam } from "../wrapper/createButton";
 import type { ButtonAction } from "./buttonPart/buttonHook";
+import type { ButtonParam } from "./buttonPart/outputButtonComponent";
 
 export const createButton = (param: {
   customId?: string;
-  button: (value: boolean) => Omit<ButtonParam, "customId" | "type">;
+  button: LazyParam<ButtonParam, State>;
   initialAnswered?: boolean;
 }): PromptFactory<void> => {
   const { customId = "button", button, initialAnswered } = param;

@@ -1,96 +1,51 @@
-import { Collection, MessageActionRow } from "discord.js";
+import { compositeComponentParts } from "./compositeComponent";
+import { outputSelectComponent } from "./selectPart/outputSelectComponent";
+import { selectHook } from "./selectPart/selectHook";
 
-import { resolveLazy, resolveLazyParam } from "../../util/lazy";
-import { createSelectMenu } from "../wrapper/createSelectMenu";
-import { selectMenuComponentHookValue } from "./componentHookWithValue";
+import type { AnswerStatus, PromptFactory } from "../promptTypes";
+import type { LazySelectParam } from "./selectPart/outputSelectComponent";
+import type { SelectAction } from "./selectPart/selectHook";
 
-import type { Lazy, LazyParam } from "../../util/lazy";
-import type { PromptComponent } from "../promptTypes";
-import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { EmojiIdentifierResolvable } from "discord.js";
+//TODO optionのvalueを置き換える高階関数を作る
 
-export type SelectOption<T> = {
-  label: Lazy<string>;
-  value: T;
-  default?: boolean;
-  description?: Lazy<string>;
-  emoji?: Lazy<EmojiIdentifierResolvable>;
-  inactive?: Lazy<boolean>;
+export const createSelect = <TOptionValue extends string>(param: {
+  customId?: string;
+  select: LazySelectParam<TOptionValue, TOptionValue[]>;
+  //TODO 回答数0でも回答済みにするかどうかのパラメータを追加する
+}): PromptFactory<TOptionValue[]> => {
+  const { customId = "select", select } = param;
+
+  return compositeComponentParts<TOptionValue[], Action, TOptionValue[]>((hookParam) => ({
+    initialState: select.options
+      .filter((option) => option.default === true)
+      .map((option) => option.value),
+    hookMessages: [selectHook(customId, hookParam)],
+    stateReducer: selectReducer,
+    outputResult: outputSelectState(select.minValues ?? 1),
+    outputComponentParam: outputSelectComponent<TOptionValue>(customId, select),
+  }));
 };
 
-const resolveSelectorLazyParam = (param: LazyParam<SelectorParam>) => resolveLazyParam(param);
+type Action = SelectAction;
 
-export const createSelectComponent = <TOptionValue>(param: {
-  selector: LazyParam<SelectorParam>;
-  options: SelectOption<TOptionValue>[];
-  customId?: string;
-}): PromptComponent<TOptionValue[]> => {
-  const customId = param.customId ?? "select";
+export const selectReducer = <TState extends string[]>(state: TState, action: Action): TState => {
+  if (action.type === "select") {
+    return action.selectedItems as TState;
+  }
+  return state;
+};
 
-  const { options, relationCollection } = createValueRelation(param.options);
-
-  const initState = options.filter((item) => item.default).map((item) => item.indexKey);
-  const { getRawValue, hook } = selectMenuComponentHookValue<string[]>({
-    customId: customId,
-    reducer: (interaction) => interaction.values,
-    initialState: initState,
-  });
-
-  return {
-    getStatus: () => {
-      const keys = getRawValue();
-
-      const minSelectNum = resolveLazy(param.selector.minValues) ?? 1;
-      if (keys == null || keys.length < minSelectNum) {
-        return {
-          status: "unanswered",
-        };
-      }
-
-      const values = keys
-        .map((key) => relationCollection.get(key))
-        .filter((item) => item !== undefined) as TOptionValue[];
+export const outputSelectState =
+  (minValues: number) =>
+  <TState extends string[]>(state: TState): AnswerStatus<TState> => {
+    if (state.length >= minValues) {
       return {
         status: "answered",
-        value: values,
+        value: state,
       };
-    },
-    hook: hook,
-    renderComponent: () => {
-      const component = createSelectMenu(customId, resolveSelectorLazyParam(param.selector));
-
-      component.setOptions(
-        options
-          .filter((opt) => resolveLazy(opt.inactive) !== true)
-          .map((opt) => {
-            return {
-              label: resolveLazy(opt.label),
-              value: opt.indexKey,
-              default: getRawValue()?.includes(opt.indexKey) ?? false,
-              description: resolveLazy(opt.description),
-              emoji: resolveLazy(opt.emoji),
-            };
-          })
-      );
-      return [new MessageActionRow().addComponents(component)];
-    },
+    } else {
+      return {
+        status: "unanswered",
+      };
+    }
   };
-};
-
-const createValueRelation = <TOptionValue>(options: SelectOption<TOptionValue>[]) => {
-  const optionsWithIndexKey = options.map((opt, index) => {
-    return {
-      ...opt,
-      indexKey: index.toString(),
-    };
-  });
-
-  const relationEntries: [string, TOptionValue][] = optionsWithIndexKey.map((opt) => {
-    return [opt.indexKey, opt.value];
-  });
-
-  return {
-    options: optionsWithIndexKey,
-    relationCollection: new Collection<string, TOptionValue>(relationEntries),
-  };
-};

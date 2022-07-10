@@ -2,13 +2,14 @@ import { buttonHook } from "./buttonPart/buttonHook";
 import { outputButtonComponent } from "./buttonPart/outputButtonComponent";
 import { compositeComponentParts } from "./compositeComponent";
 
+import type { LazyParam } from "../../util/lazy";
 import type { AnswerStatus, PromptFactory, OutputResult, StateReducer } from "../promptTypes";
-import type { ButtonParam } from "../wrapper/createButton";
 import type { ButtonAction } from "./buttonPart/buttonHook";
+import type { ButtonParam } from "./buttonPart/outputButtonComponent";
 
 export const createToggle = (param: {
   customId?: string;
-  button: (value: boolean) => Omit<ButtonParam, "customId" | "type">;
+  button: LazyParam<ButtonParam, State>;
   initialState?: boolean;
 }): PromptFactory<boolean> => {
   const { customId = "toggle", button, initialState } = param;
