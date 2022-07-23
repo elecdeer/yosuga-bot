@@ -13,12 +13,15 @@ export type ButtonParam = {
 };
 
 export const outputButtonComponent =
-  <TState>(customId: string, param: LazyParam<ButtonParam, TState>): OutputComponentParam<TState> =>
-  (state) => {
+  <TState>(
+    customId: string,
+    param: LazyParam<ButtonParam, void>
+  ): OutputComponentParam<TState, void> =>
+  (state, result) => {
     return [
       [
         {
-          ...resolveButtonParam(param, state),
+          ...resolveButtonParam(param, result),
           type: "BUTTON",
           customId: customId,
         },
@@ -26,9 +29,9 @@ export const outputButtonComponent =
     ];
   };
 
-export const resolveButtonParam = <TState>(
-  param: LazyParam<ButtonParam, TState>,
-  value: TState
+export const resolveButtonParam = <TResult>(
+  param: LazyParam<ButtonParam, TResult>,
+  value: TResult
 ): ButtonParam => {
   return {
     style: resolveLazy(param.style, value),

@@ -137,7 +137,10 @@ export type StateReducer<TState, TAction> = (prev: TState, action: TAction) => T
 
 export type OutputResult<TState, TResult> = (state: TState) => AnswerStatus<TResult>;
 
-export type OutputComponentParam<TState> = (state: TState) => ComponentRowList;
+export type OutputComponentParam<TState, TResult> = (
+  state: TState,
+  result: AnswerStatus<TResult>
+) => ComponentRowList;
 
 //TODO hookからsubscribeに命名変更
 export interface PromptParts<TResult, TAction, TState> {
@@ -145,7 +148,7 @@ export interface PromptParts<TResult, TAction, TState> {
   hookMessages: HookMessage<TAction>[];
   stateReducer: StateReducer<TState, TAction>;
   outputResult: OutputResult<TState, TResult>;
-  outputComponentParam: OutputComponentParam<TState>;
+  outputComponentParam: OutputComponentParam<TState, TResult>;
 }
 
 export type PromptFactory<TResult> = (

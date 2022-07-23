@@ -8,27 +8,29 @@ export const compositeComponentParts = <TResult, TAction, TState>(
       parts(hookParam);
 
     let state = initialState;
+    let result = outputResult(state);
+    let componentParam = outputComponentParam(state, result);
 
     const handleAction = (action: TAction) => {
       const prevState = state;
       state = stateReducer(state, action);
 
-      const prevResult = outputResult(prevState);
-      const result = outputResult(state);
+      const prevResult = result;
+      result = outputResult(state);
       if (!isSameResult(prevResult, result)) {
         updateStatus();
       }
 
-      const prevParam = outputComponentParam(prevState);
-      const param = outputComponentParam(state);
-      if (!isSameComponentParam(prevParam, param)) {
+      const prevParam = componentParam;
+      componentParam = outputComponentParam(state, result);
+      if (!isSameComponentParam(prevParam, componentParam)) {
         updateComponent();
       }
     };
 
     return {
       getStatus: () => outputResult(state),
-      getComponent: () => outputComponentParam(state),
+      getComponent: () => outputComponentParam(state, result),
       hookMessage: async (message) => {
         const cleaners = await Promise.all(hookMessages.map((hook) => hook(message, handleAction)));
 

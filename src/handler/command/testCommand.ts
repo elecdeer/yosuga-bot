@@ -22,7 +22,7 @@ export class TestCommand extends CommandHandler {
       {
         toggle: createToggle({
           button: {
-            label: (value) => (value ? "ON" : "OFF"),
+            label: () => (collector.getStatus().toggle.value === true ? "ON" : "OFF"),
           },
         }),
         select: createSelect({
@@ -30,16 +30,16 @@ export class TestCommand extends CommandHandler {
             options: [
               {
                 label: "label0",
-                value: "value0",
+                value: 0,
               },
               {
                 label: "label1",
-                value: "value1",
+                value: 1,
                 default: true,
               },
               {
                 label: (value) => `${value.length} selected`,
-                value: "selected",
+                value: 2,
               },
             ],
             placeholder: "please select",

@@ -4,23 +4,23 @@ import type { LazyParam } from "../../../util/lazy";
 import type { OutputComponentParam } from "../../promptTypes";
 import type { EmojiIdentifierResolvable } from "discord.js";
 
-export type SelectParam<TValue extends string> = {
-  options: SelectOption<TValue>[];
+export type SelectParam<TOptionValue> = {
+  options: SelectOption<TOptionValue>[];
   placeholder?: string;
   disabled?: boolean;
   maxValues?: number;
   minValues?: number;
 };
 
-export type LazySelectParam<TValue extends string, TState> = LazyParam<
-  Omit<SelectParam<TValue>, "options">,
-  TState,
+export type LazySelectParam<TOptionValue, TResult> = LazyParam<
+  Omit<SelectParam<unknown>, "options">,
+  TResult,
   "placeholder" | "maxValues" | "disabled"
 > & {
-  options: LazySelectOption<TValue, TState>[];
+  options: LazySelectOption<TOptionValue, TResult>[];
 };
 
-export type SelectOption<TValue extends string> = {
+export type SelectOption<TValue> = {
   label: string;
   value: TValue;
   default?: boolean;
@@ -29,10 +29,10 @@ export type SelectOption<TValue extends string> = {
   inactive?: boolean;
 };
 
-export type LazySelectOption<TValue extends string, TState> = LazyParam<
-  SelectOption<TValue>,
+export type LazySelectOption<TOptionValue, TState> = LazyParam<
+  SelectOption<TOptionValue>,
   TState,
-  Exclude<keyof SelectOption<TValue>, "value" | "default">
+  Exclude<keyof SelectOption<TOptionValue>, "value" | "default">
 >;
 
 //createSelectの引数とここのparamは別?
@@ -41,12 +41,12 @@ export type LazySelectOption<TValue extends string, TState> = LazyParam<
 //変換テーブルもstateに載っけてしまうのがいい気がする
 //valueにはMap等のイミュータブルな値が入っても問題無い
 export const outputSelectComponent =
-  <TState extends string>(
+  <TOptionValue extends string, TResult>(
     customId: string,
-    param: LazySelectParam<TState, TState[]>
-  ): OutputComponentParam<TState[]> =>
-  (state) => {
-    const { options, ...restParam } = resolveSelectParam(param, state);
+    param: LazySelectParam<TOptionValue, TResult>
+  ): OutputComponentParam<TOptionValue[], TResult> =>
+  (state, result) => {
+    const { options, ...restParam } = resolveSelectParam(param, result);
     return [
       [
         {
@@ -64,9 +64,9 @@ export const outputSelectComponent =
     ];
   };
 
-export const resolveSelectParam = <TState extends string>(
-  param: LazySelectParam<TState, TState[]>,
-  value: TState[]
+export const resolveSelectParam = <TState, TResult>(
+  param: LazySelectParam<TState, TResult>,
+  value: TResult
 ): SelectParam<TState> => {
   return {
     options: param.options.map((option) => resolveSelectOption(option, value)),
@@ -77,9 +77,9 @@ export const resolveSelectParam = <TState extends string>(
   };
 };
 
-export const resolveSelectOption = <TState extends string>(
-  param: LazySelectOption<TState, TState[]>,
-  value: TState[]
+export const resolveSelectOption = <TState, TResult>(
+  param: LazySelectOption<TState, TResult>,
+  value: TResult
 ): SelectOption<TState> => {
   return {
     label: resolveLazy(param.label, value),
