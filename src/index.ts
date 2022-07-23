@@ -1,9 +1,8 @@
 import { generateDependencyReport } from "@discordjs/voice";
-import Discord, { Intents } from "discord.js";
+import Discord, { GatewayIntentBits } from "discord.js";
 import log4js from "log4js";
 
 import { yosugaEnv } from "./environment";
-import { YosugaClient } from "./yosugaClient";
 
 import type { Client } from "discord.js";
 
@@ -29,12 +28,16 @@ logger.debug(generateDependencyReport());
 //======================================================================
 
 const client: Client = new Discord.Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
+  ],
 });
 
 client.once("ready", (readyClient) => {
-  const yosuga = new YosugaClient(readyClient);
-  void yosuga.initClient();
+  // const yosuga = new YosugaClient(readyClient);
+  // void yosuga.initClient();
 });
 
 void client.login(yosugaEnv.discordToken);
