@@ -1,27 +1,32 @@
 type Awaitable<T> = Promise<T> | T;
 
-interface IEventFlowEmitter<T> {
+type Handler<T> = (value: T) => Awaitable<void>;
+type Filter<T> = (value: T) => boolean;
+type TypeGuardFilter<T, U extends T> = (value: T) => value is U;
+type Mapper<T, U> = (value: T) => U;
+
+export interface IEventFlowEmitter<T> {
   emit(value: T): void;
 }
 
-interface IEventFlowHandler<T> {
+export interface IEventFlowHandler<T> {
   /**
    * handlerを登録する
    * @param handler
    */
-  on(handler: (value: T) => Awaitable<void>): void;
+  on(handler: Handler<T>): void;
 
   /**
    * 1度のみ呼ばれるhandlerを登録する
    * @param handler
    */
-  once(handler: (value: T) => Awaitable<void>): void;
+  once(handler: Handler<T>): void;
 
   /**
    * handlerを削除する
    * @param handler
    */
-  off(handler: (value: T) => Awaitable<void>): void;
+  off(handler: Handler<T>): void;
 
   /**
    * 接続するEventFlowの全てのhandlerを削除する
@@ -37,100 +42,94 @@ interface IEventFlowHandler<T> {
    * filterを通過したemitのみを受け取るEventFlowを作成する
    * @param filters
    */
-  filter(...filters: ((value: T) => boolean)[]): IEventFlowHandler<T>;
-  filter<U extends T = T>(...filters: ((value: T) => value is U)[]): IEventFlowHandler<U>;
+  filter(...filters: Filter<T>[]): IEventFlowHandler<T>;
+  filter<U extends T = T>(...filters: TypeGuardFilter<T, U>[]): IEventFlowHandler<U>;
 
-  // map(mapper: (value: T) => T): IEventFlowHandler<T>;
+  /**
+   * 変換された値をhandlerで受け取るEventFlowを作成する
+   * @param mapper
+   */
+  map<U>(mapper: Mapper<T, U>): IEventFlowHandler<U>;
 }
 
-interface IEventFlow<T> extends IEventFlowEmitter<T>, IEventFlowHandler<T> {}
+export interface IEventFlow<T> extends IEventFlowEmitter<T>, IEventFlowHandler<T> {}
 
 export const createEventFlow = <T>(): IEventFlow<T> => {
-  return new EventFlow<T>();
+  return createEventFlowSource<T>();
 };
 
-class EventFlow<T> implements IEventFlow<T> {
-  private readonly sourceFlow: EventFlow<T> | undefined;
-  private readonly handlers: Set<(value: T) => Awaitable<void>> = new Set();
+const createEventFlowSource = <T>(): IEventFlow<T> => {
+  const handlers: Set<Handler<T>> = new Set();
 
-  constructor(sourceFlow?: EventFlow<T>) {
-    this.sourceFlow = sourceFlow;
-  }
-
-  emit(value: T): void {
-    if (this.sourceFlow) {
-      this.sourceFlow.emit(value);
-    } else {
-      this.handlers.forEach((handler) => {
+  return {
+    emit(value: T): void {
+      handlers.forEach((handler) => void handler(value));
+    },
+    on(handler: Handler<T>): void {
+      handlers.add(handler);
+    },
+    once(handler: Handler<T>): void {
+      const onceHandler = (value: T) => {
         void handler(value);
+        this.off(onceHandler);
+      };
+      this.on(onceHandler);
+    },
+    off(handler: Handler<T>): void {
+      handlers.delete(handler);
+    },
+    offAll(): void {
+      handlers.clear();
+    },
+    offAllInBranch(): void {
+      handlers.clear();
+    },
+    filter(...filters: Filter<T>[]): IEventFlowHandler<T> {
+      const branchHandlerMap = new Map<Handler<T>, Handler<T>>();
+
+      const sourceBranch = {
+        ...this,
+      };
+
+      return {
+        ...sourceBranch,
+        on(handler: Handler<T>) {
+          const filterHandler = (value: T) => {
+            if (filters.some((filter) => !filter(value))) return;
+            void handler(value);
+          };
+
+          sourceBranch.on(filterHandler);
+          branchHandlerMap.set(handler, filterHandler);
+        },
+        off(handler: Handler<T>) {
+          const filterHandler = branchHandlerMap.get(handler);
+
+          sourceBranch.off(filterHandler!);
+          branchHandlerMap.delete(handler);
+        },
+        offAllInBranch: () => {
+          branchHandlerMap.forEach((filterHandler) => {
+            sourceBranch.off(filterHandler);
+          });
+          branchHandlerMap.clear();
+        },
+      };
+    },
+    map<U>(mapper: Mapper<T, U>): IEventFlowHandler<U> {
+      const branch = createEventFlowSource<U>();
+      this.on((value: T) => {
+        branch.emit(mapper(value));
       });
-    }
-  }
 
-  on(handler: (value: T) => Awaitable<void>): void {
-    if (this.sourceFlow) {
-      this.sourceFlow.on(handler);
-    }
+      const sourceOffAll = () => this.offAll();
 
-    //offAllInBranchでの削除用にsourceFlowがあっても自身でも保持する
-    this.handlers.add(handler);
-  }
-
-  once(handler: (value: T) => Awaitable<void>): void {
-    const onceHandler = (value: T) => {
-      void handler(value);
-      this.off(onceHandler);
-    };
-
-    this.on(onceHandler);
-  }
-
-  off(handler: (value: T) => Awaitable<void>): void {
-    if (this.sourceFlow) {
-      this.sourceFlow.off(handler);
-    } else {
-      this.handlers.delete(handler);
-    }
-  }
-
-  offAll(): void {
-    if (this.sourceFlow) {
-      this.sourceFlow.offAll();
-    }
-    this.handlers.clear();
-  }
-
-  offAllInBranch(): void {
-    const flow = this.sourceFlow;
-    if (flow) {
-      this.handlers.forEach((handler) => {
-        flow.off(handler);
-      });
-    }
-
-    this.handlers.clear();
-  }
-
-  filter(...filter: ((value: T) => boolean)[]): IEventFlowHandler<T>;
-  filter<U extends T = T>(...filters: ((value: T) => value is U)[]): IEventFlowHandler<U> {
-    return new EventFlowFiltered<U>(this as unknown as EventFlow<U>, ...filters);
-  }
-}
-
-class EventFlowFiltered<T> extends EventFlow<T> {
-  private filters: ((value: T) => value is T)[] = [];
-
-  constructor(sourceFlow: EventFlow<T>, ...filters: ((value: T) => value is T)[]) {
-    super(sourceFlow);
-    this.filters = filters;
-  }
-
-  override on(handler: (value: T) => Awaitable<void>) {
-    const filteredHandler = (value: T) => {
-      if (this.filters.every((filter) => filter(value))) {
-        void handler(value);
-      }
-    };
-    super.on(filteredHandler);
-  }
-}
+      return {
+        ...branch,
+        offAll() {
+          sourceOffAll();
+        },
+      };
+    },
+  };
+};

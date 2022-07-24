@@ -1,90 +1,147 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createEventFlow } from "./eventFlow";
 
+import type { IEventFlowEmitter, IEventFlowHandler, IEventFlow } from "./eventFlow";
+
 describe("utils/eventFlow", () => {
-  describe("on(), emit()", () => {
-    test("登録した複数のhandlerが呼ばれる", () => {
+  const createOnTestCase =
+    (testFlow: IEventFlowHandler<number>, emitFlow: IEventFlowEmitter<number>) => () => {
       const handler1 = vi.fn();
       const handler2 = vi.fn();
       const handler3 = vi.fn();
 
-      const flow = createEventFlow();
-      flow.on(handler1);
-      flow.on(handler2);
-      flow.on(handler3);
+      testFlow.on(handler1);
+      testFlow.on(handler2);
+      testFlow.on(handler3);
 
-      const obj = {
-        str: "test data",
-      };
+      const emitValue = 0;
+      const emitValue2 = 2;
+      emitFlow.emit(emitValue);
+      emitFlow.emit(emitValue2);
 
-      flow.emit(obj);
-      expect(handler1).toBeCalledWith(obj);
-      expect(handler2).toBeCalledWith(obj);
-      expect(handler3).toBeCalledWith(obj);
-    });
-  });
+      expect(handler1).toHaveBeenCalledWith(emitValue);
+      expect(handler2).toHaveBeenCalledWith(emitValue);
+      expect(handler3).toHaveBeenCalledWith(emitValue);
 
-  describe("once()", () => {
-    test("発火後は削除される", () => {
+      expect(handler1).toHaveBeenCalledWith(emitValue2);
+      expect(handler2).toHaveBeenCalledWith(emitValue2);
+      expect(handler3).toHaveBeenCalledWith(emitValue2);
+
+      expect(handler1).toHaveBeenCalledTimes(2);
+      expect(handler2).toHaveBeenCalledTimes(2);
+      expect(handler3).toHaveBeenCalledTimes(2);
+    };
+
+  const createOnceTestCase =
+    (testFlow: IEventFlowHandler<number>, emitFlow: IEventFlowEmitter<number>) => () => {
       const handler = vi.fn();
 
-      const flow = createEventFlow();
-      flow.once(handler);
+      testFlow.once(handler);
 
-      flow.emit(0);
-      flow.emit(0);
+      emitFlow.emit(0);
+      emitFlow.emit(1);
       expect(handler).toBeCalledTimes(1);
-    });
-  });
+    };
 
-  describe("off()", () => {
-    test("削除したhandlerが呼ばれない", () => {
+  const createOffTestCase =
+    (testFlow: IEventFlowHandler<number>, emitFlow: IEventFlowEmitter<number>) => () => {
       const handler = vi.fn();
 
-      const flow = createEventFlow();
-      flow.on(handler);
-      flow.off(handler);
+      testFlow.on(handler);
+      testFlow.off(handler);
 
-      flow.emit(0);
+      emitFlow.emit(0);
       expect(handler).not.toBeCalled();
-    });
-  });
+    };
 
-  describe("offAll()", () => {
-    test("削除したhandlerが呼ばれない", () => {
+  const createOffAllTestCase =
+    (testFlow: IEventFlowHandler<number>, sourceFlow: IEventFlow<number>) => () => {
       const handler = vi.fn();
       const handler2 = vi.fn();
+      const handler3 = vi.fn();
 
-      const flow = createEventFlow();
-      flow.on(handler);
-      flow.on(handler2);
-      flow.offAll();
+      testFlow.on(handler);
+      testFlow.on(handler2);
+      sourceFlow.on(handler3);
+      testFlow.offAll();
 
-      flow.emit(0);
+      sourceFlow.emit(0);
       expect(handler).not.toBeCalled();
-    });
-  });
+      expect(handler2).not.toBeCalled();
+      expect(handler3).not.toBeCalledWith(0);
+    };
 
-  describe("offAllInBranch()", () => {
-    test("このBranchのhandlerのみが削除される", () => {
+  const createOffAllInBranchTestCase =
+    (testFlow: IEventFlowHandler<number>, sourceFlow: IEventFlow<number>) => () => {
       const handler = vi.fn();
       const handler2 = vi.fn();
+      const handler3 = vi.fn();
 
-      const flow = createEventFlow();
-      const subFlow = flow.filter(() => true);
+      testFlow.on(handler);
+      testFlow.on(handler2);
+      sourceFlow.on(handler3);
+      testFlow.offAllInBranch();
 
-      flow.on(handler);
-      subFlow.on(handler2);
-      subFlow.offAllInBranch();
+      sourceFlow.emit(0);
+      expect(handler).not.toBeCalled();
+      expect(handler2).not.toBeCalled();
+      expect(handler3).toBeCalledWith(0);
+    };
 
-      flow.emit(0);
-      expect(handler).toHaveBeenCalled();
-      expect(handler2).not.toHaveBeenCalled();
+  describe("createEventFlow()", () => {
+    describe("functions test", () => {
+      let flow: IEventFlow<number> = createEventFlow<number>();
+      beforeEach(() => {
+        flow = createEventFlow<number>();
+      });
+
+      test.each([
+        ["on()", () => createOnTestCase(flow, flow)],
+        ["once()", () => createOnceTestCase(flow, flow)],
+        ["off()", () => createOffTestCase(flow, flow)],
+        [
+          "offAll()",
+          () =>
+            createOffAllTestCase(
+              flow.filter(() => true),
+              flow
+            ),
+        ],
+        [
+          "offAllInBranch()",
+          () =>
+            createOffAllInBranchTestCase(
+              flow.filter(() => true),
+              flow
+            ),
+        ],
+      ])("%s", (_, testCase) => {
+        testCase()();
+      });
     });
   });
 
   describe("filter()", () => {
+    describe("functions test", () => {
+      let sourceFlow: IEventFlow<number> = createEventFlow<number>();
+      let flow: IEventFlowHandler<number> = sourceFlow.filter(() => true);
+      beforeEach(() => {
+        sourceFlow = createEventFlow<number>();
+        flow = sourceFlow.filter(() => true);
+      });
+
+      test.each([
+        ["on()", () => createOnTestCase(flow, sourceFlow)],
+        ["once()", () => createOnceTestCase(flow, sourceFlow)],
+        ["off()", () => createOffTestCase(flow, sourceFlow)],
+        ["offAll()", () => createOffAllTestCase(flow, sourceFlow)],
+        ["offAllInBranch()", () => createOffAllInBranchTestCase(flow, sourceFlow)],
+      ])("%s", (_, testCase) => {
+        testCase()();
+      });
+    });
+
     test("元のflowに影響を与えない", () => {
       const handler = vi.fn();
 
@@ -171,6 +228,51 @@ describe("utils/eventFlow", () => {
       flow.emit(0);
 
       expect(handler).not.toHaveBeenCalledWith(0);
+    });
+  });
+
+  describe("map()", () => {
+    describe("functions test", () => {
+      let sourceFlow: IEventFlow<number> = createEventFlow<number>();
+      let flow: IEventFlowHandler<number> = sourceFlow.map((value) => value);
+      beforeEach(() => {
+        sourceFlow = createEventFlow<number>();
+        flow = sourceFlow.map((value) => value);
+      });
+
+      test.each([
+        ["on()", () => createOnTestCase(flow, sourceFlow)],
+        ["once()", () => createOnceTestCase(flow, sourceFlow)],
+        ["off()", () => createOffTestCase(flow, sourceFlow)],
+        ["offAll()", () => createOffAllTestCase(flow, sourceFlow)],
+        ["offAllInBranch()", () => createOffAllInBranchTestCase(flow, sourceFlow)],
+      ])("%s", (_, testCase) => {
+        testCase()();
+      });
+    });
+
+    test("元のflowに影響を与えない", () => {
+      const handler = vi.fn();
+
+      const flow = createEventFlow();
+      flow.map((value) => value);
+
+      flow.on(handler);
+      flow.emit(0);
+
+      expect(handler).toHaveBeenCalledWith(0);
+    });
+
+    test("変換された値を受け取れる", () => {
+      const handler = vi.fn();
+
+      const numberFlow = createEventFlow();
+      const stringFlow = numberFlow.map((value) => String(value));
+
+      stringFlow.on(handler);
+      numberFlow.emit(0);
+
+      expect(handler).toHaveBeenCalledWith("0");
     });
   });
 });
