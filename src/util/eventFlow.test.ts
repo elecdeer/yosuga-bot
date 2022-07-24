@@ -51,6 +51,8 @@ describe("utils/eventFlow", () => {
       testFlow.on(handler);
       testFlow.off(handler);
 
+      testFlow.on(handler).off();
+
       emitFlow.emit(0);
       expect(handler).not.toBeCalled();
     };
