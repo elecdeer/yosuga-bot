@@ -2,28 +2,17 @@ import { generateDependencyReport } from "@discordjs/voice";
 import Discord, { GatewayIntentBits } from "discord.js";
 import log4js from "log4js";
 
-import { yosugaEnv } from "./environment";
+import { imageEnv, yosugaEnv } from "./environment";
+import { initLogger } from "./logger";
 
 import type { Client } from "discord.js";
 
-//最初にconfigureしないとenvironmentのログが出ない
-log4js.configure({
-  appenders: {
-    out: { type: "stdout" },
-    app: { type: "file", filename: "yosuga.log" },
-    wrapErr: { type: "logLevelFilter", appender: "app", level: "warn" },
-  },
-  categories: {
-    default: {
-      appenders: ["out", "app"],
-      level: "all",
-    },
-  },
-});
+initLogger();
 
 const logger = log4js.getLogger();
 logger.info("start process");
 logger.debug(generateDependencyReport());
+logger.info("imageEnv", imageEnv);
 
 //======================================================================
 
@@ -36,6 +25,7 @@ const client: Client = new Discord.Client({
 });
 
 client.once("ready", (readyClient) => {
+  logger.info("client ready");
   // const yosuga = new YosugaClient(readyClient);
   // void yosuga.initClient();
 });

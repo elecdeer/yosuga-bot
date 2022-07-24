@@ -4,7 +4,8 @@ import * as fs from "fs";
 config();
 
 export type YosugaEnv = {
-  configPath: string;
+  logDir: string;
+  configDir: string;
   discordToken: string;
   discordAppId: string;
   discordPublicKey: string;
@@ -20,13 +21,15 @@ export type ImageEnv = {
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
   const env: Partial<YosugaEnv> = {
-    configPath: process.env.CONFIG_PATH,
+    logDir: process.env.LOG_DIR,
+    configDir: process.env.CONFIG_DIR,
     discordToken: process.env.DISCORD_TOKEN,
     discordAppId: process.env.DISCORD_APP_ID,
     discordPublicKey: process.env.DISCORD_PUB_KEY,
   };
 
-  env.configPath ??= "./config";
+  env.configDir ??= "./config";
+  env.logDir ??= "./log";
   if (env.discordToken === undefined) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
 
   console.info(env);

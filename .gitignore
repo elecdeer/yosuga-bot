@@ -1,7 +1,7 @@
 # Project exclude paths
 /node_modules/
-/.env
-/dist/
-/docker-compose-test.yml
 /config/
-/yosuga.log
+/dist/
+/log/
+/.env
+/docker-compose-test.yml
