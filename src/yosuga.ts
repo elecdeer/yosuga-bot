@@ -36,11 +36,11 @@ export class Yosuga {
   constructor(client: Client<true>) {
     this.client = client;
 
-    this.warpEvents();
+    this.wrapEvents();
     this.registerLogHandlers();
   }
 
-  private warpEvents() {
+  private wrapEvents() {
     this.client.on("messageCreate", (message: Message) => {
       const logger = getLogger("messageCreate");
       logger.addContext("eventId", message.id);
