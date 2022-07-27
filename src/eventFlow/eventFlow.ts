@@ -23,12 +23,14 @@ export interface IEventFlowEmitter<T> {
 export interface IEventFlowHandler<T> {
   /**
    * handlerを登録する
+   * 同じhandlerは登録されない
    * @param handler
    */
   on(handler: Handler<T>): HookReturn<T>;
 
   /**
    * 1度のみ呼ばれるhandlerを登録する
+   * 同じhandlerは登録されない
    * @param handler
    */
   once(handler: Handler<T>): HookReturn<T>;
@@ -67,7 +69,7 @@ export interface IEventFlowHandler<T> {
    * handler全体が呼ばれる前と後に関数呼び出しを挟むEventFlowを作成する
    * @param param
    */
-  tap(param: { pre?: (value: T) => void; post?: (value: T) => void }): this;
+  tap(param: { pre?: (value: T) => void; post?: (value: T) => void }): IEventFlow<T>;
 }
 
 export interface IEventFlow<T> extends IEventFlowEmitter<T>, IEventFlowHandler<T> {}
@@ -103,16 +105,16 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
       return {
         handler,
         off: () => {
-          this.off(handler);
+          methods.off(handler);
         },
       };
     },
     once(handler: Handler<T>): HookReturn<T> {
       const onceHandler = (value: T) => {
         void handler(value);
-        this.off(onceHandler);
+        methods.off(onceHandler);
       };
-      return this.on(onceHandler);
+      return methods.on(onceHandler);
     },
     off(handler: Handler<T>): void {
       handlers.delete(handler);
