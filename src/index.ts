@@ -4,6 +4,7 @@ import log4js from "log4js";
 
 import { imageEnv, yosugaEnv } from "./environment";
 import { initLogger } from "./logger";
+import { Yosuga } from "./yosuga";
 
 import type { Client } from "discord.js";
 
@@ -26,6 +27,7 @@ const client: Client = new Discord.Client({
 
 client.once("ready", (readyClient) => {
   logger.info("client ready");
+  const yosuga = new Yosuga(readyClient);
   // const yosuga = new YosugaClient(readyClient);
   // void yosuga.initClient();
 });

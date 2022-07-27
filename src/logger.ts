@@ -8,7 +8,7 @@ import type { Layout } from "log4js";
 
 const logLayout = (oneLine: boolean): Layout => ({
   type: "pattern",
-  pattern: "%d %z %p %c %f:%l %x{oneLine}",
+  pattern: "%d %z %p %c %X{eventId} %f:%l %x{oneLine}",
   tokens: {
     oneLine: (logEvent) => {
       return logEvent.data
