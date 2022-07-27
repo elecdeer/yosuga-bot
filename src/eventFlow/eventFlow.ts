@@ -76,8 +76,23 @@ export const createEventFlow = <T>(): IEventFlow<T> => {
 
 const createEventFlowSource = <T>(): IEventFlow<T> => {
   const handlers: Set<Handler<T>> = new Set();
+  const branchFlows: IEventFlowHandler<unknown>[] = [];
 
-  return {
+  const createBranchNode = <T>(): IEventFlow<T> => {
+    const branchFlow: IEventFlow<T> = {
+      ...createEventFlowSource<T>(),
+      offAll() {
+        //sourceのを削除
+        //源流までリフトアップされ、そこからoffAllInBranchで全て削除される
+        methods.offAll();
+      },
+    };
+
+    branchFlows.push(branchFlow as IEventFlowHandler<unknown>);
+    return branchFlow;
+  };
+
+  const methods = {
     emit(value: T): void {
       handlers.forEach((handler) => void handler(value));
     },
@@ -102,69 +117,32 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
       handlers.delete(handler);
     },
     offAll(): void {
-      handlers.clear();
+      methods.offAllInBranch();
     },
     offAllInBranch(): void {
       handlers.clear();
+      branchFlows.forEach((branchFlow) => {
+        branchFlow.offAllInBranch();
+      });
     },
     filter(...filters: Filter<T>[]): IEventFlowHandler<T> {
-      const branchHandlerMap = new Map<Handler<T>, Handler<T>>();
+      const branch = createBranchNode<T>();
+      this.on((value: T) => {
+        if (filters.some((filter) => !filter(value))) return;
+        branch.emit(value);
+      });
 
-      const sourceBranch = {
-        ...this,
-      };
-
-      return {
-        ...sourceBranch,
-        on(handler: Handler<T>) {
-          const filterHandler = (value: T) => {
-            if (filters.some((filter) => !filter(value))) return;
-            void handler(value);
-          };
-
-          branchHandlerMap.set(handler, filterHandler);
-
-          const ret = sourceBranch.on(filterHandler);
-          return {
-            ...ret,
-            rawHandler: handler,
-          };
-        },
-        off(handler: Handler<T>) {
-          const filterHandler = branchHandlerMap.get(handler);
-
-          sourceBranch.off(filterHandler!);
-          branchHandlerMap.delete(handler);
-        },
-        offAllInBranch: () => {
-          branchHandlerMap.forEach((filterHandler) => {
-            sourceBranch.off(filterHandler);
-          });
-          branchHandlerMap.clear();
-        },
-      };
+      return branch;
     },
     map<U>(mapper: Mapper<T, U>): IEventFlowHandler<U> {
-      const branch = createEventFlowSource<U>();
+      const branch = createBranchNode<U>();
       this.on((value: T) => {
         branch.emit(mapper(value));
       });
 
-      const sourceOffAll = () => this.offAll();
-
-      return {
-        ...branch,
-        on(handler: Handler<U>): HookReturn<U> {
-          const ret = branch.on(handler);
-          return {
-            ...ret,
-            rawHandler: handler,
-          };
-        },
-        offAll() {
-          sourceOffAll();
-        },
-      };
+      return branch;
     },
   };
+
+  return methods;
 };

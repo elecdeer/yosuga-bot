@@ -71,7 +71,7 @@ describe("utils/eventFlow", () => {
       sourceFlow.emit(0);
       expect(handler).not.toBeCalled();
       expect(handler2).not.toBeCalled();
-      expect(handler3).not.toBeCalledWith(0);
+      expect(handler3).not.toBeCalled();
     };
 
   const createOffAllInBranchTestCase =
@@ -88,7 +88,7 @@ describe("utils/eventFlow", () => {
       sourceFlow.emit(0);
       expect(handler).not.toBeCalled();
       expect(handler2).not.toBeCalled();
-      expect(handler3).toBeCalledWith(0);
+      expect(handler3).toBeCalled();
     };
 
   describe("createEventFlow()", () => {
@@ -127,7 +127,7 @@ describe("utils/eventFlow", () => {
   describe("filter()", () => {
     describe("functions test", () => {
       let sourceFlow: IEventFlow<number> = createEventFlow<number>();
-      let flow: IEventFlowHandler<number> = sourceFlow.filter(() => true);
+      let flow: IEventFlowHandler<number> = sourceFlow.filter(() => true).filter(() => true);
       beforeEach(() => {
         sourceFlow = createEventFlow<number>();
         flow = sourceFlow.filter(() => true);
