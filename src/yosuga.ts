@@ -1,8 +1,8 @@
 import { getLogger } from "log4js";
 
-import { createEventFlow } from "./util/eventFlow";
+import { createEventFlow } from "./eventFlow/eventFlow";
 
-import type { IEventFlow } from "./util/eventFlow";
+import type { IEventFlow } from "./eventFlow/eventFlow";
 import type { Message, VoiceState, Client, Interaction } from "discord.js";
 import type { Logger } from "log4js";
 
