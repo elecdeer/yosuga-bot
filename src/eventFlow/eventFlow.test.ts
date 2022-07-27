@@ -277,4 +277,52 @@ describe("utils/eventFlow", () => {
       expect(handler).toHaveBeenCalledWith("0");
     });
   });
+
+  describe("tap()", () => {
+    describe("functions test", () => {
+      let sourceFlow: IEventFlow<number> = createEventFlow<number>();
+      let flow: IEventFlowHandler<number> = sourceFlow.tap({});
+      beforeEach(() => {
+        sourceFlow = createEventFlow<number>();
+        flow = sourceFlow.tap({});
+      });
+
+      test.each([
+        ["on()", () => createOnTestCase(flow, sourceFlow)],
+        ["once()", () => createOnceTestCase(flow, sourceFlow)],
+        ["off()", () => createOffTestCase(flow, sourceFlow)],
+        ["offAll()", () => createOffAllTestCase(flow, sourceFlow)],
+        ["offAllInBranch()", () => createOffAllInBranchTestCase(flow, sourceFlow)],
+      ])("%s", (_, testCase) => {
+        testCase()();
+      });
+    });
+
+    test("元のflowに影響を与えない", () => {
+      const handler = vi.fn();
+
+      const flow = createEventFlow();
+      flow.map((value) => value);
+
+      flow.on(handler);
+      flow.emit(0);
+
+      expect(handler).toHaveBeenCalledWith(0);
+    });
+
+    test("preとpostが呼ばれる", () => {
+      const handler = vi.fn();
+      const pre = vi.fn();
+      const post = vi.fn();
+
+      const flow = createEventFlow().tap({ pre, post });
+
+      flow.on(handler);
+      flow.emit(0);
+
+      expect(handler).toHaveBeenCalledWith(0);
+      expect(pre).toHaveBeenCalledWith(0);
+      expect(post).toHaveBeenCalledWith(0);
+    });
+  });
 });

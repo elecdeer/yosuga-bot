@@ -6,14 +6,9 @@ type TypeGuardFilter<T, U extends T> = (value: T) => value is U;
 type Mapper<T, U> = (value: T) => U;
 type HookReturn<T> = {
   /**
-   * sourceFlowに登録されたhandler
+   * 登録されたhandler
    */
   handler: Handler<T>;
-
-  /**
-   * 引数で指定したhandler
-   */
-  rawHandler: Handler<T>;
 
   /**
    * handlerをoffする
@@ -59,6 +54,7 @@ export interface IEventFlowHandler<T> {
    * @param filters
    */
   filter(...filters: Filter<T>[]): IEventFlowHandler<T>;
+
   filter<U extends T = T>(...filters: TypeGuardFilter<T, U>[]): IEventFlowHandler<U>;
 
   /**
@@ -66,6 +62,12 @@ export interface IEventFlowHandler<T> {
    * @param mapper
    */
   map<U>(mapper: Mapper<T, U>): IEventFlowHandler<U>;
+
+  /**
+   * handler全体が呼ばれる前と後に関数呼び出しを挟むEventFlowを作成する
+   * @param param
+   */
+  tap(param: { pre?: (value: T) => void; post?: (value: T) => void }): this;
 }
 
 export interface IEventFlow<T> extends IEventFlowEmitter<T>, IEventFlowHandler<T> {}
@@ -100,7 +102,6 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
       handlers.add(handler);
       return {
         handler,
-        rawHandler: handler,
         off: () => {
           this.off(handler);
         },
@@ -141,6 +142,21 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
       });
 
       return branch;
+    },
+    tap(param: { pre?: (value: T) => void; post?: (value: T) => void }): IEventFlow<T> {
+      const branch = createBranchNode<T>();
+      this.on((value: T) => {
+        branch.emit(value);
+      });
+
+      return {
+        ...branch,
+        emit(value: T) {
+          param.pre?.(value);
+          branch.emit(value);
+          param.post?.(value);
+        },
+      };
     },
   };
 
