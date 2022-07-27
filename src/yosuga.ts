@@ -13,21 +13,23 @@ type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<
   } & T
 >;
 
+type Events = {
+  messageCreate: YosugaEvent<{
+    message: Message;
+  }>;
+  interactionCreate: YosugaEvent<{
+    interaction: Interaction;
+  }>;
+  voiceStateUpdate: YosugaEvent<{
+    oldState: VoiceState;
+    newState: VoiceState;
+  }>;
+};
+
 export class Yosuga {
   private readonly client: Client<true>;
 
-  readonly events: {
-    messageCreate: YosugaEvent<{
-      message: Message;
-    }>;
-    interactionCreate: YosugaEvent<{
-      interaction: Interaction;
-    }>;
-    voiceStateUpdate: YosugaEvent<{
-      oldState: VoiceState;
-      newState: VoiceState;
-    }>;
-  } = {
+  public readonly events: Events = {
     messageCreate: createEventFlow(),
     interactionCreate: createEventFlow(),
     voiceStateUpdate: createEventFlow(),
