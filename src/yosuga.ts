@@ -1,17 +1,17 @@
 import { getLogger } from "log4js";
 
 import { createEventFlow } from "./eventFlow/eventFlow";
+import { registerHandlers } from "./handler";
 
 import type { IEventFlow } from "./eventFlow/eventFlow";
 import type { Message, VoiceState, Client, Interaction } from "discord.js";
 import type { Logger } from "log4js";
 
-type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<
-  {
-    yosuga: Yosuga;
-    logger: Logger;
-  } & T
->;
+export type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<YosugaEventParam<T>>;
+export type YosugaEventParam<T extends Record<string, unknown>> = {
+  yosuga: Yosuga;
+  logger: Logger;
+} & T;
 
 type Events = {
   messageCreate: YosugaEvent<{
@@ -40,6 +40,7 @@ export class Yosuga {
 
     this.wrapEvents();
     this.registerLogHandlers();
+    registerHandlers(this);
   }
 
   private wrapEvents() {
