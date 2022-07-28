@@ -10,6 +10,8 @@ const chatInputCommandFilter = (
   interaction: ChatInputCommandInteraction;
 }> => param.interaction.isChatInputCommand();
 
+//TODO permission判定はcommand側の高階関数でやる
+
 export const registerHandlersFromCommandTree = (
   interactionCreateFlow: Yosuga["events"]["interactionCreate"],
   commandTree: CommandTree
