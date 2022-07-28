@@ -7,12 +7,11 @@ import type { IEventFlow } from "./eventFlow/eventFlow";
 import type { Message, VoiceState, Client, Interaction } from "discord.js";
 import type { Logger } from "log4js";
 
-type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<
-  {
-    yosuga: Yosuga;
-    logger: Logger;
-  } & T
->;
+export type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<YosugaEventParam<T>>;
+export type YosugaEventParam<T extends Record<string, unknown>> = {
+  yosuga: Yosuga;
+  logger: Logger;
+} & T;
 
 type Events = {
   messageCreate: YosugaEvent<{
