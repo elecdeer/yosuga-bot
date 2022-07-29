@@ -63,7 +63,7 @@
     "charset": "^1.0.1",
     "deepmerge": "^4.2.2",
     "discord-api-types": "^0.36.3",
-    "discord.js": "^14.0.3",
+    "discord.js": "^14.1.1",
     "dotenv": "^16.0.1",
     "emoji-regex": "^10.1.0",
     "eslint-plugin-import": "^2.26.0",
