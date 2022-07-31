@@ -11,30 +11,30 @@ datasource db {
 }
 
 model UserConfig {
-  id         Int   @id
+  id         String   @id
   voice      Voice @relation(fields: [voiceId], references: [id])
-  voiceId    Int
-  pitch      Int
-  intonation Int
+  voiceId    Int   @unique
+  pitch      Float @default(value: 1.0)
+  intonation Float @default(value: 1.0)
 }
 
 model GuildConfig {
-  id             Int     @id
-  volume         Int
-  speed          Int
-  fastSpeedScale Int
-  readEnterExit  Boolean
-  readTimeSignal Boolean
-  timeAutoLeave  Int
-  timeReReadName Int
-  readMaxLength  Int
+  id             String     @id
+  volume         Float   @default(value: 1.0)
+  speed          Float   @default(value: 1.2)
+  fastSpeedScale Float   @default(value: 1.5)
+  readEnterExit  Boolean @default(value: true)
+  readTimeSignal Boolean @default(value: true)
+  timeAutoLeave  Int     @default(value: 10000)
+  timeReReadName Int     @default(value: 30000)
+  readMaxLength  Int     @default(value: 80)
 }
 
 model Voice {
   id                   Int                   @id @default(autoincrement())
-  name                 String
+  name                 String                @unique
   type                 String
-  active               Boolean
+  active               Boolean               @default(true)
   VoicevoxVoice        VoicevoxVoice?
   VoiceroidDaemonVoice VoiceroidDaemonVoice?
   UserConfig           UserConfig[]
