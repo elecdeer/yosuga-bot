@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model UserConfig {
+  id         Int   @id
+  voice      Voice @relation(fields: [voiceId], references: [id])
+  voiceId    Int
+  pitch      Int
+  intonation Int
+}
+
+model GuildConfig {
+  id             Int     @id
+  volume         Int
+  speed          Int
+  fastSpeedScale Int
+  readEnterExit  Boolean
+  readTimeSignal Boolean
+  timeAutoLeave  Int
+  timeReReadName Int
+  readMaxLength  Int
+}
+
+model Voice {
+  id                   Int                   @id @default(autoincrement())
+  name                 String
+  type                 String
+  active               Boolean
+  VoicevoxVoice        VoicevoxVoice?
+  VoiceroidDaemonVoice VoiceroidDaemonVoice?
+  UserConfig           UserConfig[]
+}
+
+model VoicevoxVoice {
+  id          Int    @id @default(autoincrement())
+  voice       Voice  @relation(fields: [voiceId], references: [id])
+  voiceId     Int    @unique
+  url         String
+  speakerUUID String
+  styleName   String
+}
+
+model VoiceroidDaemonVoice {
+  id      Int    @id @default(autoincrement())
+  voice   Voice  @relation(fields: [voiceId], references: [id])
+  voiceId Int    @unique
+  url     String
+}
