@@ -1,7 +1,7 @@
 import { parseVoice, parseVoiceNullable } from "../voiceParamSchema";
 
 import type { IRepository, Voice } from "../interaface";
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 export const createVoiceAccessor = (client: PrismaClient): IRepository["voice"] => {
   return {
@@ -42,7 +42,11 @@ export const createVoiceAccessor = (client: PrismaClient): IRepository["voice"] 
         },
       });
     },
-    findMany: async (query: Prisma.VoiceWhereInput) => {
+    findMany: async (query: {
+      type?: Voice["type"];
+      active?: Voice["active"];
+      name?: Voice["name"];
+    }) => {
       const rawVoices = await client.voice.findMany({
         where: query,
       });

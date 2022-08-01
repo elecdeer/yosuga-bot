@@ -1,5 +1,4 @@
 import type { VoiceroidDaemonParamSchema, VoicevoxParamSchema } from "./voiceParamSchema";
-import type { Prisma } from "@prisma/client";
 import type {
   GuildConfig as RawGuildConfig,
   UserConfig as RawUserConfig,
@@ -12,6 +11,7 @@ export type GuildConfig = RawGuildConfig;
 export type VoicevoxParam = z.infer<typeof VoicevoxParamSchema>;
 export type VoiceroidDaemonParam = z.infer<typeof VoiceroidDaemonParamSchema>;
 export type Voice = Omit<RawVoice, "params"> & {
+  type: (VoicevoxParam | VoiceroidDaemonParam)["type"];
   params: VoicevoxParam | VoiceroidDaemonParam;
 };
 
@@ -33,7 +33,11 @@ export interface IRepository {
    * id: VoiceId
    */
   voice: CURD<number, Omit<Voice, "id">, Voice> & {
-    findMany: (query: Prisma.VoiceWhereInput) => Promise<Voice[]>;
+    findMany: (query: {
+      type?: Voice["type"];
+      active?: Voice["active"];
+      name?: Voice["name"];
+    }) => Promise<Voice[]>;
   };
 }
 
