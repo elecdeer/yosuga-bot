@@ -22,7 +22,7 @@ export type Voice = RawVoice &
       }
   );
 
-interface IRepository {
+export interface IRepository {
   /**
    * Userレベルの設定
    * id: UserId | GuildId | AppId
