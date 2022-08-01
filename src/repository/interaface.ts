@@ -1,63 +1,45 @@
+import type { VoiceroidDaemonParamSchema, VoicevoxParamSchema } from "./voiceParamSchema";
+import type { Prisma } from "@prisma/client";
 import type {
+  GuildConfig as RawGuildConfig,
   UserConfig as RawUserConfig,
   Voice as RawVoice,
-  GuildConfig as RawGuildConfig,
-  VoicevoxVoice as RawVoiceVoxVoice,
-  VoiceroidDaemonVoice as RawVoiceroidDaemonVoice,
 } from "@prisma/client";
+import type { z } from "zod";
 
 export type UserConfig = RawUserConfig;
 export type GuildConfig = RawGuildConfig;
-export type VoicevoxVoice = RawVoiceVoxVoice;
-export type VoiceroidDaemonVoice = RawVoiceroidDaemonVoice;
-export type Voice = RawVoice &
-  (
-    | {
-        type: "VOICEVOX";
-        VoicevoxVoice: Omit<VoicevoxVoice, "id" | "voiceId">;
-      }
-    | {
-        type: "VOICEROID_DAEMON";
-        VoiceroidDaemonVoice: Omit<VoiceroidDaemonVoice, "id" | "voiceId">;
-      }
-  );
+export type VoicevoxParam = z.infer<typeof VoicevoxParamSchema>;
+export type VoiceroidDaemonParam = z.infer<typeof VoiceroidDaemonParamSchema>;
+export type Voice = Omit<RawVoice, "params"> & {
+  params: VoicevoxParam | VoiceroidDaemonParam;
+};
 
 export interface IRepository {
   /**
    * Userレベルの設定
    * id: UserId | GuildId | AppId
    */
-  userLevel: CURD<string, Omit<UserConfig, "id">, UserConfig & { voice: Voice }>;
+  userLevel: CURD<string, UserConfig, UserConfig & { voice: Voice | null }>;
 
   /**
    * Guildレベルの設定
    * id: GuildId | AppId
    */
-  guildLevel: CURD<string, Omit<GuildConfig, "id">, GuildConfig>;
+  guildLevel: CURD<string, GuildConfig, GuildConfig>;
 
   /**
    * Voice設定
    * id: VoiceId
    */
-  voice: CURD<number, Omit<Voice, "id">, Voice>;
-
-  unified: Pick<
-    CURD<
-      {
-        userId: string;
-        guildId: string;
-        appId: string;
-      },
-      unknown,
-      Required<UserConfig & { voice: Voice } & GuildConfig>
-    >,
-    "read"
-  >;
+  voice: CURD<number, Omit<Voice, "id">, Voice> & {
+    findMany: (query: Prisma.VoiceWhereInput) => Promise<Voice[]>;
+  };
 }
 
 type CURD<TId, TWrite, TRead = TWrite> = {
-  create: (value: TWrite) => Promise<TWrite>;
-  read: (id: TId) => Promise<TRead>;
+  create: (value: TWrite) => Promise<TId>;
+  read: (id: TId) => Promise<TRead | null>;
   update: (id: TId, value: TWrite) => Promise<TWrite>;
   delete: (id: TId) => Promise<void>;
 };

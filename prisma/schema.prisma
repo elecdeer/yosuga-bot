@@ -11,15 +11,19 @@ datasource db {
 }
 
 model UserConfig {
-  id         String @id
+  snowflake  String @id
+  class      String
   voice      Voice? @relation(fields: [voiceId], references: [id])
   voiceId    Int?   @unique
   pitch      Float?
   intonation Float?
+
+  @@index(fields: [snowflake])
 }
 
 model GuildConfig {
-  id             String   @id
+  snowflake      String   @id
+  class          String
   volume         Float?
   speed          Float?
   fastSpeedScale Float?
@@ -28,30 +32,15 @@ model GuildConfig {
   timeAutoLeave  Int?
   timeReReadName Int?
   readMaxLength  Int?
+
+  @@index(fields: [snowflake])
 }
 
 model Voice {
-  id                   Int                   @id @default(autoincrement())
-  name                 String                @unique
-  type                 String
-  active               Boolean               @default(true)
-  VoicevoxVoice        VoicevoxVoice?
-  VoiceroidDaemonVoice VoiceroidDaemonVoice?
-  UserConfig           UserConfig[]
-}
-
-model VoicevoxVoice {
-  id          Int    @id @default(autoincrement())
-  voice       Voice  @relation(fields: [voiceId], references: [id])
-  voiceId     Int    @unique
-  url         String
-  speakerUUID String
-  styleName   String
-}
-
-model VoiceroidDaemonVoice {
-  id      Int    @id @default(autoincrement())
-  voice   Voice  @relation(fields: [voiceId], references: [id])
-  voiceId Int    @unique
-  url     String
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  active     Boolean      @default(true)
+  type       String
+  params     String
+  UserConfig UserConfig[]
 }
