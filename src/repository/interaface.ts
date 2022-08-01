@@ -49,7 +49,7 @@ interface IRepository {
         appId: string;
       },
       unknown,
-      UserConfig & { voice: Voice } & GuildConfig
+      Required<UserConfig & { voice: Voice } & GuildConfig>
     >,
     "read"
   >;
