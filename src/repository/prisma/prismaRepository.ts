@@ -14,5 +14,3 @@ export const createRepositoryAccessor = (): IRepository => {
     voice: createVoiceAccessor(client),
   };
 };
-
-// const createUserRepositoryAccessor =

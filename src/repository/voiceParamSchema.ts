@@ -21,9 +21,12 @@ export const VoiceParamSchema = z.discriminatedUnion("type", [
 ]);
 
 export const parseVoice = (rawVoice: RawVoice): Voice => {
+  const parsed = VoiceParamSchema.parse(JSON.parse(rawVoice.params));
+
   return {
     ...rawVoice,
-    params: VoiceParamSchema.parse(JSON.parse(rawVoice.params)),
+    type: parsed.type,
+    params: parsed,
   };
 };
 
