@@ -12,7 +12,7 @@ export const createVoiceAccessor = (client: PrismaClient): IRepository["voice"] 
           params: JSON.stringify(value.params),
         },
       });
-      return res.id;
+      return parseVoice(res);
     },
     read: async (id: number) => {
       const rawVoice = await client.voice.findFirst({

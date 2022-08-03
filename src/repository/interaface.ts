@@ -1,13 +1,14 @@
+import type { SetPartialIfNullable } from "../util/utilTypes";
 import type { VoiceroidDaemonParamSchema, VoicevoxParamSchema } from "./voiceParamSchema";
 import type {
-  GuildConfig as RawGuildConfig,
-  UserConfig as RawUserConfig,
+  General as RawGeneralConfig,
+  Personal as RawPersonalConfig,
   Voice as RawVoice,
 } from "@prisma/client";
 import type { z } from "zod";
 
-export type UserConfig = RawUserConfig;
-export type GuildConfig = RawGuildConfig;
+export type PersonalConfig = RawPersonalConfig;
+export type GeneralConfig = RawGeneralConfig;
 export type VoicevoxParam = z.infer<typeof VoicevoxParamSchema>;
 export type VoiceroidDaemonParam = z.infer<typeof VoiceroidDaemonParamSchema>;
 export type Voice = Omit<RawVoice, "params"> & {
@@ -17,22 +18,27 @@ export type Voice = Omit<RawVoice, "params"> & {
 
 export interface IRepository {
   /**
-   * Userレベルの設定
+   * personalレベルの設定
    * id: UserId | GuildId | AppId
    */
-  userLevel: CURD<string, UserConfig, UserConfig & { voice: Voice | null }>;
+  personalLevel: CURD<
+    string,
+    SetPartialIfNullable<PersonalConfig>,
+    PersonalConfig & { voice: Voice | null },
+    PersonalConfig
+  >;
 
   /**
    * Guildレベルの設定
    * id: GuildId | AppId
    */
-  guildLevel: CURD<string, GuildConfig, GuildConfig>;
+  generalLevel: CURD<string, SetPartialIfNullable<GeneralConfig>, GeneralConfig, GeneralConfig>;
 
   /**
    * Voice設定
    * id: VoiceId
    */
-  voice: CURD<number, Omit<Voice, "id">, Voice> & {
+  voice: CURD<number, Omit<Voice, "id">, Voice, Voice> & {
     findMany: (query: {
       type?: Voice["type"];
       active?: Voice["active"];
@@ -41,11 +47,11 @@ export interface IRepository {
   };
 }
 
-type CURD<TId, TWrite, TRead = TWrite> = {
-  create: (value: TWrite) => Promise<TId>;
+type CURD<TId, TWrite, TRead = TWrite, TWriteResult = TWrite> = {
+  create: (value: TWrite) => Promise<TWriteResult>;
   read: (id: TId) => Promise<TRead | null>;
-  update: (id: TId, value: TWrite) => Promise<TWrite>;
-  upsert: (id: TId, value: TWrite) => Promise<TWrite>;
+  update: (id: TId, value: TWrite) => Promise<TWriteResult>;
+  upsert: (id: TId, value: TWrite) => Promise<TWriteResult>;
   delete: (id: TId) => Promise<void>;
 };
 //

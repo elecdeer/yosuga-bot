@@ -1,18 +1,17 @@
 import { parseVoiceNullable } from "../voiceParamSchema";
 
-import type { IRepository, UserConfig } from "../interaface";
+import type { IRepository } from "../interaface";
 import type { PrismaClient } from "@prisma/client";
 
-export const createUserConfigAccessor = (client: PrismaClient): IRepository["userLevel"] => {
+export const createUserConfigAccessor = (client: PrismaClient): IRepository["personalLevel"] => {
   return {
-    create: async (value: UserConfig) => {
-      const res = await client.userConfig.create({
+    create: async (value) => {
+      return await client.personal.create({
         data: value,
       });
-      return res.snowflake;
     },
-    read: async (snowflake: string) => {
-      const rawData = await client.userConfig.findFirst({
+    read: async (snowflake) => {
+      const rawData = await client.personal.findFirst({
         where: {
           snowflake: snowflake,
         },
@@ -27,16 +26,16 @@ export const createUserConfigAccessor = (client: PrismaClient): IRepository["use
         voice: parseVoiceNullable(rawData.voice),
       };
     },
-    update: async (snowflake: string, value: UserConfig) => {
-      return await client.userConfig.update({
+    update: async (snowflake, value) => {
+      return await client.personal.update({
         where: {
           snowflake: snowflake,
         },
         data: value,
       });
     },
-    upsert: async (snowflake: string, value: UserConfig) => {
-      return await client.userConfig.upsert({
+    upsert: async (snowflake, value) => {
+      return await client.personal.upsert({
         where: {
           snowflake: snowflake,
         },
@@ -44,8 +43,8 @@ export const createUserConfigAccessor = (client: PrismaClient): IRepository["use
         create: value,
       });
     },
-    delete: async (snowflake: string) => {
-      await client.userConfig.delete({
+    delete: async (snowflake) => {
+      await client.personal.delete({
         where: {
           snowflake: snowflake,
         },

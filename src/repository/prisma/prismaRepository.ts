@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
-import { createGuildConfigAccessor } from "./guildConfig";
-import { createUserConfigAccessor } from "./userConfig";
+import { createGuildConfigAccessor } from "./generalConfig";
+import { createUserConfigAccessor } from "./personalConfig";
 import { createVoiceAccessor } from "./voice";
 
 import type { IRepository } from "../interaface";
@@ -9,8 +9,8 @@ import type { IRepository } from "../interaface";
 export const createRepositoryAccessor = (): IRepository => {
   const client = new PrismaClient();
   return {
-    userLevel: createUserConfigAccessor(client),
-    guildLevel: createGuildConfigAccessor(client),
+    personalLevel: createUserConfigAccessor(client),
+    generalLevel: createGuildConfigAccessor(client),
     voice: createVoiceAccessor(client),
   };
 };

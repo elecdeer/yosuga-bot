@@ -10,20 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserConfig {
+model Personal {
   snowflake  String @id
-  class      String
+  level      String
   voice      Voice? @relation(fields: [voiceId], references: [id])
-  voiceId    Int?   @unique
+  voiceId    Int?
   pitch      Float?
   intonation Float?
 
   @@index(fields: [snowflake])
 }
 
-model GuildConfig {
+model General {
   snowflake      String   @id
-  class          String
+  level          String
   volume         Float?
   speed          Float?
   fastSpeedScale Float?
@@ -37,10 +37,10 @@ model GuildConfig {
 }
 
 model Voice {
-  id         Int          @id @default(autoincrement())
-  name       String       @unique
-  active     Boolean      @default(true)
-  type       String
-  params     String
-  UserConfig UserConfig[]
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  active   Boolean    @default(true)
+  type     String
+  params   String
+  Personal Personal[]
 }
