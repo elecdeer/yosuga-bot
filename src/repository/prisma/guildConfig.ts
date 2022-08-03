@@ -24,6 +24,15 @@ export const createGuildConfigAccessor = (client: PrismaClient): IRepository["gu
         data: value,
       });
     },
+    upsert: async (snowflake: string, value: GuildConfig) => {
+      return await client.guildConfig.upsert({
+        where: {
+          snowflake: snowflake,
+        },
+        update: value,
+        create: value,
+      });
+    },
     delete: async (snowflake: string) => {
       await client.guildConfig.delete({
         where: {

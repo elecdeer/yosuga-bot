@@ -35,6 +35,15 @@ export const createUserConfigAccessor = (client: PrismaClient): IRepository["use
         data: value,
       });
     },
+    upsert: async (snowflake: string, value: UserConfig) => {
+      return await client.userConfig.upsert({
+        where: {
+          snowflake: snowflake,
+        },
+        update: value,
+        create: value,
+      });
+    },
     delete: async (snowflake: string) => {
       await client.userConfig.delete({
         where: {

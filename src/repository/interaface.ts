@@ -45,6 +45,7 @@ type CURD<TId, TWrite, TRead = TWrite> = {
   create: (value: TWrite) => Promise<TId>;
   read: (id: TId) => Promise<TRead | null>;
   update: (id: TId, value: TWrite) => Promise<TWrite>;
+  upsert: (id: TId, value: TWrite) => Promise<TWrite>;
   delete: (id: TId) => Promise<void>;
 };
 //

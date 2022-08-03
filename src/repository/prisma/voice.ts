@@ -35,6 +35,21 @@ export const createVoiceAccessor = (client: PrismaClient): IRepository["voice"] 
 
       return parseVoice(rawVoice);
     },
+    upsert: async (id: number, value: Omit<Voice, "id">) => {
+      const param = {
+        ...value,
+        params: JSON.stringify(value.params),
+      };
+
+      const rawVoice = await client.voice.upsert({
+        where: {
+          id: id,
+        },
+        update: param,
+        create: param,
+      });
+      return parseVoice(rawVoice);
+    },
     delete: async (id: number) => {
       await client.voice.delete({
         where: {
