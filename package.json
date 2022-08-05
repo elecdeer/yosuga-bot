@@ -75,7 +75,7 @@
     "sodium-native": "^3.3.0",
     "url-regex-safe": "^3.0.0",
     "utf-8-validate": "^5.0.9",
-    "vite-node": "^0.19.1"
+    "vite-node": "^0.21.0"
   },
   "eslintIgnore": [
     "/.eslintrc.cjs"
