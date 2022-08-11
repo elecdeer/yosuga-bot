@@ -54,14 +54,12 @@
     "@discordjs/rest": "^1.0.0",
     "@discordjs/voice": "0.11.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
-    "@kvs/node-localstorage": "^2.1.1",
-    "@kvs/types": "^2.1.1",
+    "@prisma/client": "^4.1.1",
     "@sap_oss/node-socketio-stream": "^1.0.3",
     "async": "^3.2.4",
     "axios": "^0.27.2",
     "bufferutil": "^4.0.6",
     "charset": "^1.0.1",
-    "deepmerge": "^4.2.2",
     "discord-api-types": "^0.36.3",
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.1",
@@ -71,11 +69,12 @@
     "http-status": "^1.5.2",
     "log4js": "^6.6.1",
     "open-graph-scraper": "^4.11.1",
+    "prisma": "^4.1.1",
     "socket.io-client": "^4.5.1",
     "sodium-native": "^3.3.0",
-    "url-regex-safe": "^3.0.0",
     "utf-8-validate": "^5.0.9",
-    "vite-node": "^0.19.1"
+    "vite-node": "^0.19.1",
+    "zod": "^3.17.10"
   },
   "eslintIgnore": [
     "/.eslintrc.cjs"

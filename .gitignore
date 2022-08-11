@@ -5,3 +5,5 @@
 /log/
 /.env
 /docker-compose-test.yml
+/prisma/dev.db
+/prisma/dev.db-journal

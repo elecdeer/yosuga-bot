@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Personal {
+  snowflake  String @id
+  level      String
+  voice      Voice? @relation(fields: [voiceId], references: [id])
+  voiceId    Int?
+  pitch      Float?
+  intonation Float?
+
+  @@index(fields: [snowflake])
+}
+
+model General {
+  snowflake      String   @id
+  level          String
+  volume         Float?
+  speed          Float?
+  fastSpeedScale Float?
+  readEnterExit  Boolean?
+  readTimeSignal Boolean?
+  timeAutoLeave  Int?
+  timeReReadName Int?
+  readMaxLength  Int?
+
+  @@index(fields: [snowflake])
+}
+
+model Voice {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  active   Boolean    @default(true)
+  type     String
+  params   String
+  Personal Personal[]
+}
