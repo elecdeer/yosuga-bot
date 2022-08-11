@@ -6,7 +6,7 @@ import { createVoiceAccessor } from "./voice";
 
 import type { IRepository } from "../interaface";
 
-export const createRepositoryAccessor = (): IRepository => {
+export const createPrismaRepository = (): IRepository => {
   const client = new PrismaClient();
   return {
     personalLevel: createUserConfigAccessor(client),
