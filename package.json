@@ -69,7 +69,7 @@
     "http-status": "^1.5.2",
     "log4js": "^6.6.1",
     "open-graph-scraper": "^4.11.1",
-    "prisma": "^4.1.1",
+    "prisma": "^4.2.1",
     "socket.io-client": "^4.5.1",
     "sodium-native": "^3.3.0",
     "utf-8-validate": "^5.0.9",
