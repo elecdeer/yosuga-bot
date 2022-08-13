@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/async": "^3.2.15",
     "@types/charset": "^1.0.2",
-    "@types/node": "^18.7.2",
+    "@types/node": "^18.7.3",
     "@types/open-graph-scraper": "^4.8.1",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
@@ -51,7 +51,7 @@
   "dependencies": {
     "@aspida/axios": "^1.10.3",
     "@discordjs/opus": "^0.8.0",
-    "@discordjs/rest": "^1.0.0",
+    "@discordjs/rest": "^1.0.1",
     "@discordjs/voice": "0.11.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
     "@prisma/client": "^4.2.1",
@@ -71,7 +71,7 @@
     "open-graph-scraper": "^4.11.1",
     "prisma": "^4.2.1",
     "socket.io-client": "^4.5.1",
-    "sodium-native": "^3.3.0",
+    "sodium-native": "^3.4.1",
     "utf-8-validate": "^5.0.9",
     "vite-node": "^0.21.1",
     "zod": "^3.18.0"
