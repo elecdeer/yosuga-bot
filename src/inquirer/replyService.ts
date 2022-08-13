@@ -86,18 +86,18 @@ export const replyService = (scene: ReplyScene): ReplyHelper => {
 };
 
 const replyToTarget = (scene: ReplyScene) => {
-  const getThreadIdParam = async () => {
-    //newThreadの場合は初回にスレッドを作成する
-    if (scene.type === "newThread") {
-      const thread = await scene.channel.threads.create(scene.option);
-      scene = {
-        type: "threadChannel",
-        channel: thread,
-      };
-      return {
-        threadId: thread.id,
-      };
+  const createThread = async () => {
+    if (scene.type !== "newThread") {
+      return;
     }
+    const thread = await scene.channel.threads.create(scene.option);
+    scene = {
+      type: "threadChannel",
+      channel: thread,
+    };
+  };
+
+  const getThreadIdParam = async () => {
     if (scene.type === "threadChannel") {
       return {
         threadId: scene.channel.id,
@@ -107,6 +107,7 @@ const replyToTarget = (scene: ReplyScene) => {
   };
 
   return async (param: ReplyParam, target: ReplyTarget) => {
+    await createThread();
     switch (target.type) {
       case "channel":
         return scene.channel.send(param);
