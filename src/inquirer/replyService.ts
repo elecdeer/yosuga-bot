@@ -97,7 +97,7 @@ const replyToTarget = (scene: ReplyScene) => {
     };
   };
 
-  const getThreadIdParam = async () => {
+  const getThreadIdParam = () => {
     if (scene.type === "threadChannel") {
       return {
         threadId: scene.channel.id,
@@ -108,6 +108,7 @@ const replyToTarget = (scene: ReplyScene) => {
 
   return async (param: ReplyParam, target: ReplyTarget) => {
     await createThread();
+
     switch (target.type) {
       case "channel":
         return scene.channel.send(param);
@@ -118,7 +119,7 @@ const replyToTarget = (scene: ReplyScene) => {
         return await target.interaction.reply({
           ...param,
           fetchReply: true,
-          ...(await getThreadIdParam()),
+          ...getThreadIdParam(),
         });
       default:
         throw new Error("target.typeが不正です");
