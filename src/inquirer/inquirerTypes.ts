@@ -4,26 +4,19 @@ import type { APIActionRowComponent, APIMessageActionRowComponent } from "discor
 import type { APIEmbed } from "discord-api-types/v10";
 import type { Message, Awaitable } from "discord.js";
 
-export type PromptEvent<T extends Record<string, Prompt<unknown>>> = {
-  update: {
-    key: keyof T;
-  };
-  close: Record<string, never>;
-};
-
-export type PromptParamHook = {
+export type PromptOptionTimer = {
   /**
-   * Messageを送信してからタイムアウトするまでの時間
+   * 最初にinquirerを送信してからタイムアウトするまでの時間
    */
   time?: number;
 
   /**
-   * 最後にInteractionを受信してからタイムアウトするまでの時間
+   * 最後に回答状態かコンポーネントの状態が変化してからタイムアウトするまでの時間
    */
   idle?: number;
 };
 
-export type PromptParamMessage = {
+export type PromptOptionMessage = {
   /**
    * 送信するMessageに含まれるコンテント
    */
@@ -45,7 +38,7 @@ export type PromptParamMessage = {
   ephemeral?: boolean;
 };
 
-export type PromptParam = PromptParamHook & PromptParamMessage;
+export type PromptOption = PromptOptionTimer & PromptOptionMessage;
 
 export interface PromptController {
   close: (rerender?: boolean) => Promise<void>;
@@ -124,12 +117,12 @@ export type AnswerStatus<T> =
 
 export type ComponentPayload = APIActionRowComponent<APIMessageActionRowComponent>;
 
-export type HookCleaner = () => Awaitable<void> | void;
+export type SubscribeCleaner = () => Awaitable<void> | void;
 
 export type SubscribeMessage<TAction> = (
   message: Message,
   emitAction: (action: TAction) => void
-) => Awaitable<HookCleaner>;
+) => Awaitable<SubscribeCleaner>;
 
 export type StateReducer<TState, TAction> = (prev: TState, action: TAction) => TState;
 
@@ -156,5 +149,5 @@ export type PromptFactory<TResult> = (
 export interface Prompt<TResult> {
   getStatus: () => AnswerStatus<TResult>;
   getComponent: () => ComponentPayload;
-  subscribeMessage: (message: Message) => Promise<HookCleaner>;
+  subscribeMessage: (message: Message) => Promise<SubscribeCleaner>;
 }

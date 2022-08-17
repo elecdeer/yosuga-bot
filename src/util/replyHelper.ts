@@ -19,7 +19,12 @@ export interface ReplyHelper {
 export type ReplyParam = Pick<
   MessageOptions,
   "content" | "embeds" | "components" | "allowedMentions" | "stickers" | "attachments"
->;
+> & {
+  /**
+   * interactionへの返答にのみ適用される
+   */
+  ephemeral?: boolean;
+};
 
 export type ReplyScene =
   | {
@@ -62,7 +67,7 @@ type ReplyHistory = {
   target: ReplyTarget;
 };
 
-export const replyHelper = (scene: ReplyScene): ReplyHelper => {
+export const createReplyHelper = (scene: ReplyScene): ReplyHelper => {
   const history: ReplyHistory[] = [];
 
   const reply = replyToTarget(scene);
@@ -113,7 +118,9 @@ const replyToTarget = (scene: ReplyScene) => {
       case "channel":
         return scene.channel.send(param);
       case "message":
-        return target.message.reply(param);
+        return target.message.reply({
+          ...param,
+        });
       case "commandInteraction":
       case "messageComponentInteraction":
         return await target.interaction.reply({
