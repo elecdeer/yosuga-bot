@@ -8,8 +8,8 @@ import {
   createMessageMock,
   createSendableChannelMock,
   createTextChannelMock,
-} from "./mock";
-import { replyService } from "./replyService";
+} from "../mock";
+import { replyHelper } from "./replyHelper";
 
 import type {
   DMChannel,
@@ -26,7 +26,7 @@ describe("replier", () => {
       },
     } as unknown as TextChannel;
 
-    const service = replyService({
+    const service = replyHelper({
       type: "newThread",
       channel: textChannel,
       option: {
@@ -47,7 +47,7 @@ describe("replier", () => {
     it("scene.typeがtextChannelのとき", async () => {
       const textChannel = createSendableChannelMock<TextChannel>();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -65,7 +65,7 @@ describe("replier", () => {
     it("scene.typeがthreadChannelのとき", async () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "threadChannel",
         channel: threadChannel,
       });
@@ -83,7 +83,7 @@ describe("replier", () => {
     it("scene.typeがdmChannelのとき", async () => {
       const dmChannel = createSendableChannelMock<DMChannel>();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "dmChannel",
         channel: dmChannel,
       });
@@ -103,7 +103,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const message = createMessageMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -126,7 +126,7 @@ describe("replier", () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
       const message = createMessageMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "threadChannel",
         channel: threadChannel,
       });
@@ -152,7 +152,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const interaction = createChatInputInteractionMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -176,7 +176,7 @@ describe("replier", () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
       const interaction = createChatInputInteractionMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "threadChannel",
         channel: threadChannel,
       });
@@ -204,7 +204,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const interaction = createInteractionMock<MessageComponentInteraction<"cached">>();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -228,7 +228,7 @@ describe("replier", () => {
       const threadChannel = createSendableChannelMock<ThreadChannel>();
       const interaction = createMessageComponentInteractionMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "threadChannel",
         channel: threadChannel,
       });
@@ -256,7 +256,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const message = createMessageMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -288,7 +288,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const interaction = createChatInputInteractionMock();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });
@@ -321,7 +321,7 @@ describe("replier", () => {
       const textChannel = createSendableChannelMock<TextChannel>();
       const interaction = createInteractionMock<MessageComponentInteraction<"cached">>();
 
-      const replier = replyService({
+      const replier = replyHelper({
         type: "textChannel",
         channel: textChannel,
       });

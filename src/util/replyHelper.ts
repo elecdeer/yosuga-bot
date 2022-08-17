@@ -62,7 +62,7 @@ type ReplyHistory = {
   target: ReplyTarget;
 };
 
-export const replyService = (scene: ReplyScene): ReplyHelper => {
+export const replyHelper = (scene: ReplyScene): ReplyHelper => {
   const history: ReplyHistory[] = [];
 
   const reply = replyToTarget(scene);
