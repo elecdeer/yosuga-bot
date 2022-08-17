@@ -128,7 +128,7 @@ export type StateReducer<TState, TAction> = (prev: TState, action: TAction) => T
 
 export type OutputResult<TState, TResult> = (state: TState) => AnswerStatus<TResult>;
 
-export type OutputComponentParam<TState, TResult> = (
+export type OutputComponent<TState, TResult> = (
   state: TState,
   result: AnswerStatus<TResult>
 ) => ComponentPayload;
@@ -138,7 +138,7 @@ export interface PromptParts<TResult, TAction, TState> {
   subscribeMessages: SubscribeMessage<TAction>[];
   stateReducer: StateReducer<TState, TAction>;
   outputResult: OutputResult<TState, TResult>;
-  outputComponentParam: OutputComponentParam<TState, TResult>;
+  outputComponentParam: OutputComponent<TState, TResult>;
 }
 
 export type PromptFactory<TResult> = (
