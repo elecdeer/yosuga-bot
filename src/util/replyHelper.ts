@@ -1,3 +1,8 @@
+import { getLogger } from "log4js";
+
+import { resolveLazy } from "./lazy";
+
+import type { Lazy } from "./lazy";
 import type {
   AllowedThreadTypeForTextChannel,
   ChatInputCommandInteraction,
@@ -42,7 +47,9 @@ export type ReplyScene =
   | {
       type: "newThread";
       channel: TextChannel;
-      option: ThreadCreateOptions<AllowedThreadTypeForTextChannel>;
+      option: Omit<ThreadCreateOptions<AllowedThreadTypeForTextChannel>, "startMessage"> & {
+        startMessageParam: Lazy<ReplyParam, ThreadChannel | null>;
+      };
     };
 
 export type ReplyTarget =
@@ -67,6 +74,8 @@ type ReplyHistory = {
   target: ReplyTarget;
 };
 
+const logger = getLogger("replyHelper");
+
 export const createReplyHelper = (scene: ReplyScene): ReplyHelper => {
   const history: ReplyHistory[] = [];
 
@@ -76,10 +85,12 @@ export const createReplyHelper = (scene: ReplyScene): ReplyHelper => {
     reply: async (param: ReplyParam, target: ReplyTarget = { type: "channel" }) => {
       const message = await reply(param, target);
       history.push({ message, target });
+      logger.trace(`pushMessage: ${message.id}`);
       return message;
     },
     edit: async (param, index) => {
       const historyItem = history.at(index ?? -1);
+      logger.trace(`editMessage: ${historyItem?.message.id}`);
       if (historyItem === undefined) {
         throw new Error("送信済みのMessageが存在しません");
       }
@@ -91,19 +102,9 @@ export const createReplyHelper = (scene: ReplyScene): ReplyHelper => {
 };
 
 const replyToTarget = (scene: ReplyScene) => {
-  const createThread = async () => {
-    if (scene.type !== "newThread") {
-      return;
-    }
-    const thread = await scene.channel.threads.create(scene.option);
-    scene = {
-      type: "threadChannel",
-      channel: thread,
-    };
-  };
-
   const getThreadIdParam = () => {
     if (scene.type === "threadChannel") {
+      logger.trace("threadChannel", scene.channel.id);
       return {
         threadId: scene.channel.id,
       };
@@ -111,37 +112,60 @@ const replyToTarget = (scene: ReplyScene) => {
     return {};
   };
 
-  return async (param: ReplyParam, target: ReplyTarget) => {
-    await createThread();
-
-    switch (target.type) {
-      case "channel":
-        return scene.channel.send(param);
-      case "message":
-        return target.message.reply({
-          ...param,
-        });
-      case "commandInteraction":
-      case "messageComponentInteraction":
+  const createMessage = async (param: ReplyParam, target: ReplyTarget): Promise<Message> => {
+    // await createThread();
+    if (target.type === "channel") {
+      return scene.channel.send(param);
+    }
+    if (target.type === "message") {
+      return target.message.reply({
+        ...param,
+      });
+    }
+    if (target.type === "commandInteraction" || target.type === "messageComponentInteraction") {
+      if (!target.interaction.replied) {
         return await target.interaction.reply({
           ...param,
           fetchReply: true,
           ...getThreadIdParam(),
         });
-      default:
-        throw new Error("target.typeが不正です");
+      } else {
+        return await target.interaction.followUp({
+          ...param,
+          fetchReply: true,
+          ...getThreadIdParam(),
+        });
+      }
+    }
+    throw new Error("target.typeが不正です");
+  };
+
+  return async (param: ReplyParam, target: ReplyTarget) => {
+    if (scene.type === "newThread") {
+      const msg = await createMessage(resolveLazy(scene.option.startMessageParam, null), target);
+      const thread = await msg.startThread(scene.option);
+      await msg.edit(resolveLazy(scene.option.startMessageParam, thread));
+      scene = {
+        type: "threadChannel",
+        channel: thread,
+      };
+      return await createMessage(param, {
+        type: "channel",
+      });
+    } else {
+      return await createMessage(param, target);
     }
   };
 };
 
 const editHistory = (historyItem: ReplyHistory) => {
   return async (editParam: ReplyParam) => {
-    if (
-      historyItem.target.type === "commandInteraction" ||
-      historyItem.target.type === "messageComponentInteraction"
-    ) {
-      return await historyItem.target.interaction.editReply(editParam);
-    }
+    // if (
+    //   historyItem.target.type === "commandInteraction" ||
+    //   historyItem.target.type === "messageComponentInteraction"
+    // ) {
+    //   return await historyItem.target.interaction.editReply(editParam);
+    // }
 
     return await historyItem.message.edit(editParam);
   };
