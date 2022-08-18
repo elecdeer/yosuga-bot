@@ -14,6 +14,8 @@ import type {
 } from "../inquirerTypes";
 import type { APIMessageComponentEmoji } from "discord.js";
 
+//TODO テスト書く
+
 //APIButtonComponentBase
 type ButtonParam = {
   style?: ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger;
@@ -23,7 +25,7 @@ type ButtonParam = {
 };
 
 export const buttonPrompt = (param: {
-  customId: string;
+  customId?: string;
   button: LazyParam<ButtonParam, boolean>;
   initialAnswered?: boolean;
 }): PromptFactory<void> => {

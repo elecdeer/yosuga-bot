@@ -1,4 +1,5 @@
 import { registerHandlersFromCommandTree } from "../commandHandler";
+import { testCommandEvent, testCommandProps } from "./testCommand";
 
 import type { IEventFlowHandler } from "../../eventFlow/eventFlow";
 import type { YosugaEventParam } from "../../yosuga";
@@ -39,7 +40,10 @@ export type CommandTree = {
 }[];
 
 export const commandTree: CommandTree = [
-  //ここにcommandを列挙
+  {
+    props: testCommandProps,
+    event: testCommandEvent,
+  },
 ];
 
 export const registerCommandHandlers: HandlerRegister = (yosuga) => {
