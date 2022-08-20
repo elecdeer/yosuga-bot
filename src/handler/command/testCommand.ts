@@ -49,6 +49,7 @@ export const testCommandEvent: CommandEvent = {
               },
             },
           },
+          ephemeral: true,
           rootTarget: {
             type: "commandInteraction",
             interaction: interaction,
