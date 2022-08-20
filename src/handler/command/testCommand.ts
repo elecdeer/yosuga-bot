@@ -1,6 +1,7 @@
 import { ChannelType, EmbedBuilder } from "discord.js";
 
 import { buttonPrompt, inquire } from "../../inquirer";
+import { createNewThreadMessenger } from "../../util/messenger/newThreadMessenger";
 
 import type { CommandEvent, CommandProps } from "./index";
 
@@ -22,6 +23,24 @@ export const testCommandEvent: CommandEvent = {
 
       if (channel === null || channel.type !== ChannelType.GuildText) return;
 
+      const messenger = createNewThreadMessenger(
+        channel,
+        {
+          name: "testThread",
+        },
+        (thread) => {
+          if (thread !== null) {
+            return {
+              content: `<#${thread.id}>`,
+            };
+          } else {
+            return {
+              content: "スレッドを作成します",
+            };
+          }
+        }
+      );
+
       const { collector, controller } = await inquire(
         {
           button: buttonPrompt({
@@ -31,24 +50,7 @@ export const testCommandEvent: CommandEvent = {
           }),
         },
         {
-          scene: {
-            type: "newThread",
-            channel: channel,
-            option: {
-              name: "testThread",
-              startMessageParam: (thread) => {
-                if (thread !== null) {
-                  return {
-                    content: `<#${thread.id}>`,
-                  };
-                } else {
-                  return {
-                    content: "スレッドを作成します",
-                  };
-                }
-              },
-            },
-          },
+          messenger: messenger,
           ephemeral: true,
           rootTarget: {
             type: "commandInteraction",

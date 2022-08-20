@@ -1,5 +1,5 @@
 import type { Lazy } from "../util/lazy";
-import type { ReplyScene, ReplyTarget } from "../util/replyHelper";
+import type { Messenger, ReplyTarget } from "../util/messenger/messenger";
 import type { APIActionRowComponent, APIMessageActionRowComponent } from "discord-api-types/v10";
 import type { APIEmbed } from "discord-api-types/v10";
 import type { Message, Awaitable } from "discord.js";
@@ -23,9 +23,9 @@ export type PromptOptionMessage = {
   messageContent: Lazy<APIEmbed>;
 
   /**
-   * promptの送信先
+   * promptを送信するためのMessenger
    */
-  scene: ReplyScene;
+  messenger: Messenger;
 
   /**
    * 最初のMessageの送信先

@@ -24,13 +24,13 @@ export const inquire = async <T extends Record<string, PromptFactory<unknown>>>(
     [K in keyof T]: ReturnType<T[K]>;
   }>;
 }> => {
-  const { scene, rootTarget, idle, time, messageContent, ephemeral } = option;
+  const { messenger, rootTarget, idle, time, messageContent, ephemeral } = option;
   const timerParam: PromptOptionTimer = {
     time,
     idle,
   };
   const messageParam: PromptOptionMessage = {
-    scene,
+    messenger,
     rootTarget,
     messageContent,
     ephemeral,

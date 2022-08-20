@@ -16,8 +16,6 @@ export const createNewThreadMessenger = (
   let thread: ThreadChannel | null = null;
 
   const createThread = async (target: ReplyTarget) => {
-    if (thread !== null) return thread;
-
     const startMessage = await sendTextChannelMessage(channel)(
       resolveLazy(startMessageParam, null),
       target
@@ -29,7 +27,14 @@ export const createNewThreadMessenger = (
   };
 
   return createMessengerBase(async (param, target) => {
-    const thr = await createThread(target);
-    return sendThreadMessage(thr)(param, target);
+    if (thread === null) {
+      thread = await createThread(target);
+
+      return sendThreadMessage(thread)(param, {
+        type: "channel",
+      });
+    } else {
+      return sendThreadMessage(thread)(param, target);
+    }
   });
 };

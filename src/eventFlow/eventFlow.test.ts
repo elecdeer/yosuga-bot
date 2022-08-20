@@ -147,7 +147,7 @@ describe("utils/eventFlow", () => {
     test("元のflowに影響を与えない", () => {
       const handler = vi.fn();
 
-      const flow = createEventFlow();
+      const flow = createEventFlow<number>();
       flow.filter(() => false);
 
       flow.on(handler);
@@ -256,7 +256,7 @@ describe("utils/eventFlow", () => {
     test("元のflowに影響を与えない", () => {
       const handler = vi.fn();
 
-      const flow = createEventFlow();
+      const flow = createEventFlow<number>();
       flow.map((value) => value);
 
       flow.on(handler);
@@ -268,7 +268,7 @@ describe("utils/eventFlow", () => {
     test("変換された値を受け取れる", () => {
       const handler = vi.fn();
 
-      const numberFlow = createEventFlow();
+      const numberFlow = createEventFlow<number>();
       const stringFlow = numberFlow.map((value) => String(value));
 
       stringFlow.on(handler);
@@ -301,7 +301,7 @@ describe("utils/eventFlow", () => {
     test("元のflowに影響を与えない", () => {
       const handler = vi.fn();
 
-      const flow = createEventFlow();
+      const flow = createEventFlow<number>();
       flow.map((value) => value);
 
       flow.on(handler);
@@ -315,7 +315,7 @@ describe("utils/eventFlow", () => {
       const pre = vi.fn();
       const post = vi.fn();
 
-      const flow = createEventFlow().tap({ pre, post });
+      const flow = createEventFlow<number>().tap({ pre, post });
 
       flow.on(handler);
       flow.emit(0);
