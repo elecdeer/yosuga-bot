@@ -8,6 +8,8 @@ import run from "@rollup/plugin-run";
 
 import pkg from "./package.json";
 
+const dev = !!process.env.DEV;
+
 const entry = "src/index.ts";
 
 const external = [
@@ -28,12 +30,13 @@ const plugins = [
   esbuild({
     target: "node16",
   }),
-  run({
-    // env: {
-    //   "enable-source-maps": true,
-    // },
-    execArgv: ["--enable-source-maps"],
-  }),
+  dev &&
+    run({
+      // env: {
+      //   "enable-source-maps": true,
+      // },
+      execArgv: ["--enable-source-maps"],
+    }),
 ];
 
 export default defineConfig([

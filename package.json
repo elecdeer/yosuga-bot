@@ -4,10 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "vite-node src/index.ts",
+    "start": "node --enable-source-maps dist/index.mjs",
     "build": "rimraf dist && rollup -c",
-    "dev": "vite-node src/index.ts",
-    "dev:watch": "vite-node -w src/index.ts",
+    "dev": "rimraf dist && rollup -c --environment DEV",
     "test": "vitest",
     "test:watch": "vitest watch",
     "check": "npm-run-all check:*",
