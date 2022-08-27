@@ -43,3 +43,9 @@ process.on("exit", (code) => {
 process.on("SIGINT", () => {
   process.exit(0);
 });
+
+// const as = async () => {
+//   console.log("hoge");
+// };
+//
+// await as();

@@ -1,4 +1,4 @@
-import { getLogger } from "log4js";
+import log4js from "log4js";
 
 import { createEventFlow } from "./eventFlow/eventFlow";
 import { registerHandlers } from "./handler";
@@ -27,6 +27,8 @@ type Events = {
     newState: VoiceState;
   }>;
 };
+
+const { getLogger } = log4js;
 
 export class Yosuga {
   private readonly client: Client<true>;
