@@ -4,6 +4,6 @@
 /dist/
 /log/
 /.env
-/docker-compose-test.yml
+/docker-compose-dev.yml
 /prisma/dev.db
 /prisma/dev.db-journal
