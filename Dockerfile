@@ -6,6 +6,7 @@ WORKDIR /app
 COPY tsconfig.json ./
 COPY package*.json ./
 
+ENV NODE_ENV=production
 RUN npm ci --omit=dev
 
 COPY src src
