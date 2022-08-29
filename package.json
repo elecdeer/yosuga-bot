@@ -14,7 +14,7 @@
     "check:format": "prettier --cache --check 'src/**/*.ts' 'src/*.ts'",
     "check:lint": "eslint 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
     "format": "prettier 'src/**/*.ts' 'src/*.ts' --write",
-    "prepare": "husky install",
+    "prepare": "node -e \"if(process.env.NODE_ENV !== 'production'){ console.log('install husky'); require('husky').install() }\"",
     "lint-staged": "lint-staged"
   },
   "lint-staged": {
