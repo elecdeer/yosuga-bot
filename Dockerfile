@@ -61,5 +61,5 @@ ENV NODE_ENV=production
 #EXPOSE 80
 #EXPOSE 443
 
-CMD ["node", "--enable-source-maps", "./dist/index.mjs"]
+CMD ["npm", "start"]
 
