@@ -6,9 +6,9 @@ import { yosugaEnv } from "./environment";
 
 import type { Layout } from "log4js";
 
-const logLayout = (oneLine: boolean): Layout => ({
+const logLayout = ({ oneLine, colored }: { oneLine: boolean; colored: boolean }): Layout => ({
   type: "pattern",
-  pattern: "%d %z %p %c %X{eventId} %f:%l %x{oneLine}",
+  pattern: `${colored ? "%[" : ""}%d %z %p %c %X{eventId} %f:%l ${colored ? "%]" : ""}%x{oneLine}`,
   tokens: {
     oneLine: (logEvent) => {
       return logEvent.data
@@ -40,16 +40,16 @@ const stringifyLogMessage = (data: unknown) => {
 };
 
 export const initLogger = () => {
-  const layoutOneLine = logLayout(true);
-  const layoutMultiLine = logLayout(false);
-
   log4js.configure({
     appenders: {
-      out: { type: "stdout", layout: layoutMultiLine },
+      out: {
+        type: "stdout",
+        layout: logLayout({ oneLine: false, colored: true }),
+      },
       app: {
         type: "file",
         filename: path.join(yosugaEnv.logDir, "yosuga.log"),
-        layout: layoutOneLine,
+        layout: logLayout({ oneLine: true, colored: false }),
         pattern: "-yyyy-MM-dd",
         dayToKeep: 7,
         compress: true,
@@ -57,7 +57,7 @@ export const initLogger = () => {
       error: {
         type: "file",
         filename: path.join(yosugaEnv.logDir, "yosuga-error.log"),
-        layout: layoutMultiLine,
+        layout: logLayout({ oneLine: false, colored: false }),
       },
     },
     categories: {
