@@ -12,8 +12,8 @@
     "check": "npm-run-all check:*",
     "check:type": "tsc",
     "check:format": "prettier --cache --check 'src/**/*.ts' 'src/*.ts'",
-    "check:lint": "eslint 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
-    "format": "prettier 'src/**/*.ts' 'src/*.ts' --write",
+    "check:lint": "eslint --cache 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
+    "format": "prettier --cache  'src/**/*.ts' 'src/*.ts' --write",
     "prepare": "node -e \"if(process.env.NODE_ENV !== 'production'){ console.log('install husky'); require('husky').install() }\"",
     "lint-staged": "lint-staged"
   },
@@ -24,7 +24,7 @@
     ]
   },
   "keywords": [],
-  "author": "",
+  "author": "elecdeer",
   "license": "MIT",
   "engines": {
     "node": "18.x"
