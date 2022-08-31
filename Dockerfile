@@ -6,7 +6,7 @@ WORKDIR /app
 COPY tsconfig.json ./
 COPY package*.json ./
 
-RUN npm ci --ignore-scripts=true
+RUN npm ci
 
 COPY src src
 COPY imageenv.json ./
@@ -14,59 +14,52 @@ COPY rollup.config.js ./
 
 RUN npm run build
 
-#FROM rust:1.63-alpine as prisma
-#
-#ENV RUSTFLAGS="-C target-feature=-crt-static"
-#
-#RUN apk --no-cache add openssl direnv git musl-dev openssl-dev build-base perl protoc
-#RUN git clone --depth=1 --branch=3.12.0 https://github.com/prisma/prisma-engines.git /prisma && cd /prisma
-#
-#WORKDIR /prisma
-#
-#RUN cargo build --release
 
-FROM node:18 as deps
+FROM node:18-slim as node
+
+
+FROM ubuntu:jammy as base
+
+ENV NODE_ENV=production
+COPY --from=node /usr/local/include/ /usr/local/include/
+COPY --from=node /usr/local/lib/ /usr/local/lib/
+COPY --from=node /usr/local/bin/ /usr/local/bin/
+RUN corepack disable && corepack enable
+
+RUN apt update && apt install -y openssl
+
+RUN groupadd --gid 1000 node \
+    && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
+
+
+FROM base as deps
+
+RUN apt install -y python3 make g++
 
 WORKDIR /app
-
+ENV NODE_ENV=production
 COPY package*.json ./
+COPY prisma ./prisma
+
 RUN npm ci --omit=dev
 
-COPY prisma prisma
 
-#RUN apt-get update
-#RUN apt-get install -y openssl
-#
-#ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
-#  PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
-#  PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
-#  PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
-#  PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
-#  PRISMA_CLIENT_ENGINE_TYPE=binary
-#
-#COPY --from=prisma /prisma/target/release/query-engine /prisma/target/release/migration-engine /prisma/target/release/introspection-engine /prisma/target/release/prisma-fmt  /prisma-engines/
+FROM base as prod
 
-RUN npx prisma generate
-
-FROM gcr.io/distroless/nodejs:18-debug
-#FROM node:18-slim
+USER node
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY prisma prisma
+COPY --chown=node:node package*.json ./
 
-COPY --from=build /app/dist ./dist
-COPY --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist ./dist
 
-EXPOSE 80
-EXPOSE 443
+ENV NODE_ENV=production
 
-#RUN ./node_modules/prisma/build/index.js generate
-#RUN ["/app/node_modules/prisma/build/index.js", "generate"]
 
-#RUN ["./node_modules/prisma/build/index.js", "generate"]
+#EXPOSE 80
+#EXPOSE 443
 
-#CMD ["node", "--enable-source-maps", "./dist/index.mjs"]
-CMD ["--enable-source-maps", "./dist/index.mjs"]
+CMD ["node", "--enable-source-maps", "./dist/index.mjs"]
 
