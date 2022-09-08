@@ -3,7 +3,7 @@ import { ButtonStyle, ComponentType } from "discord.js";
 import { resolveLazy } from "../../util/lazy";
 
 import type { LazyParam } from "../../util/lazy";
-import type { ComponentPayload, OutputComponent } from "../inquirerTypes";
+import type { ComponentPayload, OutputComponent } from "../types/prompt";
 import type { APIMessageComponentEmoji } from "discord.js";
 
 //based APIButtonComponentBase

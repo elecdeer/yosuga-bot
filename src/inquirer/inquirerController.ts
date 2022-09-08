@@ -1,13 +1,14 @@
 import { resolveLazy } from "../util/lazy";
 
 import type { ReplyTarget } from "../util/messenger/messenger";
-import type { Prompt, PromptController, PromptOptionMessage } from "./inquirerTypes";
+import type { InquirerController, InquirerOptionMessage } from "./types/inquirer";
+import type { Prompt } from "./types/prompt";
 import type { Awaitable, Collection, Message } from "discord.js";
 
 export const createInquireController = async (
   promptCollection: Collection<string, Prompt<unknown>>,
-  { messenger, rootTarget, ephemeral, messageContent }: PromptOptionMessage
-): Promise<PromptController> => {
+  { messenger, rootTarget, ephemeral, messageContent }: InquirerOptionMessage
+): Promise<InquirerController> => {
   let hooksCleaner: (() => Awaitable<void>)[] = [];
   const cleanHooks = async () => {
     await Promise.all(hooksCleaner.map((item) => item()));

@@ -1,7 +1,7 @@
 import { ComponentType } from "discord.js";
 
-import type { SubscribeMessage } from "../inquirerTypes";
 import type { ButtonAction } from "../types/action";
+import type { SubscribeMessage } from "../types/prompt";
 
 export const subscribeButtonInteraction =
   (customId: string): SubscribeMessage<ButtonAction> =>

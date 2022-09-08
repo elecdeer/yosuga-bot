@@ -1,12 +1,12 @@
 import { createEventFlow } from "../eventFlow/eventFlow";
 
 import type {
-  Prompt,
-  PromptCollector,
-  PromptResult,
-  PromptStatus,
+  InquirerCollector,
+  PromptsResult,
+  PromptsStatus,
   PromptValue,
-} from "./inquirerTypes";
+} from "./types/inquirer";
+import type { Prompt } from "./types/prompt";
 import type { Collection } from "discord.js";
 
 export const createInquireCollector = <T extends Record<string, Prompt<unknown>>>(
@@ -28,15 +28,15 @@ export const createInquireCollector = <T extends Record<string, Prompt<unknown>>
 
   const getResult = () => {
     const entries = collection.map((prompt, key) => [key, prompt.getStatus().value]);
-    return Object.fromEntries(entries) as PromptResult<T>;
+    return Object.fromEntries(entries) as PromptsResult<T>;
   };
 
-  const getStatus: PromptCollector<T>["getStatus"] = () => {
+  const getStatus: InquirerCollector<T>["getStatus"] = () => {
     const entries = collection.map((prompt, key) => [key, prompt.getStatus()]);
-    return Object.fromEntries(entries) as PromptStatus<T>;
+    return Object.fromEntries(entries) as PromptsStatus<T>;
   };
 
-  const awaitOne: PromptCollector<T>["awaitOne"] = <TKey extends keyof T>(watchKey: TKey) => {
+  const awaitOne: InquirerCollector<T>["awaitOne"] = <TKey extends keyof T>(watchKey: TKey) => {
     const initStatus = collection.get(watchKey)!.getStatus();
     if (initStatus.status === "answered") {
       return Promise.resolve<PromptValue<T[TKey]>>(initStatus.value as PromptValue<T[TKey]>);
@@ -63,8 +63,8 @@ export const createInquireCollector = <T extends Record<string, Prompt<unknown>>
     });
   };
 
-  const awaitAll: PromptCollector<T>["awaitAll"] = () =>
-    new Promise<PromptResult<T>>((resolve, reject) => {
+  const awaitAll: InquirerCollector<T>["awaitAll"] = () =>
+    new Promise<PromptsResult<T>>((resolve, reject) => {
       //全てansweredになったタイミングでの状態を返したいのでawaitOneの組合せではだめ
       const getAllStatus = () => collection.mapValues((prompt) => prompt.getStatus());
 
@@ -99,24 +99,24 @@ export const createInquireCollector = <T extends Record<string, Prompt<unknown>>
       });
     });
 
-  const onUpdateAny: PromptCollector<T>["onUpdateAny"] = (callback) => {
+  const onUpdateAny: InquirerCollector<T>["onUpdateAny"] = (callback) => {
     updateEvent.on((key) => {
       void callback(getStatus(), key);
     });
   };
 
-  const onUpdateOne: PromptCollector<T>["onUpdateOne"] = <TKey extends keyof T>(
+  const onUpdateOne: InquirerCollector<T>["onUpdateOne"] = <TKey extends keyof T>(
     watchKey: TKey,
-    callback: (status: PromptStatus<T>[TKey], key: TKey) => void
+    callback: (status: PromptsStatus<T>[TKey], key: TKey) => void
   ) => {
     updateEvent
       .filter((key) => key === watchKey)
       .on(() => {
-        void callback(collection.get(watchKey)!.getStatus() as PromptStatus<T>[TKey], watchKey);
+        void callback(collection.get(watchKey)!.getStatus() as PromptsStatus<T>[TKey], watchKey);
       });
   };
 
-  const collector: PromptCollector<T> = {
+  const collector: InquirerCollector<T> = {
     getStatus,
     onUpdateAny,
     onUpdateOne,

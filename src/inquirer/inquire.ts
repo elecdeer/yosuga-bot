@@ -6,30 +6,29 @@ import { createInquireController } from "./inquirerController";
 
 import type { Timer } from "../util/timer";
 import type {
-  Prompt,
-  PromptCollector,
-  PromptController,
-  PromptFactory,
-  PromptOption,
-  PromptOptionTimer,
-  PromptOptionMessage,
-} from "./inquirerTypes";
+  InquirerCollector,
+  InquirerController,
+  InquirerOption,
+  InquirerOptionTimer,
+  InquirerOptionMessage,
+} from "./types/inquirer";
+import type { Prompt, PromptFactory } from "./types/prompt";
 
 export const inquire = async <T extends Record<string, PromptFactory<unknown>>>(
   prompts: T | [keyof T, T[keyof T]][],
-  option: PromptOption
+  option: InquirerOption
 ): Promise<{
-  controller: PromptController;
-  collector: PromptCollector<{
+  controller: InquirerController;
+  collector: InquirerCollector<{
     [K in keyof T]: ReturnType<T[K]>;
   }>;
 }> => {
   const { messenger, rootTarget, idle, time, messageContent, ephemeral } = option;
-  const timerParam: PromptOptionTimer = {
+  const timerParam: InquirerOptionTimer = {
     time,
     idle,
   };
-  const messageParam: PromptOptionMessage = {
+  const messageParam: InquirerOptionMessage = {
     messenger,
     rootTarget,
     messageContent,

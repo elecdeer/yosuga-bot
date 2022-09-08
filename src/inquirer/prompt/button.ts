@@ -5,8 +5,8 @@ import { outputButtonResult } from "../modules/buttonResult";
 import { subscribeButtonInteraction } from "../modules/buttonSubscribeInteraction";
 
 import type { LazyParam } from "../../util/lazy";
-import type { PromptFactory } from "../inquirerTypes";
 import type { ButtonParam } from "../modules/buttonComponent";
+import type { PromptFactory } from "../types/prompt";
 
 export const buttonPrompt = (param: {
   customId?: string;

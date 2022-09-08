@@ -1,4 +1,4 @@
-import type { OutputResult } from "../inquirerTypes";
+import type { OutputResult } from "../types/prompt";
 
 export const outputButtonResult: OutputResult<number, void> = (state) => {
   if (state > 0) {

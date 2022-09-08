@@ -1,6 +1,6 @@
 import hash from "object-hash";
 
-import type { ComponentPayload, PromptFactory, PromptParts } from "./inquirerTypes";
+import type { ComponentPayload, PromptFactory, PromptModules } from "./types/prompt";
 
 export const composePrompt = <TResult, TAction, TState>({
   initialState,
@@ -8,7 +8,7 @@ export const composePrompt = <TResult, TAction, TState>({
   stateReducer,
   outputComponentParam,
   outputResult,
-}: PromptParts<TResult, TAction, TState>): PromptFactory<TResult> => {
+}: PromptModules<TResult, TAction, TState>): PromptFactory<TResult> => {
   return (updateStatus, updateComponent) => {
     let state = initialState;
     let result = outputResult(state);
