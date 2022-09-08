@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { buttonReducer } from "./buttonReducer";
+import { monoButtonReducer } from "./monoButtonReducer";
 
 import type { ButtonAction } from "../types/action";
 
@@ -13,7 +13,7 @@ describe("/inquirer/modules/buttonReducer", () => {
       };
 
       const prev = 0;
-      expect(buttonReducer(prev, action)).toBe(1);
+      expect(monoButtonReducer(prev, action)).toBe(1);
     });
   });
 });
