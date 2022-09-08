@@ -48,7 +48,8 @@ export const composePrompt = <TResult, TAction, TState>({
   };
 };
 
-const isSameResult = <TResult>(prevResult: TResult, result: TResult): boolean => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+const isSameResult = <TResult extends {} | null>(prevResult: TResult, result: TResult): boolean => {
   return hash(prevResult) === hash(result);
 };
 
