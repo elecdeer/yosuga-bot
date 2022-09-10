@@ -55,11 +55,11 @@ export const initLog4jsLogger = (dist: {
 }) => {
   log4js.configure({
     appenders: {
-      out: {
+      consoleLog: {
         type: "stdout",
         layout: logLayout({ oneLine: false, colored: true }),
       },
-      app: {
+      fileLog: {
         type: "file",
         filename: path.join(dist.logDir, dist.allLogFileName),
         layout: logLayout({ oneLine: true, colored: false }),
@@ -67,21 +67,21 @@ export const initLog4jsLogger = (dist: {
         dayToKeep: 7,
         compress: true,
       },
-      error: {
+      _fileErrorLog: {
         type: "file",
         filename: path.join(dist.logDir, dist.errorLogFileName),
         layout: logLayout({ oneLine: false, colored: false }),
       },
+      fileErrorLog: {
+        type: "logLevelFilter",
+        appender: "_fileErrorLog",
+        level: "error",
+      },
     },
     categories: {
       default: {
-        appenders: ["out", "app"],
+        appenders: ["consoleLog", "fileLog", "fileErrorLog"],
         level: "all",
-        enableCallStack: true,
-      },
-      error: {
-        appenders: ["error"],
-        level: "error",
         enableCallStack: true,
       },
     },
@@ -90,13 +90,16 @@ export const initLog4jsLogger = (dist: {
 
 //中に入れているとダメらしい
 const logger = getLogger("process");
+
 process.on("uncaughtException", (error) => {
   logger.fatal("catch uncaughtException", error);
-  log4js.shutdown();
-  process.exit(1);
+  log4js.shutdown(() => {
+    process.exit(1);
+  });
 });
 process.on("unhandledRejection", (error) => {
   logger.fatal("catch unhandledRejection", error);
-  log4js.shutdown();
-  process.exit(1);
+  log4js.shutdown(() => {
+    process.exit(1);
+  });
 });
