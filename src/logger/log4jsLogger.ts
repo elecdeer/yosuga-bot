@@ -88,6 +88,15 @@ export const initLog4jsLogger = (dist: {
   });
 };
 
-process.on("exit", () => {
+//中に入れているとダメらしい
+const logger = getLogger("process");
+process.on("uncaughtException", (error) => {
+  logger.fatal("catch uncaughtException", error);
   log4js.shutdown();
+  process.exit(1);
+});
+process.on("unhandledRejection", (error) => {
+  logger.fatal("catch unhandledRejection", error);
+  log4js.shutdown();
+  process.exit(1);
 });

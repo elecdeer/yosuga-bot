@@ -28,14 +28,16 @@ client.once("ready", (readyClient) => {
   const yosuga = new Yosuga(readyClient);
   // const yosuga = new YosugaClient(readyClient);
   // void yosuga.initClient();
+  (async () => {
+    throw new Error("test");
+  })();
 });
 
 void client.login(yosugaEnv.discordToken);
 
 process.on("exit", (code) => {
-  logger.info(`Exit... ${code}`);
+  logger.info(`process exit: ${code}`);
   client.destroy();
-  logger.info("Destroy");
 });
 process.on("SIGINT", () => {
   process.exit(0);
