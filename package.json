@@ -10,7 +10,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "check": "npm-run-all check:*",
-    "check:type": "tsc",
+    "check:type": "tsc --noEmit",
     "check:format": "prettier --cache --check 'src/**/*.ts' 'src/*.ts'",
     "check:lint": "eslint --cache 'src/**/*.ts' 'src/*.ts' --max-warnings 0",
     "format": "prettier --cache  'src/**/*.ts' 'src/*.ts' --write",
