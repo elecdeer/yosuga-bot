@@ -57,7 +57,7 @@ export class Yosuga {
       this.events.messageCreate.emit({ yosuga: this, message, logger });
     });
 
-    this.client.on("interaction", (interaction: Interaction) => {
+    this.client.on("interactionCreate", (interaction: Interaction) => {
       const logger = getLogger("interactionCreate");
       logger.addContext("eventId", interaction.id);
       this.events.interactionCreate.emit({ yosuga: this, interaction, logger });

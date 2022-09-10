@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { createEventFlow } from "../../eventFlow/eventFlow";
-import { registerHandlersFromCommandTree } from "../commandHandler";
+import { createEventFlow } from "../eventFlow/eventFlow";
+import { registerHandlersFromCommandTree } from "./commandHandler";
 
-import type { Yosuga, YosugaEventParam } from "../../yosuga";
-import type { CommandTree } from "./index";
+import type { Yosuga, YosugaEventParam } from "../yosuga";
+import type { CommandTree } from "./command";
 import type { Interaction } from "discord.js";
 
 const createSourceFlowParamMock = ({

@@ -74,8 +74,8 @@ export interface IEventFlowHandler<T> {
 
 export interface IEventFlow<T> extends IEventFlowEmitter<T>, IEventFlowHandler<T> {}
 
-export const createEventFlow = <T>(): IEventFlow<T> => {
-  return createEventFlowSource<T>();
+export const createEventFlow = <THandlerParam = void>(): IEventFlow<THandlerParam> => {
+  return createEventFlowSource<THandlerParam>();
 };
 
 const createEventFlowSource = <T>(): IEventFlow<T> => {
