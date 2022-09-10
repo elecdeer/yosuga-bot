@@ -1,13 +1,12 @@
-import log4js from "log4js";
-
 import { createEventFlow } from "./eventFlow/eventFlow";
 import { registerHandlers } from "./handler";
+import { getLogger } from "./logger";
 import { createRepository } from "./repository";
 import { generalConfigDefault, personalConfigDefault } from "./repository/defaultValue";
 
 import type { IEventFlow } from "./eventFlow/eventFlow";
+import type { Logger } from "./logger";
 import type { Message, VoiceState, Client, Interaction } from "discord.js";
-import type { Logger } from "log4js";
 
 export type YosugaEvent<T extends Record<string, unknown>> = IEventFlow<YosugaEventParam<T>>;
 export type YosugaEventParam<T extends Record<string, unknown>> = {
@@ -27,8 +26,6 @@ type Events = {
     newState: VoiceState;
   }>;
 };
-
-const { getLogger } = log4js;
 
 export class Yosuga {
   private readonly client: Client<true>;
@@ -52,20 +49,23 @@ export class Yosuga {
 
   private wrapEvents() {
     this.client.on("messageCreate", (message: Message) => {
-      const logger = getLogger("messageCreate");
-      logger.addContext("eventId", message.id);
+      const logger = getLogger("messageCreate", {
+        eventId: message.id,
+      });
       this.events.messageCreate.emit({ yosuga: this, message, logger });
     });
 
     this.client.on("interactionCreate", (interaction: Interaction) => {
-      const logger = getLogger("interactionCreate");
-      logger.addContext("eventId", interaction.id);
+      const logger = getLogger("interactionCreate", {
+        eventId: interaction.id,
+      });
       this.events.interactionCreate.emit({ yosuga: this, interaction, logger });
     });
 
     this.client.on("voiceStateUpdate", (oldState: VoiceState, newState: VoiceState) => {
-      const logger = getLogger("voiceStateUpdate");
-      logger.addContext("eventId", newState.id);
+      const logger = getLogger("voiceStateUpdate", {
+        eventId: newState.id,
+      });
       this.events.voiceStateUpdate.emit({ yosuga: this, oldState, newState, logger });
     });
   }

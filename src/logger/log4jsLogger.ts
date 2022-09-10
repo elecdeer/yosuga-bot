@@ -1,10 +1,19 @@
+// eslint-disable-next-line no-restricted-imports
 import log4js from "log4js";
 import path from "path";
-import * as util from "util";
+import { inspect } from "util";
 
-import { yosugaEnv } from "./environment";
-
+import type { LoggerFactory } from "./logger";
+// eslint-disable-next-line no-restricted-imports
 import type { Layout } from "log4js";
+
+export const getLogger: LoggerFactory = (category, context = {}) => {
+  const logger = log4js.getLogger(category);
+  Object.entries(context).forEach(([key, value]) => {
+    logger.addContext(key, value);
+  });
+  return logger;
+};
 
 const logLayout = ({ oneLine, colored }: { oneLine: boolean; colored: boolean }): Layout => ({
   type: "pattern",
@@ -35,42 +44,62 @@ const stringifyLogMessage = (data: unknown) => {
   if (typeof data === "string" || typeof data === "number" || typeof data === "boolean") {
     return data.toString();
   } else {
-    return util.inspect(data, { breakLength: Infinity });
+    return inspect(data, { breakLength: Infinity });
   }
 };
 
-export const initLogger = () => {
+export const initLog4jsLogger = (dist: {
+  logDir: string;
+  allLogFileName: string;
+  errorLogFileName: string;
+}) => {
   log4js.configure({
     appenders: {
-      out: {
+      consoleLog: {
         type: "stdout",
         layout: logLayout({ oneLine: false, colored: true }),
       },
-      app: {
+      fileLog: {
         type: "file",
-        filename: path.join(yosugaEnv.logDir, "yosuga.log"),
+        filename: path.join(dist.logDir, dist.allLogFileName),
         layout: logLayout({ oneLine: true, colored: false }),
         pattern: "-yyyy-MM-dd",
         dayToKeep: 7,
         compress: true,
       },
-      error: {
+      _fileErrorLog: {
         type: "file",
-        filename: path.join(yosugaEnv.logDir, "yosuga-error.log"),
+        filename: path.join(dist.logDir, dist.errorLogFileName),
         layout: logLayout({ oneLine: false, colored: false }),
+      },
+      fileErrorLog: {
+        type: "logLevelFilter",
+        appender: "_fileErrorLog",
+        level: "error",
       },
     },
     categories: {
       default: {
-        appenders: ["out", "app"],
+        appenders: ["consoleLog", "fileLog", "fileErrorLog"],
         level: "all",
-        enableCallStack: true,
-      },
-      error: {
-        appenders: ["error"],
-        level: "error",
         enableCallStack: true,
       },
     },
   });
 };
+
+//中に入れているとダメらしい
+const logger = getLogger("process");
+
+process.on("uncaughtException", (error) => {
+  logger.fatal("catch uncaughtException", error);
+  log4js.shutdown(() => {
+    process.exit(1);
+  });
+});
+process.on("unhandledRejection", (error) => {
+  logger.fatal("catch unhandledRejection", error);
+  log4js.shutdown(() => {
+    process.exit(1);
+  });
+});

@@ -44,6 +44,17 @@
         },
         "newlines-between": "always"
       }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "log4js",
+            "message": "Please use ./logger"
+          }
+        ]
+      }
     ]
   }
 }

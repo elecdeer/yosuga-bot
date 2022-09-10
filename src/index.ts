@@ -1,16 +1,14 @@
 import { generateDependencyReport } from "@discordjs/voice";
 import Discord, { GatewayIntentBits } from "discord.js";
-import log4js from "log4js";
 
 import { imageEnv, yosugaEnv } from "./environment";
-import { initLogger } from "./logger";
+import { getLogger } from "./logger";
 import { Yosuga } from "./yosuga";
 
 import type { Client } from "discord.js";
 
-initLogger();
+const logger = getLogger("main");
 
-const logger = log4js.getLogger();
 logger.info("start process");
 logger.debug(generateDependencyReport());
 logger.info("imageEnv", imageEnv);
@@ -30,15 +28,16 @@ client.once("ready", (readyClient) => {
   const yosuga = new Yosuga(readyClient);
   // const yosuga = new YosugaClient(readyClient);
   // void yosuga.initClient();
+  (async () => {
+    throw new Error("test");
+  })();
 });
 
 void client.login(yosugaEnv.discordToken);
 
 process.on("exit", (code) => {
-  logger.info(`Exit... ${code}`);
-  log4js.shutdown();
+  logger.info(`process exit: ${code}`);
   client.destroy();
-  logger.info("Destroy");
 });
 process.on("SIGINT", () => {
   process.exit(0);
