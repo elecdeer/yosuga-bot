@@ -10,10 +10,12 @@ export const selectPrompt = <TOption extends string>(param: {
   select: LazySelectParam<TOption, SelectState>;
 }): PromptFactory<SelectResult> => {
   const { customId = "select", select } = param;
-  const initialState: SelectState = select.options.map((option) => ({
-    value: option.value,
-    selected: option.default ?? false,
-  }));
+  const initialState: SelectState<TOption> = {
+    select: select.options.map((option) => ({
+      value: option.value,
+      selected: option.default ?? false,
+    })),
+  };
 
   return composePrompt({
     initialState: initialState,
@@ -24,9 +26,12 @@ export const selectPrompt = <TOption extends string>(param: {
   });
 };
 
-export type SelectState<T = string> = {
+export type OptionSelectedState<T = string> = {
   selected: boolean;
   value: T;
 }[];
 
-export type SelectResult<T = string> = SelectState<T>;
+type SelectState<T = string> = {
+  select: OptionSelectedState<T>;
+};
+export type SelectResult<T = string> = OptionSelectedState<T>;

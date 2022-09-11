@@ -3,7 +3,7 @@ import { ComponentType } from "discord-api-types/v10";
 import { resolveLazy } from "../../util/lazy";
 
 import type { LazyParam } from "../../util/lazy";
-import type { SelectState } from "../prompt/select";
+import type { OptionSelectedState } from "../prompt/select";
 import type { SelectResult } from "../prompt/select";
 import type { ComponentPayload, OutputComponent } from "../types/prompt";
 import type { APIMessageComponentEmoji } from "discord-api-types/payloads/v10/channel";
@@ -27,7 +27,7 @@ export type SelectParam<T> = {
 
 export const outputMonoSelectComponent = <
   TState extends {
-    select: SelectState;
+    select: OptionSelectedState<TOption>;
   },
   TOption extends string
 >(
