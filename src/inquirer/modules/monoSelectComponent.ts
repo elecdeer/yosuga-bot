@@ -1,8 +1,9 @@
-import { ComponentType } from "discord-api-types/payloads/v10/channel";
+import { ComponentType } from "discord-api-types/v10";
 
 import { resolveLazy } from "../../util/lazy";
 
 import type { LazyParam } from "../../util/lazy";
+import type { SelectState } from "../prompt/select";
 import type { SelectResult } from "../prompt/select";
 import type { ComponentPayload, OutputComponent } from "../types/prompt";
 import type { APIMessageComponentEmoji } from "discord-api-types/payloads/v10/channel";
@@ -24,11 +25,16 @@ export type SelectParam<T> = {
   disabled?: boolean;
 };
 
-export const outputSelectComponent = <TState, TOption extends string>(
+export const outputMonoSelectComponent = <
+  TState extends {
+    select: SelectState;
+  },
+  TOption extends string
+>(
   customId: string,
   param: LazySelectParam<TOption, TState>
 ): OutputComponent<TState, SelectResult<TOption>> => {
-  return (state, result) => {
+  return (state, _) => {
     const { options, placeholder, minValues, maxValues, disabled } = resolveSelectParam<
       TState,
       TOption
@@ -40,7 +46,10 @@ export const outputSelectComponent = <TState, TOption extends string>(
         {
           type: ComponentType.SelectMenu,
           custom_id: customId,
-          options: options,
+          options: options.map((option) => ({
+            ...option,
+            default: state.select.find((item) => item.value === option.value)?.selected ?? false,
+          })),
           placeholder: placeholder,
           min_values: minValues,
           max_values: maxValues,

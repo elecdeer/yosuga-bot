@@ -1,5 +1,5 @@
 import { composePrompt } from "../composePrompt";
-import { outputSelectComponent } from "../modules/monoSelectComponent";
+import { outputMonoSelectComponent } from "../modules/monoSelectComponent";
 import { selectSubscribeInteraction } from "../modules/selectSubscribeInteraction";
 
 import type { LazySelectParam } from "../modules/monoSelectComponent";
@@ -20,13 +20,13 @@ export const selectPrompt = <TOption extends string>(param: {
     subscribeMessages: [selectSubscribeInteraction(customId)],
     stateReducer: selectReducer,
     outputResult: outputSelectResult,
-    outputComponentParam: outputSelectComponent(customId, select),
+    outputComponentParam: outputMonoSelectComponent(customId, select),
   });
 };
 
-type SelectState = SelectResult;
-
-export type SelectResult<T = string> = {
+export type SelectState<T = string> = {
   selected: boolean;
   value: T;
 }[];
+
+export type SelectResult<T = string> = SelectState<T>;
