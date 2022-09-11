@@ -3,10 +3,15 @@ import { Collection } from "discord.js";
 import type { MessageParam, Messenger, ReplyTarget } from "./messenger";
 import type { Message } from "discord.js";
 
+type SendHistoryItem = {
+  message: Message;
+  target: ReplyTarget;
+};
+
 export const createMessengerBase = (
   sendMessage: (param: MessageParam, target: ReplyTarget) => Promise<Message>
 ): Messenger => {
-  const messageCollection = new Collection<string, Message>();
+  const sendHistoryCollection = new Collection<string, SendHistoryItem>();
 
   return {
     send: async (
@@ -16,24 +21,36 @@ export const createMessengerBase = (
       }
     ) => {
       const message = await sendMessage(param, target);
-      messageCollection.set(message.id, message);
+      sendHistoryCollection.set(message.id, {
+        message,
+        target,
+      });
       return message;
     },
     edit: async (param, message) => {
-      if (messageCollection.has(message.id)) {
+      if (sendHistoryCollection.has(message.id)) {
         return await message.edit(param);
       } else {
         throw new Error(`このMessengerから送信されたMessageではないため編集できません`);
       }
     },
     editLatest: async (param) => {
-      const message = messageCollection.last();
-      if (message) {
-        return await message.edit(param);
+      const historyItem = sendHistoryCollection.last();
+
+      if (historyItem === undefined) {
+        throw new Error(`このMessengerから送信されたMessageがありません`);
+      }
+
+      if (
+        historyItem.target.type === "commandInteraction" ||
+        historyItem.target.type === "messageComponentInteraction"
+      ) {
+        //ephemeralなinteractionReplyの編集はmessageからではなく、interaction側から行う必要がある
+        return await historyItem.target.interaction.editReply(param);
       } else {
-        throw new Error("送信したメッセージがありません");
+        return await historyItem.message.edit(param);
       }
     },
-    postedMessages: () => Array.from(messageCollection.values()),
+    postedMessages: () => Array.from(sendHistoryCollection.values()).map((item) => item.message),
   };
 };

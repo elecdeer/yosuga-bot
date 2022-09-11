@@ -71,6 +71,10 @@ export const testCommandEvent: CommandEvent = {
         logger.trace("select state updated", state);
       });
 
+      collector.onUpdateOne("button", (state) => {
+        logger.trace("button state updated", state);
+      });
+
       const result = await collector.awaitAll();
       // await controller.repost({
       //   type: "channel",
