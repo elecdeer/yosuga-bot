@@ -28,9 +28,6 @@ client.once("ready", (readyClient) => {
   const yosuga = new Yosuga(readyClient);
   // const yosuga = new YosugaClient(readyClient);
   // void yosuga.initClient();
-  (async () => {
-    throw new Error("test");
-  })();
 });
 
 void client.login(yosugaEnv.discordToken);

@@ -1,7 +1,7 @@
 import { ChannelType, EmbedBuilder } from "discord.js";
 
-import { buttonPrompt, inquire } from "../../inquirer";
-import { createNewThreadMessenger } from "../../util/messenger/newThreadMessenger";
+import { buttonPrompt, inquire, selectPrompt } from "../../inquirer";
+import { createTextChannelMessenger } from "../../util/messenger/textChannelMessenger";
 
 import type { CommandEvent, CommandProps } from "./index";
 
@@ -23,29 +23,33 @@ export const testCommandEvent: CommandEvent = {
 
       if (channel === null || channel.type !== ChannelType.GuildText) return;
 
-      const messenger = createNewThreadMessenger(
-        channel,
-        {
-          name: "testThread",
-        },
-        (thread) => {
-          if (thread !== null) {
-            return {
-              content: `<#${thread.id}>`,
-            };
-          } else {
-            return {
-              content: "スレッドを作成します",
-            };
-          }
-        }
-      );
+      const messenger = createTextChannelMessenger(channel);
 
       const { collector, controller } = await inquire(
         {
           button: buttonPrompt({
             button: {
               label: (value) => `Test ${value}`,
+            },
+          }),
+          select: selectPrompt({
+            select: {
+              options: [
+                {
+                  label: "ItemA",
+                  value: "A",
+                  description: "This is ItemA",
+                  default: true,
+                },
+                {
+                  label: "ItemB",
+                  value: "B",
+                  description: "This is ItemB",
+                  default: false,
+                },
+              ],
+              minValues: 1,
+              maxValues: 2,
             },
           }),
         },
@@ -62,6 +66,14 @@ export const testCommandEvent: CommandEvent = {
             .toJSON(),
         }
       );
+
+      collector.onUpdateOne("select", (state) => {
+        logger.trace("select state updated", state);
+      });
+
+      collector.onUpdateOne("button", (state) => {
+        logger.trace("button state updated", state);
+      });
 
       const result = await collector.awaitAll();
       // await controller.repost({
