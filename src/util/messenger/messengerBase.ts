@@ -13,6 +13,18 @@ export const createMessengerBase = (
 ): Messenger => {
   const sendHistoryCollection = new Collection<string, SendHistoryItem>();
 
+  const editItem = async (historyItem: SendHistoryItem, param: MessageParam) => {
+    if (
+      historyItem.target.type === "commandInteraction" ||
+      historyItem.target.type === "messageComponentInteraction"
+    ) {
+      //ephemeralなinteractionReplyの編集はmessageからではなく、interaction側から行う必要がある
+      return await historyItem.target.interaction.editReply(param);
+    } else {
+      return await historyItem.message.edit(param);
+    }
+  };
+
   return {
     send: async (
       param,
@@ -28,27 +40,19 @@ export const createMessengerBase = (
       return message;
     },
     edit: async (param, message) => {
-      if (sendHistoryCollection.has(message.id)) {
-        return await message.edit(param);
+      const historyItem = sendHistoryCollection.get(message.id);
+      if (historyItem !== undefined) {
+        return await editItem(historyItem, param);
       } else {
         throw new Error(`このMessengerから送信されたMessageではないため編集できません`);
       }
     },
     editLatest: async (param) => {
       const historyItem = sendHistoryCollection.last();
-
-      if (historyItem === undefined) {
-        throw new Error(`このMessengerから送信されたMessageがありません`);
-      }
-
-      if (
-        historyItem.target.type === "commandInteraction" ||
-        historyItem.target.type === "messageComponentInteraction"
-      ) {
-        //ephemeralなinteractionReplyの編集はmessageからではなく、interaction側から行う必要がある
-        return await historyItem.target.interaction.editReply(param);
+      if (historyItem !== undefined) {
+        return await editItem(historyItem, param);
       } else {
-        return await historyItem.message.edit(param);
+        throw new Error(`このMessengerから送信されたMessageがありません`);
       }
     },
     postedMessages: () => Array.from(sendHistoryCollection.values()).map((item) => item.message),
