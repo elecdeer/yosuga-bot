@@ -14,7 +14,8 @@
     "noUnusedParameters": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "importsNotUsedAsValues": "error",
   },
   "include": [
     "src/*.ts",

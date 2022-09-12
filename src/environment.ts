@@ -1,65 +1,61 @@
 import { config } from "dotenv";
-import * as fs from "fs";
+import { readFileSync } from "fs";
+import { z } from "zod";
+
+import type { JsonObject } from "type-fest";
 
 config();
 
-export type YosugaEnv = {
-  logDir: string;
-  configDir: string;
-  discordToken: string;
-  discordAppId: string;
-  discordPublicKey: string;
-};
+const yosugaEnvScheme = z.object({
+  envMode: z.union([z.literal("production"), z.literal("development")]).default("production"),
+  logDir: z.string().default("./log"),
+  configDir: z.string().default("./config"),
+  discordToken: z.string(),
+});
 
-export type ImageEnv = {
-  commitId: string;
-  ref: string;
-  imageName: string;
-  trigger: string;
-};
+export type YosugaEnv = z.infer<typeof yosugaEnvScheme>;
+
+const imageEnvScheme = z.object({
+  commitId: z.string().default(""),
+  ref: z.string().default(""),
+  imageName: z.string().default(""),
+  trigger: z.string().default(""),
+});
+
+export type ImageEnv = z.infer<typeof imageEnvScheme>;
 
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
-  const env: Partial<YosugaEnv> = {
+  const env = {
+    envMode: process.env.NODE_ENV,
     logDir: process.env.LOG_DIR,
     configDir: process.env.CONFIG_DIR,
     discordToken: process.env.DISCORD_TOKEN,
-    discordAppId: process.env.DISCORD_APP_ID,
-    discordPublicKey: process.env.DISCORD_PUB_KEY,
   };
 
-  env.configDir ??= "./config";
-  env.logDir ??= "./log";
-  if (env.discordToken === undefined) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
-
-  console.info(env);
-
-  return env as YosugaEnv;
+  try {
+    const parsed = yosugaEnvScheme.parse(env);
+    console.log("env", parsed);
+    return parsed;
+  } catch (e) {
+    throw new Error("不適切な環境変数が設定されています", {
+      cause: e,
+    });
+  }
 };
 
 export const yosugaEnv: Readonly<YosugaEnv> = initEnv();
 
-const initImageEnv = (): ImageEnv => {
+const readImageEnvFile = (): JsonObject => {
   try {
-    const readResult = fs.readFileSync("./imageenv.json");
-    const env = JSON.parse(readResult.toString()) as ImageEnv;
-    const empty = {
-      imageName: "",
-      ref: "",
-      trigger: "",
-      commitId: "",
-    };
-    return {
-      ...empty,
-      ...env,
-    };
+    return JSON.parse(readFileSync("./imageenv.json").toString());
   } catch (e) {
-    return {
-      commitId: "",
-      ref: "",
-      imageName: "",
-      trigger: "",
-    };
+    return {};
   }
+};
+
+const initImageEnv = (): ImageEnv => {
+  const readResult = readImageEnvFile();
+  return imageEnvScheme.parse(readResult);
 };
 export const imageEnv: Readonly<ImageEnv> = initImageEnv();

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --enable-source-maps dist/index.mjs",
     "build": "rimraf dist && rollup -c",
-    "dev": "rimraf dist && rollup -c --environment DEV",
+    "dev": "rimraf dist && rollup -c --environment DEV,NODE_ENV:development",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "check": "npm-run-all check:*",
