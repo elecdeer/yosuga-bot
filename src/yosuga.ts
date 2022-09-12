@@ -71,14 +71,14 @@ export class Yosuga {
   }
 
   private registerLogHandlers() {
-    this.events.messageCreate.on(({ logger }) => {
-      logger.debug("event called: messageCreate");
+    this.events.messageCreate.on(({ logger, message }) => {
+      logger.debug("event called: messageCreate", message.toJSON());
     });
-    this.events.interactionCreate.on(({ logger }) => {
-      logger.debug("event called: interactionCreate");
+    this.events.interactionCreate.on(({ logger, interaction }) => {
+      logger.debug("event called: interactionCreate", interaction.toJSON());
     });
-    this.events.voiceStateUpdate.on(({ logger }) => {
-      logger.debug("event called: voiceStateUpdate");
+    this.events.voiceStateUpdate.on(({ logger, newState }) => {
+      logger.debug("event called: voiceStateUpdate", newState.toJSON());
     });
   }
 
