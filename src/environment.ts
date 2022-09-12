@@ -1,6 +1,8 @@
 import { config } from "dotenv";
-import * as fs from "fs";
+import { readFileSync } from "fs";
 import { z } from "zod";
+
+import type { JsonObject } from "type-fest";
 
 config();
 
@@ -13,12 +15,14 @@ const yosugaEnvScheme = z.object({
 
 export type YosugaEnv = z.infer<typeof yosugaEnvScheme>;
 
-export type ImageEnv = {
-  commitId: string;
-  ref: string;
-  imageName: string;
-  trigger: string;
-};
+const imageEnvScheme = z.object({
+  commitId: z.string().default(""),
+  ref: z.string().default(""),
+  imageName: z.string().default(""),
+  trigger: z.string().default(""),
+});
+
+export type ImageEnv = z.infer<typeof imageEnvScheme>;
 
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
@@ -42,27 +46,16 @@ const initEnv = (): YosugaEnv => {
 
 export const yosugaEnv: Readonly<YosugaEnv> = initEnv();
 
-const initImageEnv = (): ImageEnv => {
+const readImageEnvFile = (): JsonObject => {
   try {
-    const readResult = fs.readFileSync("./imageenv.json");
-    const env = JSON.parse(readResult.toString()) as ImageEnv;
-    const empty = {
-      imageName: "",
-      ref: "",
-      trigger: "",
-      commitId: "",
-    };
-    return {
-      ...empty,
-      ...env,
-    };
+    return JSON.parse(readFileSync("./imageenv.json").toString());
   } catch (e) {
-    return {
-      commitId: "",
-      ref: "",
-      imageName: "",
-      trigger: "",
-    };
+    return {};
   }
+};
+
+const initImageEnv = (): ImageEnv => {
+  const readResult = readImageEnvFile();
+  return imageEnvScheme.parse(readResult);
 };
 export const imageEnv: Readonly<ImageEnv> = initImageEnv();
