@@ -1,15 +1,17 @@
 import { config } from "dotenv";
 import * as fs from "fs";
+import { z } from "zod";
 
 config();
 
-export type YosugaEnv = {
-  logDir: string;
-  configDir: string;
-  discordToken: string;
-  discordAppId: string;
-  discordPublicKey: string;
-};
+const yosugaEnvScheme = z.object({
+  nodeEnv: z.union([z.literal("production"), z.literal("development")]).default("production"),
+  logDir: z.string().default("./log"),
+  configDir: z.string().default("./config"),
+  discordToken: z.string(),
+});
+
+export type YosugaEnv = z.infer<typeof yosugaEnvScheme>;
 
 export type ImageEnv = {
   commitId: string;
@@ -20,21 +22,22 @@ export type ImageEnv = {
 
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
-  const env: Partial<YosugaEnv> = {
+  const env = {
+    nodeEnv: process.env.NODE_ENV,
     logDir: process.env.LOG_DIR,
     configDir: process.env.CONFIG_DIR,
     discordToken: process.env.DISCORD_TOKEN,
-    discordAppId: process.env.DISCORD_APP_ID,
-    discordPublicKey: process.env.DISCORD_PUB_KEY,
   };
 
-  env.configDir ??= "./config";
-  env.logDir ??= "./log";
-  if (env.discordToken === undefined) throw Error("環境変数 DISCORD_TOKEN が設定されていません");
-
-  console.info(env);
-
-  return env as YosugaEnv;
+  try {
+    const parsed = yosugaEnvScheme.parse(env);
+    console.log("env", parsed);
+    return parsed;
+  } catch (e) {
+    throw new Error("不適切な環境変数が設定されています", {
+      cause: e,
+    });
+  }
 };
 
 export const yosugaEnv: Readonly<YosugaEnv> = initEnv();
