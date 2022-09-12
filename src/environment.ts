@@ -7,7 +7,7 @@ import type { JsonObject } from "type-fest";
 config();
 
 const yosugaEnvScheme = z.object({
-  nodeEnv: z.union([z.literal("production"), z.literal("development")]).default("production"),
+  envMode: z.union([z.literal("production"), z.literal("development")]).default("production"),
   logDir: z.string().default("./log"),
   configDir: z.string().default("./config"),
   discordToken: z.string(),
@@ -27,7 +27,7 @@ export type ImageEnv = z.infer<typeof imageEnvScheme>;
 const initEnv = (): YosugaEnv => {
   console.log("initEnv");
   const env = {
-    nodeEnv: process.env.NODE_ENV,
+    envMode: process.env.NODE_ENV,
     logDir: process.env.LOG_DIR,
     configDir: process.env.CONFIG_DIR,
     discordToken: process.env.DISCORD_TOKEN,
