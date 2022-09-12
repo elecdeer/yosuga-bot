@@ -1,4 +1,4 @@
-import { ChannelType } from "discord-api-types/payloads/v10/channel";
+import { ChannelType } from "discord-api-types/payloads/v10";
 import { InteractionType } from "discord-api-types/v10";
 
 import type { BaseInteraction } from "discord.js";

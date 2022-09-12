@@ -7,5 +7,9 @@ export const summarizeMessage = (message: Message) => {
     guildId: message.guildId,
     authorId: message.author.id,
     content: message.content,
+    embeds: message.embeds.map((embed) => embed.toJSON()),
+    attachments: message.attachments.map((attachment) => attachment.toJSON()),
+    stickers: message.stickers.map((sticker) => sticker.toJSON()),
+    components: message.components.map((component) => component.toJSON()),
   };
 };
