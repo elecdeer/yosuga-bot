@@ -3,6 +3,7 @@ import { registerHandlers } from "./handler";
 import { getLogger } from "./logger";
 import { createRepository } from "./repository";
 import { generalConfigDefault, personalConfigDefault } from "./repository/defaultValue";
+import { summarizeInteraction, summarizeMessage, summarizeVoiceState } from "./util/summarize";
 
 import type { IEventFlow } from "./eventFlow/eventFlow";
 import type { Logger } from "./logger";
@@ -71,14 +72,14 @@ export class Yosuga {
   }
 
   private registerLogHandlers() {
-    this.events.messageCreate.on(({ logger }) => {
-      logger.debug("event called: messageCreate");
+    this.events.messageCreate.on(({ logger, message }) => {
+      logger.debug("event called: messageCreate", summarizeMessage(message));
     });
-    this.events.interactionCreate.on(({ logger }) => {
-      logger.debug("event called: interactionCreate");
+    this.events.interactionCreate.on(({ logger, interaction }) => {
+      logger.debug("event called: interactionCreate", summarizeInteraction(interaction));
     });
-    this.events.voiceStateUpdate.on(({ logger }) => {
-      logger.debug("event called: voiceStateUpdate");
+    this.events.voiceStateUpdate.on(({ logger, newState }) => {
+      logger.debug("event called: voiceStateUpdate", summarizeVoiceState(newState));
     });
   }
 

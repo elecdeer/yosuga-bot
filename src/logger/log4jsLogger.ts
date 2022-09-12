@@ -23,9 +23,9 @@ const logLayout = ({ oneLine, colored }: { oneLine: boolean; colored: boolean })
       return logEvent.data
         .map((d) => {
           if (oneLine) {
-            return stringifyLogMessage(d).replace(/\n/gm, "\\n");
+            return stringifyLogMessage(d, colored).replace(/\n/gm, "\\n");
           } else {
-            const str = stringifyLogMessage(d);
+            const str = stringifyLogMessage(d, colored);
             if (str.includes("\n")) {
               const lines = str.split("\n");
               return `\n${lines.map((line) => `  ${line}`).join("\n")}`;
@@ -40,11 +40,11 @@ const logLayout = ({ oneLine, colored }: { oneLine: boolean; colored: boolean })
   },
 });
 
-const stringifyLogMessage = (data: unknown) => {
+const stringifyLogMessage = (data: unknown, colored: boolean) => {
   if (typeof data === "string" || typeof data === "number" || typeof data === "boolean") {
     return data.toString();
   } else {
-    return inspect(data, { breakLength: Infinity });
+    return inspect(data, { breakLength: Infinity, depth: 4, colors: colored });
   }
 };
 

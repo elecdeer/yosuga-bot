@@ -2,6 +2,7 @@ import { ChannelType, EmbedBuilder } from "discord.js";
 
 import { buttonPrompt, inquire, selectPrompt } from "../../inquirer";
 import { createTextChannelMessenger } from "../../util/messenger/textChannelMessenger";
+import { withLog } from "../../util/messenger/withLog";
 
 import type { CommandEvent, CommandProps } from "./index";
 
@@ -23,7 +24,7 @@ export const testCommandEvent: CommandEvent = {
 
       if (channel === null || channel.type !== ChannelType.GuildText) return;
 
-      const messenger = createTextChannelMessenger(channel);
+      const messenger = withLog(createTextChannelMessenger(channel), logger);
 
       const { collector, controller } = await inquire(
         {
