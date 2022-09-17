@@ -1,6 +1,6 @@
 import { ChannelType, EmbedBuilder } from "discord.js";
 
-import { buttonPrompt, inquire, selectPrompt } from "../../inquirer";
+import { buttonPrompt, inquire } from "../../inquirer";
 import { createTextChannelMessenger } from "../../util/messenger/textChannelMessenger";
 import { withLog } from "../../util/messenger/withLog";
 
@@ -26,33 +26,9 @@ export const testCommandEvent: CommandEvent = {
 
       const messenger = withLog(createTextChannelMessenger(channel), logger);
 
-      const { collector, controller } = await inquire(
+      await inquire(
         {
-          button: buttonPrompt({
-            button: {
-              label: (value) => `Test ${value}`,
-            },
-          }),
-          select: selectPrompt({
-            select: {
-              options: [
-                {
-                  label: "ItemA",
-                  value: "A",
-                  description: "This is ItemA",
-                  default: true,
-                },
-                {
-                  label: "ItemB",
-                  value: "B",
-                  description: "This is ItemB",
-                  default: false,
-                },
-              ],
-              minValues: 1,
-              maxValues: 2,
-            },
-          }),
+          button: buttonPrompt(),
         },
         {
           messenger: messenger,
@@ -68,19 +44,19 @@ export const testCommandEvent: CommandEvent = {
         }
       );
 
-      collector.onUpdateOne("select", (state) => {
-        logger.trace("select state updated", state);
-      });
-
-      collector.onUpdateOne("button", (state) => {
-        logger.trace("button state updated", state);
-      });
-
-      const result = await collector.awaitAll();
-      // await controller.repost({
-      //   type: "channel",
+      // collector.onUpdateOne("select", (state) => {
+      //   logger.trace("select state updated", state);
       // });
-      logger.trace("awaitAll()", result);
+      //
+      // collector.onUpdateOne("button", (state) => {
+      //   logger.trace("button state updated", state);
+      // });
+      //
+      // const result = await collector.awaitAll();
+      // // await controller.repost({
+      // //   type: "channel",
+      // // });
+      // logger.trace("awaitAll()", result);
     });
   },
   slashOption: (builder) => builder,

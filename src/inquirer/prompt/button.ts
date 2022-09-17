@@ -1,24 +1,40 @@
-import { composePrompt } from "../composePrompt";
-import { outputButtonComponent } from "../modules/buttonComponent";
-import { outputButtonResult } from "../modules/buttonResult";
-import { subscribeButtonInteraction } from "../modules/buttonSubscribeInteraction";
-import { monoButtonReducer } from "../modules/monoButtonReducer";
+import { ButtonStyle, ComponentType } from "discord-api-types/v10";
 
-import type { LazyParam } from "../../util/lazy";
-import type { ButtonParam } from "../modules/buttonComponent";
-import type { PromptFactory } from "../types/prompt";
+import { getLogger } from "../../logger";
 
-export const buttonPrompt = (param: {
-  customId?: string;
-  button: LazyParam<ButtonParam, number>;
-  initialClickCount?: number;
-}): PromptFactory<void> => {
-  const { customId = "button", button, initialClickCount = 0 } = param;
-  return composePrompt({
-    initialState: initialClickCount,
-    subscribeMessages: [subscribeButtonInteraction(customId)],
-    stateReducer: monoButtonReducer,
-    outputResult: outputButtonResult,
-    outputComponentParam: outputButtonComponent(customId, button),
-  });
+import type { Prompt } from "../types/prompt";
+
+const logger = getLogger("button");
+
+export const buttonPrompt = (): Prompt<number> => {
+  return (ctx) => {
+    const [count, setCount] = ctx.useState(0);
+    ctx.useEffect(() => {
+      logger.trace("useEffect");
+      const timer = setInterval(() => {
+        logger.trace(`setCount: ${count + 1}`);
+        setCount(count + 1);
+      }, 5000);
+      return () => {
+        clearInterval(timer);
+      };
+    }, []);
+
+    return {
+      status: {
+        status: "unanswered",
+      },
+      component: {
+        type: ComponentType.ActionRow,
+        components: [
+          {
+            type: ComponentType.Button,
+            custom_id: "button",
+            style: ButtonStyle.Primary,
+            label: `${count}`,
+          },
+        ],
+      },
+    };
+  };
 };
