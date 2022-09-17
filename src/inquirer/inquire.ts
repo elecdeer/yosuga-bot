@@ -1,11 +1,12 @@
 import { Collection } from "discord.js";
 
 import { getLogger } from "../logger";
-import { resolveLazy } from "../util/lazy";
-import { createContext, getHookContext } from "./hookContext";
+import { createHookContext } from "./hookContext";
+import { inquireCollector } from "./inquireCollector";
+import { inquirerMessageProxy } from "./inquirerMessageProxy";
 
-import type { InquirerOption, InquirerOptionMessage, InquirerOptionTimer } from "./types/inquire";
-import type { AnswerStatus, ComponentPayload, Prompt } from "./types/prompt";
+import type { InquirerOption, InquirerOptionTimer } from "./types/inquire";
+import type { AnswerStatus, Prompt } from "./types/prompt";
 
 const logger = getLogger("inquire");
 
@@ -19,7 +20,7 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     idle,
   };
 
-  const messageSender = inquirerMessageSender({
+  const messageProxy = inquirerMessageProxy({
     messenger,
     messageContent,
     ephemeral,
@@ -31,73 +32,63 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   );
 
   const queueDispatch = immediateThrottle(() => {
-    void renderPrompt();
+    void edit();
   });
-  const controller = createContext(queueDispatch);
+  const controller = createHookContext(queueDispatch);
 
-  let renderCount = 0;
-  const renderPrompt = async () => {
-    logger.trace("renderPrompt", renderCount);
-
+  const resolvePrompts = () => {
     controller.startRender();
-    logger.trace("dumpContext", getHookContext());
-
     const renderResults = promptCollection.mapValues((prompt) => prompt());
-    await updateComponentWhenUpdated(renderResults.map((result) => result.component));
-    await updateStatusWhenUpdated(renderResults.map((result) => result.status));
-
     controller.endRender();
 
-    renderCount++;
+    return {
+      component: renderResults.mapValues((result) => result.component),
+      status: renderResults.mapValues((result) => result.status),
+    };
+  };
+
+  const send = async () => {
+    const { component, status } = resolvePrompts();
+    const message = await messageProxy.send(Array.from(component.values()));
+    controller.afterMount(message);
+
+    await updateStatus(status);
+
+    return message;
+  };
+
+  const edit = async () => {
+    const { component, status } = resolvePrompts();
+    const message = await messageProxy.edit(Array.from(component.values()));
+    if (message !== null) {
+      controller.beforeUnmount();
+      controller.afterMount(message);
+    }
+    await updateStatus(status);
+
+    return message;
   };
 
   //初回
-  queueDispatch();
+  setImmediate(() => {
+    void send();
+  });
 
-  const updateStatusWhenUpdated = async (statusList: AnswerStatus<unknown>[]) => {
-    //TODO 前回と変わっているかをチェック
-    logger.trace("updateStatusWhenUpdated", statusList);
+  const updateStatus = async (
+    statusList: Collection<keyof T, AnswerStatus<unknown>>
+  ) => {
+    logger.trace("updateStatus", statusList);
+    inquireController.root.emit(statusList);
   };
 
-  const updateComponentWhenUpdated = async (componentList: ComponentPayload[]) => {
-    //TODO 前回と変わっているかをチェック
-    logger.trace("updateComponentWhenUpdated", componentList);
+  const inquireController = inquireCollector<T>(Array.from(promptCollection.keys()));
 
-    if (renderCount === 0) {
-      const message = await messageSender.send(componentList);
-      controller.afterMount(message);
-    } else {
-      controller.beforeUnmount();
-      const message = await messageSender.edit(componentList);
-      controller.afterMount(message);
-    }
-  };
-};
-
-const inquirerMessageSender = ({
-  messenger,
-  messageContent,
-  ephemeral,
-  rootTarget,
-}: InquirerOptionMessage) => {
   return {
-    send: async (componentList: ComponentPayload[]) => {
-      return messenger.send(
-        {
-          embeds: [resolveLazy(messageContent)],
-          components: componentList,
-          ephemeral: ephemeral,
-        },
-        rootTarget
-      );
+    controller: {
+      send,
+      edit,
     },
-    edit: async (componentList: ComponentPayload[]) => {
-      return messenger.editLatest({
-        embeds: [resolveLazy(messageContent)],
-        components: componentList,
-        ephemeral: ephemeral,
-      });
-    },
+    collector: inquireController,
   };
 };
 

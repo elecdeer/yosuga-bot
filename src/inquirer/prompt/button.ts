@@ -11,7 +11,7 @@ export const buttonPrompt = (): Prompt<number> => {
   return () => {
     const [count, setCount] = useState(0);
 
-    useEffect((message) => {
+    useEffect(() => {
       logger.trace("useEffect");
       const timer = setInterval(() => {
         logger.trace(`setCount`);
@@ -23,9 +23,7 @@ export const buttonPrompt = (): Prompt<number> => {
     });
 
     return {
-      status: {
-        status: "unanswered",
-      },
+      status: count >= 2 ? { status: "answered", value: count } : { status: "unanswered" },
       component: {
         type: ComponentType.ActionRow,
         components: [
@@ -33,7 +31,7 @@ export const buttonPrompt = (): Prompt<number> => {
             type: ComponentType.Button,
             custom_id: "button",
             style: ButtonStyle.Primary,
-            label: `${count}`,
+            label: `count: ${count}`,
           },
         ],
       },

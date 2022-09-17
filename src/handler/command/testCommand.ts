@@ -26,7 +26,7 @@ export const testCommandEvent: CommandEvent = {
 
       const messenger = withLog(createTextChannelMessenger(channel), logger);
 
-      await inquire(
+      const { collector } = inquire(
         {
           button: buttonPrompt(),
         },
@@ -44,19 +44,21 @@ export const testCommandEvent: CommandEvent = {
         }
       );
 
-      // collector.onUpdateOne("select", (state) => {
-      //   logger.trace("select state updated", state);
-      // });
-      //
-      // collector.onUpdateOne("button", (state) => {
-      //   logger.trace("button state updated", state);
-      // });
-      //
-      // const result = await collector.awaitAll();
-      // // await controller.repost({
-      // //   type: "channel",
-      // // });
-      // logger.trace("awaitAll()", result);
+      collector.all.on((status) => {
+        logger.debug("all", status);
+      });
+
+      collector.one.button.on((state) => {
+        logger.debug("one.button", state);
+      });
+
+      collector.some.on((value) => {
+        logger.debug("some", value);
+      });
+
+      const result = await collector.allAnswered.wait();
+      logger.debug("allAnswered", result);
+
     });
   },
   slashOption: (builder) => builder,

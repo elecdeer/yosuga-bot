@@ -36,6 +36,11 @@ export interface IEventFlowHandler<T> {
   once(handler: Handler<T>): HookReturn<T>;
 
   /**
+   * 次にemitされた値を持ったPromiseを返す
+   */
+  wait(): Promise<T>;
+
+  /**
    * handlerを削除する
    * @param handler
    */
@@ -115,6 +120,11 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
         methods.off(onceHandler);
       };
       return methods.on(onceHandler);
+    },
+    wait(): Promise<T> {
+      return new Promise((resolve) => {
+        methods.once(resolve);
+      });
     },
     off(handler: Handler<T>): void {
       handlers.delete(handler);
