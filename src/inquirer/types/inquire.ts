@@ -2,18 +2,6 @@ import type { Lazy } from "../../util/lazy";
 import type { Messenger, ReplyTarget } from "../../util/messenger/messenger";
 import type { APIEmbed } from "discord-api-types/v10";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Context extends HookContext {
-  //
-}
-
-export interface HookContext {
-  useState<T>(initial: T): [T, (value: T) => void];
-  useEffect(callback: () => CleanHook | void, deps?: unknown[]): void;
-}
-
-type CleanHook = () => void;
-
 export type InquirerOptionTimer = {
   /**
    * 最初にinquirerを送信してからタイムアウトするまでの時間

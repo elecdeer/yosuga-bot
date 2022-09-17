@@ -1,7 +1,6 @@
-import type { Context } from "./inquire";
 import type { APIActionRowComponent, APIMessageActionRowComponent } from "discord-api-types/v10";
 
-export type Prompt<TResult> = (ctx: Context) => {
+export type Prompt<TResult> = () => {
   status: AnswerStatus<TResult>;
   component: ComponentPayload;
 };

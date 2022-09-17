@@ -2,7 +2,7 @@ import { Collection } from "discord.js";
 
 import { getLogger } from "../logger";
 import { resolveLazy } from "../util/lazy";
-import { createContext } from "./hookContext";
+import { createContext, getHookContext } from "./hookContext";
 
 import type { InquirerOption, InquirerOptionMessage, InquirerOptionTimer } from "./types/inquire";
 import type { AnswerStatus, ComponentPayload, Prompt } from "./types/prompt";
@@ -33,15 +33,20 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   const queueDispatch = immediateThrottle(() => {
     void renderPrompt();
   });
-  const { context, controller } = createContext(queueDispatch);
+  const controller = createContext(queueDispatch);
 
   let renderCount = 0;
   const renderPrompt = async () => {
     logger.trace("renderPrompt", renderCount);
-    controller.start();
-    const renderResults = promptCollection.mapValues((prompt) => prompt(context));
+
+    controller.startRender();
+    logger.trace("dumpContext", getHookContext());
+
+    const renderResults = promptCollection.mapValues((prompt) => prompt());
     await updateComponentWhenUpdated(renderResults.map((result) => result.component));
     await updateStatusWhenUpdated(renderResults.map((result) => result.status));
+
+    controller.endRender();
 
     renderCount++;
   };
@@ -57,10 +62,14 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   const updateComponentWhenUpdated = async (componentList: ComponentPayload[]) => {
     //TODO 前回と変わっているかをチェック
     logger.trace("updateComponentWhenUpdated", componentList);
+
     if (renderCount === 0) {
-      await messageSender.send(componentList);
+      const message = await messageSender.send(componentList);
+      controller.afterMount(message);
     } else {
-      await messageSender.edit(componentList);
+      controller.beforeUnmount();
+      const message = await messageSender.edit(componentList);
+      controller.afterMount(message);
     }
   };
 };

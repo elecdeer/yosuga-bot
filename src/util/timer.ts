@@ -41,7 +41,7 @@ export const onceTimer = (timeMs: number, unref = true): Timer => {
   };
 
   return {
-    start: start,
+    startRender: start,
     reset: () => {
       if (status !== null) {
         clearTimeout(status.timer);

@@ -1,24 +1,26 @@
 import { ButtonStyle, ComponentType } from "discord-api-types/v10";
 
 import { getLogger } from "../../logger";
+import { useState, useEffect } from "../hooks";
 
 import type { Prompt } from "../types/prompt";
 
 const logger = getLogger("button");
 
 export const buttonPrompt = (): Prompt<number> => {
-  return (ctx) => {
-    const [count, setCount] = ctx.useState(0);
-    ctx.useEffect(() => {
+  return () => {
+    const [count, setCount] = useState(0);
+
+    useEffect((message) => {
       logger.trace("useEffect");
       const timer = setInterval(() => {
-        logger.trace(`setCount: ${count + 1}`);
-        setCount(count + 1);
+        logger.trace(`setCount`);
+        setCount((prev) => prev + 1);
       }, 5000);
       return () => {
         clearInterval(timer);
       };
-    }, []);
+    });
 
     return {
       status: {
