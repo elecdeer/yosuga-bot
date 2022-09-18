@@ -58,7 +58,6 @@ export const testCommandEvent: CommandEvent = {
 
       const result = await collector.allAnswered.wait();
       logger.debug("allAnswered", result);
-
     });
   },
   slashOption: (builder) => builder,

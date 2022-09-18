@@ -1,6 +1,7 @@
 import { Collection } from "discord.js";
 
 import { getLogger } from "../logger";
+import { immediateThrottle } from "../util/throttle";
 import { createHookContext } from "./hookContext";
 import { inquireCollector } from "./inquireCollector";
 import { inquirerMessageProxy } from "./inquirerMessageProxy";
@@ -74,9 +75,7 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     void send();
   });
 
-  const updateStatus = async (
-    statusList: Collection<keyof T, AnswerStatus<unknown>>
-  ) => {
+  const updateStatus = async (statusList: Collection<keyof T, AnswerStatus<unknown>>) => {
     logger.trace("updateStatus", statusList);
     inquireController.root.emit(statusList);
   };
@@ -89,29 +88,5 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
       edit,
     },
     collector: inquireController,
-  };
-};
-
-const immediateThrottle = (fn: () => void) => {
-  let isPending = false;
-
-  return () => {
-    logger.trace("throttle");
-    if (isPending) {
-      logger.trace("skip");
-      return;
-    }
-    isPending = true;
-    logger.trace("enqueue");
-    setImmediate(() => {
-      logger.trace("execute");
-      fn();
-      isPending = false;
-    });
-    // queueMicrotask(() => {
-    //   logger.trace("execute");
-    //   fn();
-    //   isPending = false;
-    // });
   };
 };
