@@ -31,12 +31,11 @@ export const useStateWithContext =
       };
     }
 
-    const currentValue = ctx.hookValues[current].value as T;
     return [
-      currentValue,
-      (dispatch: Lazy<T, T>) => {
+      ctx.hookValues[current].value as T,
+      (dispatchValue: Lazy<T, T>) => {
         ctx.hookValues[current] = {
-          value: resolveLazy(dispatch, currentValue),
+          value: resolveLazy(dispatchValue, ctx.hookValues[current].value as T),
           hookType: hookType,
           index: current,
         };
