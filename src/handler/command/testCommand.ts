@@ -28,7 +28,9 @@ export const testCommandEvent: CommandEvent = {
 
       const { collector, controller } = inquire(
         {
-          button: buttonPrompt(),
+          button: buttonPrompt({
+            label: (value) => `ボタン`,
+          }),
         },
         {
           messenger: messenger,

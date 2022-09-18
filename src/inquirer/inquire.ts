@@ -12,7 +12,7 @@ import type { AnswerStatus, Prompt } from "./types/prompt";
 const logger = getLogger("inquire");
 
 export const inquire = <T extends Record<string, Prompt<unknown>>>(
-  prompts: T | [keyof T, T[keyof T]][],
+  prompts: keyof T extends string ? T | [keyof T, T[keyof T]][] : never,
   option: InquirerOption
 ) => {
   const messageProxy = inquirerMessageProxy({
@@ -31,10 +31,14 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   });
   const controller = createHookContext(queueDispatch);
 
+  let resolveCount = 0;
   const resolvePrompts = () => {
+    logger.debug("resolvePrompts", resolveCount);
     controller.startRender();
-    const renderResults = promptCollection.mapValues((prompt) => prompt());
+    const renderResults = promptCollection.mapValues((prompt, key) => prompt(key as string));
     controller.endRender();
+
+    resolveCount++;
 
     return {
       component: renderResults.mapValues((result) => result.component),

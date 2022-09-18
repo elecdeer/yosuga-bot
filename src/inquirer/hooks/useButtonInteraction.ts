@@ -2,11 +2,11 @@ import { ComponentType } from "discord.js";
 
 import { useEffect } from "./useEffect";
 
-import type { ButtonInteraction } from "discord.js";
+import type { ButtonInteraction, Awaitable } from "discord.js";
 
 export const useButtonInteraction = (
   customId: string,
-  callback: (interaction: ButtonInteraction) => Promise<void>
+  callback: (interaction: ButtonInteraction) => Awaitable<void>
 ) => {
   useEffect((message) => {
     const collector = message.createMessageComponentCollector({

@@ -1,6 +1,6 @@
 import type { APIActionRowComponent, APIMessageActionRowComponent } from "discord-api-types/v10";
 
-export type Prompt<TResult> = () => {
+export type Prompt<TResult> = (customId: string) => {
   status: AnswerStatus<TResult>;
   component: ComponentPayload;
 };

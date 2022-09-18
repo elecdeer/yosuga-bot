@@ -2,11 +2,11 @@ import { ComponentType } from "discord.js";
 
 import { useEffect } from "./useEffect";
 
-import type { SelectMenuInteraction } from "discord.js";
+import type { SelectMenuInteraction, Awaitable } from "discord.js";
 
 export const useSelectInteraction = (
   customId: string,
-  callback: (interaction: SelectMenuInteraction) => Promise<void>
+  callback: (interaction: SelectMenuInteraction) => Awaitable<void>
 ) => {
   useEffect((message) => {
     const collector = message.createMessageComponentCollector({
