@@ -52,7 +52,7 @@ export const testCommandEvent: CommandEvent = {
       collector.one.button.on((state) => {
         logger.debug("one.button", state);
 
-        if (state.status === "answered" && state.value > 3) {
+        if (state.condition === "answered" && state.value > 3) {
           controller.close();
         }
       });

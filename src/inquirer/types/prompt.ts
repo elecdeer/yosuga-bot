@@ -7,17 +7,17 @@ export type Prompt<TResult> = () => {
 
 export type AnswerStatus<T> =
   | {
-      status: "unanswered";
+      condition: "unanswered";
       value?: undefined;
       reason?: undefined;
     }
   | {
-      status: "answered";
+      condition: "answered";
       value: T;
       reason?: undefined;
     }
   | {
-      status: "rejected";
+      condition: "rejected";
       value?: undefined;
       reason: string;
     };

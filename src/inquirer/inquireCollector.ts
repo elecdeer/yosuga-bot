@@ -37,7 +37,7 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
     promptKeys.map((key) => [
       key,
       {
-        status: "unanswered",
+        condition: "unanswered",
       },
     ])
   );
@@ -90,7 +90,7 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
 
   const allAnsweredFlow = rootFlow
     .filter((status) => {
-      return status.every((status) => status.status === "answered");
+      return status.every((status) => status.condition === "answered");
     })
     .map((status) => {
       return Object.fromEntries(status.map((value, key) => [key, value])) as {
