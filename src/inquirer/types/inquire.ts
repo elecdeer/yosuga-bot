@@ -2,7 +2,7 @@ import type { Lazy } from "../../util/lazy";
 import type { Messenger, ReplyTarget } from "../../util/messenger/messenger";
 import type { APIEmbed } from "discord-api-types/v10";
 
-export type InquirerOptionTimer = {
+export type InquirerOptionController = {
   /**
    * 最初にinquirerを送信してからタイムアウトするまでの時間
    */
@@ -12,6 +12,11 @@ export type InquirerOptionTimer = {
    * 最後に回答状態かコンポーネントの状態が変化してからタイムアウトするまでの時間
    */
   idle?: number;
+
+  /**
+   * 使用しなくなったMessageのComponentを削除するかどうか
+   */
+  clearComponentsOnClose?: boolean;
 };
 
 export type InquirerOptionMessage = {
@@ -36,4 +41,4 @@ export type InquirerOptionMessage = {
   ephemeral?: boolean;
 };
 
-export type InquirerOption = InquirerOptionTimer & InquirerOptionMessage;
+export type InquirerOption = InquirerOptionController & InquirerOptionMessage;

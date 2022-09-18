@@ -10,22 +10,26 @@ import type { AnswerStatus } from "./types/prompt";
 
 const logger = getLogger("inquireCollector");
 
-export const inquireCollector = <T extends Record<string, unknown>>(
+export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>>(
   promptKeys: (keyof T)[]
 ): {
   root: IEventFlow<Collection<keyof T, AnswerStatus<unknown>>>;
   all: IEventFlowHandler<{
-    [K in keyof T]: AnswerStatus<T[K]>;
+    [K in keyof T]: T[K];
   }>;
   one: {
-    [K in keyof T]: IEventFlowHandler<AnswerStatus<T[K]>>;
+    [K in keyof T]: IEventFlowHandler<T[K]>;
   };
-  some: IEventFlowHandler<{
-    key: keyof T;
-    status: AnswerStatus<unknown>;
-  }>;
+  some: IEventFlowHandler<
+    {
+      [K in keyof T]: {
+        key: K;
+        status: T[K];
+      };
+    }[keyof T]
+  >;
   allAnswered: IEventFlowHandler<{
-    [K in keyof T]: AnswerStatus<T[K]>;
+    [K in keyof T]: T[K];
   }>;
 } => {
   const rootFlow = createEventFlow<Collection<keyof T, AnswerStatus<unknown>>>();
@@ -40,7 +44,7 @@ export const inquireCollector = <T extends Record<string, unknown>>(
 
   const allFlow = rootFlow.map((status) => {
     return Object.fromEntries(status.map((value, key) => [key, value])) as {
-      [K in keyof T]: AnswerStatus<T[K]>;
+      [K in keyof T]: T[K];
     };
   });
 
@@ -63,19 +67,23 @@ export const inquireCollector = <T extends Record<string, unknown>>(
       .map((status) => status.get(key)!);
     return [key, flow] as const;
   });
-  const oneFlow = Object.fromEntries(eachFlowsEntries) as {
-    [K in keyof T]: IEventFlowHandler<AnswerStatus<T[K]>>;
+  const oneFlow = Object.fromEntries(eachFlowsEntries) as unknown as {
+    [K in keyof T]: IEventFlowHandler<T[K]>;
   };
 
-  const someFlow = createEventFlow<{
-    key: keyof T;
-    status: AnswerStatus<unknown>;
-  }>();
+  const someFlow = createEventFlow<
+    {
+      [K in keyof T]: {
+        key: K;
+        status: T[K];
+      };
+    }[keyof T]
+  >();
   eachFlowsEntries.forEach(([key, flow]) => {
     flow.on((value) => {
       someFlow.emit({
         key: key,
-        status: value,
+        status: value as T[keyof T],
       });
     });
   });
@@ -86,7 +94,7 @@ export const inquireCollector = <T extends Record<string, unknown>>(
     })
     .map((status) => {
       return Object.fromEntries(status.map((value, key) => [key, value])) as {
-        [K in keyof T]: AnswerStatus<T[K]>;
+        [K in keyof T]: T[K];
       };
     });
 

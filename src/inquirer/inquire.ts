@@ -6,7 +6,7 @@ import { createHookContext } from "./hookContext";
 import { inquireCollector } from "./inquireCollector";
 import { inquirerMessageProxy } from "./inquirerMessageProxy";
 
-import type { InquirerOption, InquirerOptionTimer } from "./types/inquire";
+import type { InquirerOption } from "./types/inquire";
 import type { AnswerStatus, Prompt } from "./types/prompt";
 
 const logger = getLogger("inquire");
@@ -15,17 +15,11 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   prompts: T | [keyof T, T[keyof T]][],
   option: InquirerOption
 ) => {
-  const { messenger, rootTarget, idle, time, messageContent, ephemeral } = option;
-  const timerParam: InquirerOptionTimer = {
-    time,
-    idle,
-  };
-
   const messageProxy = inquirerMessageProxy({
-    messenger,
-    messageContent,
-    ephemeral,
-    rootTarget,
+    messenger: option.messenger,
+    messageContent: option.messageContent,
+    ephemeral: option.ephemeral,
+    rootTarget: option.rootTarget,
   });
 
   const promptCollection = new Collection<keyof T, T[keyof T]>(
@@ -49,6 +43,13 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   };
 
   const send = async () => {
+    if (option.clearComponentsOnClose ?? false) {
+      const latestMessage = option.messenger.postedMessages().at(-1);
+      if (latestMessage !== undefined) {
+        await messageProxy.edit([]);
+      }
+    }
+
     const { component, status } = resolvePrompts();
     const message = await messageProxy.send(Array.from(component.values()));
     controller.afterMount(message);
@@ -70,6 +71,17 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     return message;
   };
 
+  const close = async () => {
+    controller.close();
+
+    if (option.clearComponentsOnClose ?? false) {
+      const latestMessage = option.messenger.postedMessages().at(-1);
+      if (latestMessage !== undefined) {
+        await messageProxy.edit([]);
+      }
+    }
+  };
+
   //初回
   setImmediate(() => {
     void send();
@@ -80,12 +92,15 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     inquireController.root.emit(statusList);
   };
 
-  const inquireController = inquireCollector<T>(Array.from(promptCollection.keys()));
+  const inquireController = inquireCollector<{
+    [K in keyof T]: ReturnType<T[K]>["status"];
+  }>(Array.from(promptCollection.keys()));
 
   return {
     controller: {
       send,
       edit,
+      close,
     },
     collector: inquireController,
   };

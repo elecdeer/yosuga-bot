@@ -23,7 +23,7 @@ export const buttonPrompt = (): Prompt<number> => {
     });
 
     return {
-      status: count >= 2 ? { status: "answered", value: count } : { status: "unanswered" },
+      status: count >= 3 ? { status: "answered", value: count } : { status: "unanswered" },
       component: {
         type: ComponentType.ActionRow,
         components: [

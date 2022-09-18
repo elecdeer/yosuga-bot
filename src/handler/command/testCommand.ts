@@ -26,7 +26,7 @@ export const testCommandEvent: CommandEvent = {
 
       const messenger = withLog(createTextChannelMessenger(channel), logger);
 
-      const { collector } = inquire(
+      const { collector, controller } = inquire(
         {
           button: buttonPrompt(),
         },
@@ -41,6 +41,7 @@ export const testCommandEvent: CommandEvent = {
             .setTitle("Yosuga")
             .setDescription("Testコマンド")
             .toJSON(),
+          clearComponentsOnClose: true,
         }
       );
 
@@ -50,6 +51,10 @@ export const testCommandEvent: CommandEvent = {
 
       collector.one.button.on((state) => {
         logger.debug("one.button", state);
+
+        if (state.status === "answered" && state.value > 3) {
+          controller.close();
+        }
       });
 
       collector.some.on((value) => {
