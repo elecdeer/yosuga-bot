@@ -91,14 +91,21 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     void send();
   });
 
-  const updateStatus = async (statusList: Collection<keyof T, AnswerStatus<unknown>>) => {
-    logger.trace("updateStatus", statusList);
-    inquireController.root.emit(statusList);
-  };
-
   const inquireController = inquireCollector<{
     [K in keyof T]: ReturnType<T[K]>["status"];
   }>(Array.from(promptCollection.keys()));
+
+  let prevStatus = new Collection<keyof T, AnswerStatus<unknown>>(
+    promptCollection.map((_, key) => [key, { condition: "unanswered" }])
+  );
+  const updateStatus = async (statusList: Collection<keyof T, AnswerStatus<unknown>>) => {
+    logger.trace("updateStatus", statusList);
+    inquireController.root.emit({
+      prev: prevStatus,
+      next: statusList,
+    });
+    prevStatus = statusList;
+  };
 
   return {
     controller: {

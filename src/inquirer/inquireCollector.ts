@@ -1,5 +1,4 @@
 import assert from "assert";
-import { Collection } from "discord.js";
 import objectHash from "object-hash";
 
 import { createEventFlow } from "../eventFlow/eventFlow";
@@ -7,13 +6,17 @@ import { getLogger } from "../logger";
 
 import type { IEventFlow, IEventFlowHandler } from "../eventFlow/eventFlow";
 import type { AnswerStatus } from "./types/prompt";
+import type { Collection } from "discord.js";
 
 const logger = getLogger("inquireCollector");
 
 export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>>(
   promptKeys: (keyof T)[]
 ): {
-  root: IEventFlow<Collection<keyof T, AnswerStatus<unknown>>>;
+  root: IEventFlow<{
+    prev: Collection<keyof T, AnswerStatus<unknown>>;
+    next: Collection<keyof T, AnswerStatus<unknown>>;
+  }>;
   all: IEventFlowHandler<{
     [K in keyof T]: T[K];
   }>;
@@ -32,18 +35,12 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
     [K in keyof T]: T[K];
   }>;
 } => {
-  const rootFlow = createEventFlow<Collection<keyof T, AnswerStatus<unknown>>>();
-  let prev = new Collection<keyof T, AnswerStatus<unknown>>(
-    promptKeys.map((key) => [
-      key,
-      {
-        condition: "unanswered",
-      },
-    ])
-  );
-
+  const rootFlow = createEventFlow<{
+    prev: Collection<keyof T, AnswerStatus<unknown>>;
+    next: Collection<keyof T, AnswerStatus<unknown>>;
+  }>();
   const allFlow = rootFlow.map((status) => {
-    return Object.fromEntries(status.map((value, key) => [key, value])) as {
+    return Object.fromEntries(status.next.map((value, key) => [key, value])) as {
       [K in keyof T]: T[K];
     };
   });
@@ -51,8 +48,8 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
   const eachFlowsEntries = promptKeys.map((key) => {
     const flow = rootFlow
       .filter((status) => {
-        const prevStatus = prev.get(key);
-        const currentStatus = status.get(key);
+        const prevStatus = status.prev.get(key);
+        const currentStatus = status.next.get(key);
 
         assert(prevStatus);
         assert(currentStatus);
@@ -64,7 +61,7 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
 
         return objectHash(prevStatus) !== objectHash(currentStatus);
       })
-      .map((status) => status.get(key)!);
+      .map((status) => status.next.get(key)!);
     return [key, flow] as const;
   });
   const oneFlow = Object.fromEntries(eachFlowsEntries) as unknown as {
@@ -90,21 +87,13 @@ export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>
 
   const allAnsweredFlow = rootFlow
     .filter((status) => {
-      return status.every((status) => status.condition === "answered");
+      return status.next.every((status) => status.condition === "answered");
     })
     .map((status) => {
-      return Object.fromEntries(status.map((value, key) => [key, value])) as {
+      return Object.fromEntries(status.next.map((value, key) => [key, value])) as {
         [K in keyof T]: T[K];
       };
     });
-
-  //この実装ちょっと怖いかも
-  //前回の値はinquire側で持った方がいいかもしれない
-  rootFlow.on((status) => {
-    setImmediate(() => {
-      prev = status;
-    });
-  });
 
   return {
     root: rootFlow,
