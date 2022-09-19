@@ -2,11 +2,13 @@ import { Collection } from "discord.js";
 
 import { getLogger } from "../logger";
 import { immediateThrottle } from "../util/throttle";
+import { onceTimer } from "../util/timer";
 import { createHookContext } from "./hookContext";
 import { inquireCollector } from "./inquireCollector";
 import { inquirerMessageProxy } from "./inquirerMessageProxy";
 
-import type { InquirerOption } from "./types/inquire";
+import type { Timer } from "../util/timer";
+import type { InquirerOption, InquirerOptionController } from "./types/inquire";
 import type { AnswerStatus, Prompt } from "./types/prompt";
 
 const logger = getLogger("inquire");
@@ -34,6 +36,9 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   let resolveCount = 0;
   const resolvePrompts = () => {
     logger.debug("resolvePrompts", resolveCount);
+
+    resetIdleTimer();
+
     controller.startRender();
     const renderResults = promptCollection.mapValues((prompt, key) => prompt(key as string));
     controller.endRender();
@@ -86,11 +91,6 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     }
   };
 
-  //初回
-  setImmediate(() => {
-    void send();
-  });
-
   const inquireController = inquireCollector<{
     [K in keyof T]: ReturnType<T[K]>["status"];
   }>(Array.from(promptCollection.keys()));
@@ -99,13 +99,19 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     promptCollection.map((_, key) => [key, { condition: "unanswered" }])
   );
   const updateStatus = async (statusList: Collection<keyof T, AnswerStatus<unknown>>) => {
-    logger.trace("updateStatus", statusList);
     inquireController.root.emit({
       prev: prevStatus,
       next: statusList,
     });
     prevStatus = statusList;
   };
+
+  const { resetIdleTimer } = createTimer(option, close);
+
+  //初回
+  setImmediate(() => {
+    void send();
+  });
 
   return {
     controller: {
@@ -114,5 +120,35 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
       close,
     },
     collector: inquireController,
+  };
+};
+
+const createTimer = (
+  option: Pick<InquirerOptionController, "idle" | "time">,
+  close: () => Promise<void>
+) => {
+  if (option.time !== undefined) {
+    const timeoutTimer = onceTimer(option.time);
+    timeoutTimer.start(async () => {
+      await close();
+    });
+  }
+
+  let idleTimer: Timer | null = null;
+  if (option.idle !== undefined) {
+    idleTimer = onceTimer(option.idle);
+    idleTimer.start(async () => {
+      await close();
+    });
+  }
+
+  const resetIdleTimer = () => {
+    if (idleTimer !== null) {
+      idleTimer.reset();
+    }
+  };
+
+  return {
+    resetIdleTimer,
   };
 };
