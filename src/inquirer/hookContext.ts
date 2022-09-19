@@ -39,9 +39,10 @@ const unbindHookContext = () => {
   hookContext = undefined;
 };
 
-const logger = getLogger("hookContext");
-
-export const createHookContext = (queueDispatch: () => void) => {
+export const createHookContext = (
+  queueDispatch: () => void,
+  logger: Logger = getLogger("hookContext")
+) => {
   const context: HookContext = {
     index: 0,
     hookValues: [],
