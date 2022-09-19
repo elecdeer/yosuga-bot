@@ -4,7 +4,7 @@ import objectHash from "object-hash";
 import { createEventFlow } from "../eventFlow/eventFlow";
 import { getLogger } from "../logger";
 
-import type { IEventFlow, IEventFlowHandler } from "../eventFlow/eventFlow";
+import type { IEventFlowHandler, IEventFlowEmitter } from "../eventFlow/eventFlow";
 import type { AnswerStatus } from "./types/prompt";
 import type { Collection } from "discord.js";
 
@@ -13,7 +13,7 @@ const logger = getLogger("inquireCollector");
 export const inquireCollector = <T extends Record<string, AnswerStatus<unknown>>>(
   promptKeys: (keyof T)[]
 ): {
-  root: IEventFlow<{
+  root: IEventFlowEmitter<{
     prev: Collection<keyof T, AnswerStatus<unknown>>;
     next: Collection<keyof T, AnswerStatus<unknown>>;
   }>;
