@@ -1,10 +1,10 @@
 import { getLogger } from "../../logger";
+import { buttonComponent } from "../components/buttonComponent";
+import { rowComponent } from "../components/rowComponent";
 import { useState, useButtonInteraction } from "../hooks";
-import { buttonComponent } from "../modules/buttonComponent";
-import { rowComponent } from "../modules/rowComponent";
 
 import type { LazyParam } from "../../util/lazy";
-import type { ButtonParam } from "../modules/buttonComponent";
+import type { ButtonParam } from "../components/buttonComponent";
 import type { AnswerStatus, Prompt } from "../types/prompt";
 
 const logger = getLogger("button");

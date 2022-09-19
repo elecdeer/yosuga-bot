@@ -6,7 +6,7 @@ import { buttonComponent } from "./buttonComponent";
 
 import type { AnswerStatus } from "../types/prompt";
 
-describe("/inquirer/modules/buttonComponent", () => {
+describe("/inquirer/components/buttonComponent", () => {
   describe("resolveButtonParam()", () => {
     test("正しく出力される", () => {
       expect(
