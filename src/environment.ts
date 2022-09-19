@@ -7,7 +7,7 @@ import type { JsonObject } from "type-fest";
 config();
 
 const yosugaEnvScheme = z.object({
-  envMode: z.union([z.literal("production"), z.literal("development")]).default("production"),
+  envMode: z.enum(["production", "development", "test"]).default("production"),
   logDir: z.string().default("./log"),
   configDir: z.string().default("./config"),
   discordToken: z.string(),
