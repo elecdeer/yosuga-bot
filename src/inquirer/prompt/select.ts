@@ -1,0 +1,56 @@
+import { getLogger } from "../../logger";
+import { rowComponent } from "../components/rowComponent";
+import { valueTabledSelectComponent } from "../components/selectComponent";
+import { useSelectInteraction } from "../hooks";
+import { useReducer } from "../hooks/useReducer";
+
+import type { LazySelectParam } from "../components/selectComponent";
+import type { AnswerStatus, Prompt } from "../types/prompt";
+
+type SelectPromptResult<TOption> = {
+  value: TOption;
+  selected: boolean;
+}[];
+
+const logger = getLogger("select");
+
+export const selectPrompt = <TOption>(
+  param: LazySelectParam<TOption, AnswerStatus<SelectPromptResult<TOption>>>
+): Prompt<SelectPromptResult<TOption>> => {
+  return (customId) => {
+    const [state, dispatch] = useReducer<SelectPromptResult<TOption>, TOption[]>(
+      selectReducer,
+      param.options.map((option) => ({ value: option.value, selected: option.default ?? false }))
+    );
+
+    useSelectInteraction(customId, async (interaction) => {
+      const selected = interaction.values.map((item) => keyToOptionValue(item));
+      dispatch(selected);
+      await interaction.deferUpdate();
+    });
+
+    const status: AnswerStatus<SelectPromptResult<TOption>> =
+      state.length >= (param.minValues ?? 1)
+        ? { condition: "answered", value: state }
+        : { condition: "unanswered" };
+
+    //毎resolve時にテーブルを作るのは良くない気がする
+    //TODO
+    logger.trace("status", status);
+    logger.trace("param", param);
+    const { component, keyToOptionValue } = valueTabledSelectComponent(customId, param)(status);
+    logger.trace("component", component);
+
+    return {
+      status: status,
+      component: rowComponent([component]),
+    };
+  };
+};
+
+const selectReducer = <TOption>(state: SelectPromptResult<TOption>, action: TOption[]) => {
+  return state.map((item) => ({
+    value: item.value,
+    selected: action.includes(item.value),
+  }));
+};

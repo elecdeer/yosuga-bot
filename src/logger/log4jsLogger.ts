@@ -44,7 +44,7 @@ const stringifyLogMessage = (data: unknown, colored: boolean) => {
   if (typeof data === "string" || typeof data === "number" || typeof data === "boolean") {
     return data.toString();
   } else {
-    return inspect(data, { breakLength: Infinity, depth: 4, colors: colored });
+    return inspect(data, { breakLength: Infinity, depth: 8, colors: colored });
   }
 };
 

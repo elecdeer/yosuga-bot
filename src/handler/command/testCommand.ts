@@ -1,6 +1,7 @@
 import { ChannelType, EmbedBuilder } from "discord.js";
 
 import { buttonPrompt, inquire } from "../../inquirer";
+import { selectPrompt } from "../../inquirer";
 import { createTextChannelMessenger } from "../../util/messenger/textChannelMessenger";
 import { withLog } from "../../util/messenger/withLog";
 
@@ -30,6 +31,26 @@ export const testCommandEvent: CommandEvent = {
         {
           button: buttonPrompt({
             label: (value) => `ボタン`,
+          }),
+          select: selectPrompt({
+            options: [
+              {
+                label: (value) =>
+                  value.value?.find((item) => item.value.item === 1)?.selected === true
+                    ? "✓item1"
+                    : "item1",
+                value: {
+                  item: 1,
+                },
+              },
+              {
+                label: "item2",
+                value: {
+                  item: 2,
+                },
+              },
+            ],
+            placeholder: "選択してください",
           }),
         },
         {

@@ -69,7 +69,11 @@ export const selectComponent = <TValue extends ValueBase>(
     custom_id: customId,
     options: options.map((option) => ({
       ...option,
-      default: value.value?.find((item) => item.value === option.value)?.selected ?? false,
+
+      default:
+        option.default ??
+        value.value?.find((item) => item.value === option.value)?.selected ??
+        false,
     })),
     placeholder: placeholder,
     min_values: minValues ?? 1,
@@ -107,9 +111,14 @@ export const createValueTable = <TOption>(
   };
 };
 
-export const valueTabledSelectComponent =
-  <TOption, TValue extends ValueBase>(customId: string, param: LazySelectParam<TOption, TValue>) =>
-  (value: TValue) => {
+//あんまりイケてない
+//TODO テーブルの変換はprompt側でやった方がいいかも
+
+export const valueTabledSelectComponent = <TOption, TValue extends ValueBase>(
+  customId: string,
+  param: LazySelectParam<TOption, TValue>
+) => {
+  return (value: TValue) => {
     const { optionValueToKey, keyToOptionValue } = createValueTable(customId, param.options);
 
     const resolved = resolveSelectParam(param, value);
@@ -122,6 +131,7 @@ export const valueTabledSelectComponent =
           options: resolved.options.map((option) => ({
             ...option,
             value: optionValueToKey(option.value),
+            default: value.value?.find((item) => item.value === option.value)?.selected ?? false,
           })),
         },
         value
@@ -130,3 +140,4 @@ export const valueTabledSelectComponent =
       optionValueToKey,
     };
   };
+};
