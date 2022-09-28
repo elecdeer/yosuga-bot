@@ -35,10 +35,16 @@ export const testCommandEvent: CommandEvent = {
           select: selectPrompt({
             options: [
               {
-                label: (value) =>
-                  value.value?.find((item) => item.value.item === 1)?.selected === true
-                    ? "✓item1"
-                    : "item1",
+                label: (value) => {
+                  const result = collector.states().select;
+                  if (result.condition === "answered") {
+                    const value = result.value.find((v) => v.value.item === 1);
+                    if (value !== undefined && value.selected) {
+                      return "✓option1";
+                    }
+                  }
+                  return "option1";
+                },
                 value: {
                   item: 1,
                 },
@@ -51,6 +57,7 @@ export const testCommandEvent: CommandEvent = {
               },
             ],
             placeholder: "選択してください",
+            minValues: 0,
           }),
         },
         {

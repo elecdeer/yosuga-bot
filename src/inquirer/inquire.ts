@@ -1,15 +1,13 @@
-import { Collection } from "discord.js";
-
 import { getLogger } from "../logger";
 import { immediateThrottle } from "../util/throttle";
 import { onceTimer } from "../util/timer";
+import { inquireCollector } from "./collector/inquireCollector";
 import { createHookContext } from "./hookContext";
-import { inquireCollector } from "./inquireCollector";
 import { inquirerMessageProxy } from "./inquirerMessageProxy";
 
 import type { Timer } from "../util/timer";
 import type { InquirerOption, InquirerOptionController } from "./types/inquire";
-import type { AnswerStatus, Prompt } from "./types/prompt";
+import type { Prompt } from "./types/prompt";
 
 const logger = getLogger("inquire");
 
@@ -24,9 +22,9 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     rootTarget: option.rootTarget,
   });
 
-  const promptCollection = new Collection<keyof T, T[keyof T]>(
-    Array.isArray(prompts) ? prompts : (Object.entries(prompts) as [keyof T, T[keyof T]][])
-  );
+  const promptEntries: [string, Prompt<unknown>][] = Array.isArray(prompts)
+    ? prompts
+    : Object.entries(prompts);
 
   const queueDispatch = immediateThrottle(() => {
     void edit();
@@ -40,14 +38,14 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     resetIdleTimer();
 
     controller.startRender();
-    const renderResults = promptCollection.mapValues((prompt, key) => prompt(key as string));
+    const renderResolved = promptEntries.map(([key, prompt]) => [key, prompt(key)] as const);
     controller.endRender();
 
     resolveCount++;
 
     return {
-      component: renderResults.mapValues((result) => result.component),
-      status: renderResults.mapValues((result) => result.status),
+      components: renderResolved.map(([key, resolved]) => [key, resolved.component] as const),
+      results: renderResolved.map(([key, resolved]) => [key, resolved.result] as const),
     };
   };
 
@@ -59,23 +57,32 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
       }
     }
 
-    const { component, status } = resolvePrompts();
-    const message = await messageProxy.send(Array.from(component.values()));
+    const { components, results } = resolvePrompts();
+    const message = await messageProxy.send(components.map(([, component]) => component));
     controller.afterMount(message);
 
-    await updateStatus(status);
+    updateStates(
+      Object.fromEntries(results) as {
+        [K in keyof T]: ReturnType<T[K]>["result"];
+      }
+    );
 
     return message;
   };
 
   const edit = async () => {
-    const { component, status } = resolvePrompts();
-    const message = await messageProxy.edit(Array.from(component.values()));
+    const { components, results } = resolvePrompts();
+    const message = await messageProxy.edit(components.map(([, component]) => component));
     if (message !== null) {
       controller.beforeUnmount();
       controller.afterMount(message);
     }
-    await updateStatus(status);
+
+    updateStates(
+      Object.fromEntries(results) as {
+        [K in keyof T]: ReturnType<T[K]>["result"];
+      }
+    );
 
     return message;
   };
@@ -89,22 +96,15 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
         await messageProxy.edit([]);
       }
     }
+
+    closeCollector();
   };
 
   const inquireController = inquireCollector<{
-    [K in keyof T]: ReturnType<T[K]>["status"];
-  }>(Array.from(promptCollection.keys()));
+    [K in keyof T]: ReturnType<T[K]>["result"];
+  }>(Array.from(promptEntries.map(([key]) => key)));
 
-  let prevStatus = new Collection<keyof T, AnswerStatus<unknown>>(
-    promptCollection.map((_, key) => [key, { condition: "unanswered" }])
-  );
-  const updateStatus = async (statusList: Collection<keyof T, AnswerStatus<unknown>>) => {
-    inquireController.root.emit({
-      prev: prevStatus,
-      next: statusList,
-    });
-    prevStatus = statusList;
-  };
+  const { updateStates, close: closeCollector } = inquireController;
 
   const { resetIdleTimer } = createTimer(option, close);
 

@@ -4,13 +4,13 @@ import { describe, expect, test } from "vitest";
 
 import { buttonComponent } from "./buttonComponent";
 
-import type { AnswerStatus } from "../types/prompt";
+import type { AnswerState } from "../types/prompt";
 
 describe("/inquirer/components/buttonComponent", () => {
   describe("resolveButtonParam()", () => {
     test("正しく出力される", () => {
       expect(
-        buttonComponent<AnswerStatus<number>>(
+        buttonComponent<AnswerState<number>>(
           "thisIsCustomId",
           {
             style: ButtonStyle.Secondary,

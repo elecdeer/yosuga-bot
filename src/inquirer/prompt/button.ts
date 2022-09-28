@@ -5,12 +5,12 @@ import { useState, useButtonInteraction } from "../hooks";
 
 import type { LazyParam } from "../../util/lazy";
 import type { ButtonParam } from "../components/buttonComponent";
-import type { AnswerStatus, Prompt } from "../types/prompt";
+import type { AnswerState, Prompt } from "../types/prompt";
 
 const logger = getLogger("button");
 
 export const buttonPrompt = (
-  style: LazyParam<ButtonParam, AnswerStatus<number>>
+  style: LazyParam<ButtonParam, AnswerState<number>>
 ): Prompt<number> => {
   return (customId) => {
     const [count, setCount] = useState(0);
@@ -21,12 +21,12 @@ export const buttonPrompt = (
       await interaction.deferUpdate();
     });
 
-    const status: AnswerStatus<number> =
+    const state: AnswerState<number> =
       count > 0 ? { condition: "answered", value: count } : { condition: "unanswered" };
 
     return {
-      status: status,
-      component: rowComponent([buttonComponent(customId, style, status)]),
+      result: state,
+      component: rowComponent([buttonComponent(customId, style, state)]),
     };
   };
 };

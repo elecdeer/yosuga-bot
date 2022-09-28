@@ -1,11 +1,11 @@
 import { getLogger } from "../../logger";
 import { rowComponent } from "../components/rowComponent";
-import { valueTabledSelectComponent } from "../components/selectComponent";
+import { createValueTable, valueTabledSelectComponent } from "../components/selectComponent";
 import { useSelectInteraction } from "../hooks";
 import { useReducer } from "../hooks/useReducer";
 
 import type { LazySelectParam } from "../components/selectComponent";
-import type { AnswerStatus, Prompt } from "../types/prompt";
+import type { AnswerState, Prompt } from "../types/prompt";
 
 type SelectPromptResult<TOption> = {
   value: TOption;
@@ -15,8 +15,10 @@ type SelectPromptResult<TOption> = {
 const logger = getLogger("select");
 
 export const selectPrompt = <TOption>(
-  param: LazySelectParam<TOption, AnswerStatus<SelectPromptResult<TOption>>>
+  param: LazySelectParam<TOption, AnswerState<SelectPromptResult<TOption>>>
 ): Prompt<SelectPromptResult<TOption>> => {
+  const { keyToOptionValue, optionValueToKey } = createValueTable("selectItem", param.options);
+
   return (customId) => {
     const [state, dispatch] = useReducer<SelectPromptResult<TOption>, TOption[]>(
       selectReducer,
@@ -29,7 +31,7 @@ export const selectPrompt = <TOption>(
       await interaction.deferUpdate();
     });
 
-    const status: AnswerStatus<SelectPromptResult<TOption>> =
+    const status: AnswerState<SelectPromptResult<TOption>> =
       state.length >= (param.minValues ?? 1)
         ? { condition: "answered", value: state }
         : { condition: "unanswered" };
@@ -38,12 +40,12 @@ export const selectPrompt = <TOption>(
     //TODO
     logger.trace("status", status);
     logger.trace("param", param);
-    const { component, keyToOptionValue } = valueTabledSelectComponent(customId, param)(status);
-    logger.trace("component", component);
+    const { components, keyToOptionValue } = valueTabledSelectComponent(customId, param)(status);
+    logger.trace("component", components);
 
     return {
-      status: status,
-      component: rowComponent([component]),
+      result: status,
+      component: rowComponent([components]),
     };
   };
 };

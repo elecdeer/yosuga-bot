@@ -22,6 +22,14 @@ export interface IEventFlowEmitter<T> {
 
 export interface IEventFlowHandler<T> {
   /**
+   * 子EventFlowを生成する
+   * この方法で生成されたEventFlowはoffAllが伝播する
+   *
+   * @returns eventFlow
+   */
+  createBranchNode: <U>() => IEventFlow<U>;
+
+  /**
    * handlerを登録する
    * 同じhandlerは登録されない
    * @param handler
@@ -102,6 +110,7 @@ const createEventFlowSource = <T>(): IEventFlow<T> => {
   };
 
   const methods = {
+    createBranchNode,
     emit(value: T): void {
       handlers.forEach((handler) => void handler(value));
     },

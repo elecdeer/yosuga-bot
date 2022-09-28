@@ -1,11 +1,11 @@
 import type { APIActionRowComponent, APIMessageActionRowComponent } from "discord-api-types/v10";
 
 export type Prompt<TResult> = (customId: string) => {
-  status: AnswerStatus<TResult>;
+  result: AnswerState<TResult>;
   component: ComponentPayload;
 };
 
-export type AnswerStatus<T> =
+export type AnswerState<T> =
   | {
       condition: "unanswered";
       value?: undefined;

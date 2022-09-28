@@ -4,7 +4,7 @@ import { Collection } from "discord.js";
 import { resolveLazy } from "../../util/lazy";
 
 import type { LazyParam } from "../../util/lazy";
-import type { AnswerStatus } from "../types/prompt";
+import type { AnswerState } from "../types/prompt";
 import type { APIMessageComponentEmoji, APISelectMenuComponent } from "discord-api-types/v10";
 
 //based APISelectMenuComponent
@@ -50,7 +50,7 @@ export const resolveSelectParam = <TOption, TValue>(
   };
 };
 
-type ValueBase = AnswerStatus<
+type ValueBase = AnswerState<
   {
     value: unknown;
     selected: boolean;
@@ -124,7 +124,7 @@ export const valueTabledSelectComponent = <TOption, TValue extends ValueBase>(
     const resolved = resolveSelectParam(param, value);
 
     return {
-      component: selectComponent(
+      components: selectComponent(
         customId,
         {
           ...resolved,
