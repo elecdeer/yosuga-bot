@@ -1,7 +1,6 @@
 import { ChannelType, EmbedBuilder } from "discord.js";
 
 import { buttonPrompt, inquire } from "../../inquirer";
-import { selectPrompt } from "../../inquirer";
 import { createTextChannelMessenger } from "../../util/messenger/textChannelMessenger";
 import { withLog } from "../../util/messenger/withLog";
 
@@ -32,33 +31,33 @@ export const testCommandEvent: CommandEvent = {
           button: buttonPrompt({
             label: (value) => `ボタン`,
           }),
-          select: selectPrompt({
-            options: [
-              {
-                label: (value) => {
-                  const result = collector.states().select;
-                  if (result.condition === "answered") {
-                    const value = result.value.find((v) => v.value.item === 1);
-                    if (value !== undefined && value.selected) {
-                      return "✓option1";
-                    }
-                  }
-                  return "option1";
-                },
-                value: {
-                  item: 1,
-                },
-              },
-              {
-                label: "item2",
-                value: {
-                  item: 2,
-                },
-              },
-            ],
-            placeholder: "選択してください",
-            minValues: 0,
-          }),
+          // select: selectPrompt({
+          //   options: [
+          //     {
+          //       label: (value) => {
+          //         const result = collector.states().select;
+          //         if (result.condition === "answered") {
+          //           const value = result.value.find((v) => v.value.item === 1);
+          //           if (value !== undefined && value.selected) {
+          //             return "✓option1";
+          //           }
+          //         }
+          //         return "option1";
+          //       },
+          //       value: {
+          //         item: 1,
+          //       },
+          //     },
+          //     {
+          //       label: "item2",
+          //       value: {
+          //         item: 2,
+          //       },
+          //     },
+          //   ],
+          //   placeholder: "選択してください",
+          //   minValues: 0,
+          // }),
         },
         {
           messenger: messenger,

@@ -26,10 +26,16 @@ export const useEffectWithContext =
     const changed =
       prevDeps === undefined || deps === undefined || deps.some((dep, i) => dep !== prevDeps[i]);
 
+    ctx.logger.trace("check deps", {
+      prevDeps,
+      deps,
+      changed,
+    });
+
     if (changed) {
       //前回のrender時とdepsが変わっていたらcb実行を予約
+      ctx.logger.trace("set mount handler", current);
       ctx.mountHooks.push((message) => {
-        ctx.logger.trace("set mount handler", current);
         const clean = callback(message);
 
         if (clean !== undefined) {
@@ -37,6 +43,7 @@ export const useEffectWithContext =
           ctx.unmountHooks.push(clean);
         }
       });
+      ctx.logger.trace("mounted", ctx.mountHooks);
     }
 
     ctx.hookValues[current] = {

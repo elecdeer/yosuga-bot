@@ -1,18 +1,13 @@
-import assert from "assert";
-import objectHash from "object-hash";
-
 import { getLogger } from "../../logger";
 
 import type { IEventFlowHandler } from "../../eventFlow/eventFlow";
 import type { AnswerState } from "../types/prompt";
+import type { RootFlowEvent } from "./inquireCollector";
 
 const logger = getLogger("inquireCollector");
 
 export const asyncInquireCollector = <T extends Record<string, AnswerState<unknown>>>(
-  rootFlow: IEventFlowHandler<{
-    prev: T;
-    next: T;
-  }>,
+  rootFlow: IEventFlowHandler<RootFlowEvent<T>>,
   promptKeys: (keyof T)[]
 ): {
   all: IEventFlowHandler<{
@@ -25,7 +20,7 @@ export const asyncInquireCollector = <T extends Record<string, AnswerState<unkno
     {
       [K in keyof T]: {
         key: K;
-        status: T[K];
+        state: T[K];
       };
     }[keyof T]
   >;
@@ -33,65 +28,25 @@ export const asyncInquireCollector = <T extends Record<string, AnswerState<unkno
     [K in keyof T]: T[K];
   }>;
 } => {
-  const allFlow = rootFlow.map((status) => {
-    return status.next;
-  });
+  const allFlow = rootFlow.map((event) => event.states);
 
-  const eachFlowPairs = promptKeys.map((key) => {
-    const flow = rootFlow
-      .filter((status) => {
-        const prevStatus = status.prev[key];
-        const currentStatus = status.next[key];
-
-        assert(prevStatus);
-        assert(currentStatus);
-
-        logger.trace("check one status changed", {
-          prev: prevStatus,
-          next: currentStatus,
-        });
-
-        return objectHash(prevStatus) !== objectHash(currentStatus);
-      })
-      .map((status) => status.next[key]);
-
-    return {
-      key,
-      flow,
-    };
-  });
-
-  const oneFlows = eachFlowPairs.reduce((acc, { key, flow }) => {
-    return {
-      ...acc,
-      [key]: flow,
-    };
-  }, {}) as {
-    [K in keyof T]: IEventFlowHandler<T[K]>;
-  };
-
-  const someFlow = rootFlow.createBranchNode<
-    {
-      [K in keyof T]: {
-        key: K;
-        status: T[K];
+  const oneFlows = promptKeys.reduce(
+    (acc, key) => {
+      return {
+        ...acc,
+        [key]: rootFlow.filter(({ dif }) => dif.key === key).map(({ dif }) => dif.state),
       };
-    }[keyof T]
-  >();
-  eachFlowPairs.forEach(({ key, flow }) => {
-    flow.on((status) => {
-      someFlow.emit({
-        key,
-        status,
-      });
-    });
-  });
+    },
+    {} as {
+      [K in keyof T]: IEventFlowHandler<T[K]>;
+    }
+  );
+
+  const someFlow = rootFlow.map(({ dif }) => dif);
 
   const allAnsweredFlow = rootFlow
-    .filter((status) =>
-      Object.values(status.next).every((status) => status.condition === "answered")
-    )
-    .map((status) => status.next);
+    .filter(({ states }) => Object.values(states).every((state) => state.condition === "answered"))
+    .map(({ states }) => states);
 
   return {
     all: allFlow,

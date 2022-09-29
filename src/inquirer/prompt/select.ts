@@ -19,7 +19,7 @@ export const selectPrompt = <TOption>(
 ): Prompt<SelectPromptResult<TOption>> => {
   const { keyToOptionValue, optionValueToKey } = createValueTable("selectItem", param.options);
 
-  return (customId) => {
+  return (customId, answer) => {
     const [state, dispatch] = useReducer<SelectPromptResult<TOption>, TOption[]>(
       selectReducer,
       param.options.map((option) => ({ value: option.value, selected: option.default ?? false }))
@@ -29,6 +29,8 @@ export const selectPrompt = <TOption>(
       const selected = interaction.values.map((item) => keyToOptionValue(item));
       dispatch(selected);
       await interaction.deferUpdate();
+
+      answer({ condition: "answered", value: state });
     });
 
     const status: AnswerState<SelectPromptResult<TOption>> =
@@ -43,10 +45,7 @@ export const selectPrompt = <TOption>(
     const { components, keyToOptionValue } = valueTabledSelectComponent(customId, param)(status);
     logger.trace("component", components);
 
-    return {
-      result: status,
-      component: rowComponent([components]),
-    };
+    return rowComponent([components]);
   };
 };
 

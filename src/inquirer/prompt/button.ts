@@ -1,18 +1,16 @@
 import { getLogger } from "../../logger";
 import { buttonComponent } from "../components/buttonComponent";
 import { rowComponent } from "../components/rowComponent";
-import { useState, useButtonInteraction } from "../hooks";
+import { useState, useButtonInteraction, useEffect } from "../hooks";
 
 import type { LazyParam } from "../../util/lazy";
 import type { ButtonParam } from "../components/buttonComponent";
-import type { AnswerState, Prompt } from "../types/prompt";
+import type { Prompt } from "../types/prompt";
 
 const logger = getLogger("button");
 
-export const buttonPrompt = (
-  style: LazyParam<ButtonParam, AnswerState<number>>
-): Prompt<number> => {
-  return (customId) => {
+export const buttonPrompt = (style: LazyParam<ButtonParam, void>): Prompt<number> => {
+  return (customId, answer) => {
     const [count, setCount] = useState(0);
 
     useButtonInteraction(customId, async (interaction) => {
@@ -21,12 +19,11 @@ export const buttonPrompt = (
       await interaction.deferUpdate();
     });
 
-    const state: AnswerState<number> =
-      count > 0 ? { condition: "answered", value: count } : { condition: "unanswered" };
+    useEffect(() => {
+      logger.trace("count changed", count);
+      answer({ condition: "answered", value: count });
+    });
 
-    return {
-      result: state,
-      component: rowComponent([buttonComponent(customId, style, state)]),
-    };
+    return rowComponent([buttonComponent(customId, style, undefined)]);
   };
 };

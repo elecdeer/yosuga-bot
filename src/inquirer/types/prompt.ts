@@ -1,9 +1,11 @@
 import type { APIActionRowComponent, APIMessageActionRowComponent } from "discord-api-types/v10";
 
-export type Prompt<TResult> = (customId: string) => {
-  result: AnswerState<TResult>;
-  component: ComponentPayload;
-};
+export type Prompt<TResult> = (
+  customId: string,
+  answer: (value: AnswerState<TResult>) => void
+) => ComponentPayload;
+
+export type PromptAnswer<TPrompt> = TPrompt extends Prompt<infer T> ? T : never;
 
 export type AnswerState<T> =
   | {

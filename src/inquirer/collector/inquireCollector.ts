@@ -6,15 +6,22 @@ import type { AnswerState } from "../types/prompt";
 
 const logger = getLogger("inquireCollector");
 
+export type RootFlowEvent<T extends Record<string, AnswerState<unknown>>> = {
+  states: T;
+  dif: {
+    [K in keyof T]: {
+      key: K;
+      state: T[K];
+    };
+  }[keyof T];
+};
+
 export const inquireCollector = <T extends Record<string, AnswerState<unknown>>>(
   promptKeys: (keyof T)[]
 ) => {
-  const rootFlow = createEventFlow<{
-    prev: T;
-    next: T;
-  }>();
+  const rootFlow = createEventFlow<RootFlowEvent<T>>();
 
-  let prevStates: T = promptKeys.reduce((acc, key) => {
+  let states: T = promptKeys.reduce((acc, key) => {
     return {
       ...acc,
       [key]: {
@@ -23,12 +30,18 @@ export const inquireCollector = <T extends Record<string, AnswerState<unknown>>>
     };
   }, {} as T);
 
-  const updateStates = (states: T) => {
+  const updateStates = <K extends keyof T>(key: K, state: T[K]) => {
+    states = {
+      ...states,
+      [key]: state,
+    };
     rootFlow.emit({
-      prev: prevStates,
-      next: states,
+      states: states,
+      dif: {
+        key,
+        state,
+      },
     });
-    prevStates = states;
   };
 
   const close = () => {
@@ -39,6 +52,6 @@ export const inquireCollector = <T extends Record<string, AnswerState<unknown>>>
     updateStates,
     close,
     ...asyncInquireCollector(rootFlow, promptKeys),
-    states: () => prevStates,
+    states: () => states,
   };
 };

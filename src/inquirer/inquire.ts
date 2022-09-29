@@ -7,7 +7,7 @@ import { inquirerMessageProxy } from "./inquirerMessageProxy";
 
 import type { Timer } from "../util/timer";
 import type { InquirerOption, InquirerOptionController } from "./types/inquire";
-import type { Prompt } from "./types/prompt";
+import type { AnswerState, Prompt, PromptAnswer } from "./types/prompt";
 
 const logger = getLogger("inquire");
 
@@ -38,18 +38,23 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
     resetIdleTimer();
 
     controller.startRender();
-    const renderResolved = promptEntries.map(([key, prompt]) => [key, prompt(key)] as const);
+    const renderResolved = promptEntries.map(([key, prompt]) => {
+      const update = (value: AnswerState<unknown>) => {
+        updateStates(key, value as AnswerState<PromptAnswer<T[keyof T]>>);
+
+        void edit();
+      };
+      return [key, prompt(key, update)] as const;
+    });
     controller.endRender();
 
     resolveCount++;
 
-    return {
-      components: renderResolved.map(([key, resolved]) => [key, resolved.component] as const),
-      results: renderResolved.map(([key, resolved]) => [key, resolved.result] as const),
-    };
+    return renderResolved;
   };
 
   const send = async () => {
+    logger.trace("send");
     if (option.clearComponentsOnClose ?? false) {
       const latestMessage = option.messenger.postedMessages().at(-1);
       if (latestMessage !== undefined) {
@@ -57,32 +62,21 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
       }
     }
 
-    const { components, results } = resolvePrompts();
+    const components = resolvePrompts();
     const message = await messageProxy.send(components.map(([, component]) => component));
     controller.afterMount(message);
-
-    updateStates(
-      Object.fromEntries(results) as {
-        [K in keyof T]: ReturnType<T[K]>["result"];
-      }
-    );
 
     return message;
   };
 
   const edit = async () => {
-    const { components, results } = resolvePrompts();
-    const message = await messageProxy.edit(components.map(([, component]) => component));
-    if (message !== null) {
-      controller.beforeUnmount();
-      controller.afterMount(message);
-    }
+    logger.trace("edit");
+    controller.beforeUnmount();
 
-    updateStates(
-      Object.fromEntries(results) as {
-        [K in keyof T]: ReturnType<T[K]>["result"];
-      }
-    );
+    const components = resolvePrompts();
+    const message = await messageProxy.edit(components.map(([, component]) => component));
+
+    controller.afterMount(message);
 
     return message;
   };
@@ -101,7 +95,7 @@ export const inquire = <T extends Record<string, Prompt<unknown>>>(
   };
 
   const inquireController = inquireCollector<{
-    [K in keyof T]: ReturnType<T[K]>["result"];
+    [K in keyof T]: AnswerState<PromptAnswer<T[K]>>;
   }>(Array.from(promptEntries.map(([key]) => key)));
 
   const { updateStates, close: closeCollector } = inquireController;

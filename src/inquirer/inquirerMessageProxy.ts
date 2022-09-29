@@ -26,7 +26,7 @@ export const inquirerMessageProxy = (option: InquirerOptionMessage) => {
     return message;
   };
 
-  const edit = async (componentList: ComponentPayload[]) => {
+  const edit = async (componentList: ComponentPayload[]): Promise<Message> => {
     const latestMessage = messenger.postedMessages().at(-1);
     const prev = latestMessage && componentsHistory.get(latestMessage);
     if (prev === undefined) {
@@ -34,7 +34,7 @@ export const inquirerMessageProxy = (option: InquirerOptionMessage) => {
     }
 
     if (!isComponentChanged(prev, componentList)) {
-      return null;
+      return latestMessage!;
     }
 
     const message = await messenger.editLatest({

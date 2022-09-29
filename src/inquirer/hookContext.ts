@@ -62,13 +62,13 @@ export const createHookContext = (
   };
 
   const afterMount = (message: Message) => {
-    logger.trace("afterMount");
+    logger.trace("afterMount", context.mountHooks);
     context.mountHooks.forEach((hook) => hook(message));
     context.mountHooks = [];
   };
 
   const beforeUnmount = () => {
-    logger.trace("beforeUnmount");
+    logger.trace("beforeUnmount", context.unmountHooks);
     context.unmountHooks.forEach((hook) => hook());
     context.unmountHooks = [];
   };
