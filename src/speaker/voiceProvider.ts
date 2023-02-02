@@ -1,20 +1,20 @@
 import { Collection } from "discord.js";
 import { getLogger } from "log4js";
 
-import { Deferred } from "../util/deferred";
-import { allSerial } from "../util/promiseUtil";
-import { failure } from "../util/result";
 import { TtsControllerSpeaker } from "./ttsControllerSpeaker";
 import { VoiceroidDaemonSpeaker } from "./voiceroidDaemonSpeaker";
 import { VoicevoxSpeaker } from "./voicevoxSpeaker";
+import { Deferred } from "../util/deferred";
+import { allSerial } from "../util/promiseUtil";
+import { failure } from "../util/result";
 
-import type { Session } from "../session";
-import type { GuildId, SpeakerOption, SpeechText, UserId } from "../types";
-import type { Result } from "../util/result";
 import type { Speaker } from "./speaker";
 import type { TtsSpeakerBuildOption } from "./ttsControllerSpeaker";
 import type { DaemonSpeakerBuildOption } from "./voiceroidDaemonSpeaker";
 import type { VoicevoxSpeakerBuildOption } from "./voicevoxSpeaker";
+import type { Session } from "../session";
+import type { GuildId, SpeakerOption, SpeechText, UserId } from "../types";
+import type { Result } from "../util/result";
 import type { AudioResource } from "@discordjs/voice";
 
 export type SpeakerBuildOption = {

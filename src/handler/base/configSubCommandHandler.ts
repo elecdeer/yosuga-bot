@@ -1,5 +1,5 @@
-import { CommandPermission } from "../../application/permission";
 import { SubCommandHandler } from "./subCommandHandler";
+import { CommandPermission } from "../../application/permission";
 
 import type { CommandContext } from "../../commandContext";
 import type { ConfigAccessor } from "../../config/accessor/configAccessor";

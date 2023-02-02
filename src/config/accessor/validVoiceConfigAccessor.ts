@@ -3,15 +3,15 @@ import { getLogger } from "log4js";
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
 import { UnifiedConfigAccessor } from "./unifiedConfigAccessor";
 
+import type { GuildConfigAccessorProps } from "./guildConfigAccessor";
+import type { MasterConfigAccessorProps } from "./masterConfigAccessor";
+import type { UserConfigAccessorProps } from "./userConfigAccessor";
 import type { Speaker } from "../../speaker/speaker";
 import type { AppId, GuildId, UserId } from "../../types";
 import type { GuildConfigStore } from "../store/guildConfigStore";
 import type { MasterConfigStore } from "../store/masterConfigStore";
 import type { UserConfigStore } from "../store/userConfigStore";
 import type { UnifiedConfig, VoiceConfigKey } from "../typesConfig";
-import type { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import type { MasterConfigAccessorProps } from "./masterConfigAccessor";
-import type { UserConfigAccessorProps } from "./userConfigAccessor";
 import type { Collection } from "discord.js";
 import type { ReadonlyDeep, SetOptional } from "type-fest";
 

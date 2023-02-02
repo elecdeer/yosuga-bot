@@ -37,6 +37,21 @@ client.once("ready", (readyClient) => {
   void yosuga.initClient();
 });
 
+client.on("shardError", (err) => {
+  logger.error("handle shardError");
+  logger.error(err);
+});
+
+client.on("error", (err) => {
+  logger.error("handle error");
+  logger.error(err);
+});
+
+process.on("unhandledRejection", (error) => {
+  logger.error("handle unhandledRejection");
+  logger.error(error);
+});
+
 void client.login(yosugaEnv.discordToken);
 
 process.on("exit", (code) => {

@@ -1,9 +1,9 @@
 import { MessageActionRow } from "discord.js";
 import { getLogger } from "log4js";
 
+import { buttonComponentHookValue } from "./componentHookWithValue";
 import { resolveLazyParam } from "../../util/lazy";
 import { createButton } from "../wrapper/createButton";
-import { buttonComponentHookValue } from "./componentHookWithValue";
 
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";

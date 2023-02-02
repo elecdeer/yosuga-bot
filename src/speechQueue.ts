@@ -27,6 +27,10 @@ export const createSpeechQueue = (session: Session): SpeechQueue => {
 
     const player = session.player;
     player.play(synthesisResult.value);
+    player.on("error", (error) => {
+      logger.error("player error");
+      logger.error(error);
+    });
     logger.debug("Play start");
     await entersState(player, AudioPlayerStatus.Playing, 500);
 

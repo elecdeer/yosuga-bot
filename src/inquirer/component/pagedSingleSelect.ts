@@ -1,9 +1,9 @@
 import { createPagedSelectComponent } from "./pagedSelect";
 
+import type { PagedOption } from "./pagedSelect";
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
 import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { PagedOption } from "./pagedSelect";
 
 export const createPagedSingleSelectComponent = <TOptionValue>(param: {
   selector: LazyParam<Omit<SelectorParam, "minValues" | "maxValues">>;

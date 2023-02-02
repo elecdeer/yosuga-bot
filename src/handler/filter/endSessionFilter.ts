@@ -1,8 +1,8 @@
 import { composeFilter, filterer } from "./eventFilter";
 import { leaveVoiceChannelFilter } from "./leaveVoiceChannelFilter";
 
-import type { VoiceOrStageChannel } from "../../types";
 import type { EventFilterGenerator } from "./eventFilter";
+import type { VoiceOrStageChannel } from "../../types";
 import type { Client } from "discord.js";
 
 /**

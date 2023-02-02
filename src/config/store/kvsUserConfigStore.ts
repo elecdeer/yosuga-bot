@@ -1,9 +1,9 @@
 import { KvsStoreBase } from "./kvsStoreBase";
 
-import type { UserId } from "../../types";
-import type { UserConfig, UserConfigRecord } from "../typesConfig";
 import type { StoreProps } from "./kvsStoreBase";
 import type { UserConfigStore } from "./userConfigStore";
+import type { UserId } from "../../types";
+import type { UserConfig, UserConfigRecord } from "../typesConfig";
 
 export class KvsUserConfigStore extends KvsStoreBase<UserConfigRecord> implements UserConfigStore {
   constructor(props: StoreProps) {

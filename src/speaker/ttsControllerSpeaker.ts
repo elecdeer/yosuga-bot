@@ -2,18 +2,18 @@ import { createAudioResource, StreamType } from "@discordjs/voice";
 import axios from "axios";
 import { getLogger } from "log4js";
 
-import { endSessionFilter } from "../handler/filter/endSessionFilter";
-import { wait } from "../util/promiseUtil";
-import { success } from "../util/result";
 import { OpusEncodeStream } from "./opusEncodeStream";
 import { SIOAudioRecorder } from "./socketIOAudioRecorder";
 import { Speaker } from "./speaker";
 import { ttsControllerOccupier } from "./ttsControllerOccupier";
+import { endSessionFilter } from "../handler/filter/endSessionFilter";
+import { wait } from "../util/promiseUtil";
+import { success } from "../util/result";
 
+import type { SpeakerState } from "./speaker";
 import type { Session } from "../session";
 import type { AdditionalVoiceParam, SpeechText, VoiceParam } from "../types";
 import type { Result } from "../util/result";
-import type { SpeakerState } from "./speaker";
 import type { AudioResource } from "@discordjs/voice";
 import type { Readable } from "stream";
 

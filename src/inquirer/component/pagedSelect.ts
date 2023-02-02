@@ -1,16 +1,16 @@
 import { Collection, MessageActionRow } from "discord.js";
 
+import { buttonComponentHook, selectMenuComponentHook } from "./componentHook";
 import { resolveLazy, resolveLazyParam } from "../../util/lazy";
 import { range } from "../../util/range";
 import { minMax } from "../../util/util";
 import { createButton } from "../wrapper/createButton";
 import { createSelectMenu } from "../wrapper/createSelectMenu";
-import { buttonComponentHook, selectMenuComponentHook } from "./componentHook";
 
+import type { SelectOption } from "./select";
 import type { LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";
 import type { SelectorParam } from "../wrapper/createSelectMenu";
-import type { SelectOption } from "./select";
 import type { Awaitable } from "discord.js";
 
 export type PagedSelectOption<T> = Omit<SelectOption<T>, "inactive">;

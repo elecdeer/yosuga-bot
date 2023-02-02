@@ -1,7 +1,7 @@
 import { filterGenerator } from "./eventFilter";
 
-import type { VoiceOrStageChannel } from "../../types";
 import type { EventFilterGenerator } from "./eventFilter";
+import type { VoiceOrStageChannel } from "../../types";
 import type { ClientEvents } from "discord.js";
 
 /**

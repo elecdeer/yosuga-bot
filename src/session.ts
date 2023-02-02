@@ -70,6 +70,10 @@ export class Session {
       },
     });
     connection.subscribe(this.player);
+    connection.on("error", (message) => {
+      logger.error("connection error");
+      logger.error(message);
+    });
 
     this.lastPushedSpeech = {
       timestamp: 0,

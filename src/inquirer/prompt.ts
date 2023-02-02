@@ -1,8 +1,8 @@
 import { Collection } from "discord.js";
 
-import { TypedEventEmitter } from "../util/typedEventEmitter";
 import { createPromptCollector } from "./promptCollector";
 import { createPromptController } from "./promptController";
+import { TypedEventEmitter } from "../util/typedEventEmitter";
 
 import type {
   AnswerStatus,
