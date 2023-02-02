@@ -18,7 +18,7 @@ const LinkType = {
   InvalidUrl: "不明なURL",
 } as const;
 
-type LinkType = typeof LinkType[keyof typeof LinkType];
+type LinkType = (typeof LinkType)[keyof typeof LinkType];
 
 const urlRegStr = urlRegex({ returnString: true });
 const urlReg = new RegExp(urlRegStr, "iu");
@@ -62,7 +62,11 @@ export const urlProcessor: ProcessorProvider<number> = (fastSpeedScale) => async
   });
 };
 
-const redirectStatus = [httpStatus.MOVED_PERMANENTLY, httpStatus.FOUND, httpStatus.SEE_OTHER];
+const redirectStatus: number[] = [
+  httpStatus.MOVED_PERMANENTLY,
+  httpStatus.FOUND,
+  httpStatus.SEE_OTHER,
+];
 const tenorOmitRegex = / -.*$/;
 
 const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> = async (url) => {
@@ -87,7 +91,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
   //リダイレクト
   if (redirectStatus.includes(res.status)) {
-    return checkUrlType(res.headers["Location"]);
+    return checkUrlType(res.headers["Location"] as string);
   }
 
   const contentType = String(res.headers["content-type"]);
@@ -101,8 +105,8 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
   if (contentType.startsWith("text/html")) {
     const buffer = Buffer.from(res.data);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
-    const charCode = charset(res.headers, buffer);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-explicit-any
+    const charCode = charset(res.headers as any, buffer);
     processorLogger.debug(charCode);
 
     const html = iconv.decode(buffer, charCode ?? "utf8");

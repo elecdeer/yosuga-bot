@@ -2,14 +2,14 @@ import deepmerge from "deepmerge";
 
 import { ReadOnlyConfigAccessor } from "./readOnlyConfigAccessor";
 
+import type { GuildConfigAccessorProps } from "./guildConfigAccessor";
+import type { MasterConfigAccessorProps } from "./masterConfigAccessor";
+import type { UserConfigAccessorProps } from "./userConfigAccessor";
 import type { AppId, GuildId, UserId } from "../../types";
 import type { GuildConfigStore } from "../store/guildConfigStore";
 import type { MasterConfigStore } from "../store/masterConfigStore";
 import type { UserConfigStore } from "../store/userConfigStore";
 import type { MasterConfig, UnifiedConfig } from "../typesConfig";
-import type { GuildConfigAccessorProps } from "./guildConfigAccessor";
-import type { MasterConfigAccessorProps } from "./masterConfigAccessor";
-import type { UserConfigAccessorProps } from "./userConfigAccessor";
 import type { ReadonlyDeep, SetOptional } from "type-fest";
 
 export type UnifiedConfigAccessorProps = {

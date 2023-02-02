@@ -1,7 +1,7 @@
 import { MessageEmbed } from "discord.js";
 
-import { stringifyConfigEntry } from "../../config/conifgUtil";
 import { ConfigSubCommandHandler } from "./configSubCommandHandler";
+import { stringifyConfigEntry } from "../../config/conifgUtil";
 
 import type { CommandContextSlash } from "../../commandContextSlash";
 import type { ConfigCommandLevel, ConfigEachLevel, UnifiedConfig } from "../../config/typesConfig";

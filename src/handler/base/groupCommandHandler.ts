@@ -1,9 +1,9 @@
 import { CommandHandler } from "./commandHandler";
 
-import type { CommandContext } from "../../commandContext";
-import type { YosugaClient } from "../../yosugaClient";
 import type { EventArgs, EventKeysUnion } from "./handler";
 import type { SubCommandHandler } from "./subCommandHandler";
+import type { CommandContext } from "../../commandContext";
+import type { YosugaClient } from "../../yosugaClient";
 import type {
   ApplicationCommandOptionData,
   ChatInputApplicationCommandData,

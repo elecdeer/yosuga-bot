@@ -1,11 +1,11 @@
-import { composeFilter, filterer } from "../filter/eventFilter";
 import { CommandHandler } from "./commandHandler";
+import { composeFilter, filterer } from "../filter/eventFilter";
 
+import type { GroupCommandHandler } from "./groupCommandHandler";
+import type { EventKeysUnion } from "./handler";
 import type { CommandPermission } from "../../application/permission";
 import type { YosugaClient } from "../../yosugaClient";
 import type { EventFilter } from "../filter/eventFilter";
-import type { GroupCommandHandler } from "./groupCommandHandler";
-import type { EventKeysUnion } from "./handler";
 import type { ApplicationCommandSubCommandData, CommandInteraction } from "discord.js";
 
 export type SubCommandProps = Omit<ApplicationCommandSubCommandData, "type"> & {

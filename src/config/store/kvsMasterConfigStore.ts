@@ -1,9 +1,9 @@
 import { KvsStoreBase } from "./kvsStoreBase";
 
-import type { AppId } from "../../types";
-import type { MasterConfig, MasterConfigRecord } from "../typesConfig";
 import type { StoreProps } from "./kvsStoreBase";
 import type { MasterConfigStore } from "./masterConfigStore";
+import type { AppId } from "../../types";
+import type { MasterConfig, MasterConfigRecord } from "../typesConfig";
 
 export class KvsMasterConfigStore
   extends KvsStoreBase<MasterConfigRecord>

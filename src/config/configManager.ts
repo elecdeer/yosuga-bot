@@ -7,14 +7,14 @@ import { UnifiedConfigAccessor } from "./accessor/unifiedConfigAccessor";
 import { UserConfigAccessor } from "./accessor/userConfigAccessor";
 import { ValidVoiceConfigAccessor } from "./accessor/validVoiceConfigAccessor";
 
-import type { Speaker } from "../speaker/speaker";
-import type { GuildId, UserId } from "../types";
-import type { YosugaClient } from "../yosugaClient";
 import type { ConfigAccessor } from "./accessor/configAccessor";
 import type { GuildConfigStore } from "./store/guildConfigStore";
 import type { MasterConfigStore } from "./store/masterConfigStore";
 import type { UserConfigStore } from "./store/userConfigStore";
 import type { GuildConfig, MasterConfig, UserConfig } from "./typesConfig";
+import type { Speaker } from "../speaker/speaker";
+import type { GuildId, UserId } from "../types";
+import type { YosugaClient } from "../yosugaClient";
 import type { Collection } from "discord.js";
 
 const logger = getLogger("configManager");

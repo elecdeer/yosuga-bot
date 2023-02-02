@@ -1,7 +1,7 @@
 import { filterGenerator } from "./eventFilter";
 
-import type { CommandHandler } from "../base/commandHandler";
 import type { FilterCheckerGenerator } from "./eventFilter";
+import type { CommandHandler } from "../base/commandHandler";
 
 /**
  * イベントがコマンド呼び出しによるものかどうか

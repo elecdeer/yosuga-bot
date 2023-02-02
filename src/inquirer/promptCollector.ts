@@ -1,6 +1,5 @@
 import { getLogger } from "log4js";
 
-import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type {
   AnswerStatus,
   PromptCollector,
@@ -10,6 +9,7 @@ import type {
   PromptResult,
   PromptStatus,
 } from "./promptTypes";
+import type { TypedEventEmitter } from "../util/typedEventEmitter";
 import type { Collection } from "discord.js";
 
 const logger = getLogger("promptCollector");

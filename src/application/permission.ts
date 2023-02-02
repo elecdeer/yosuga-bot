@@ -7,7 +7,7 @@ export const CommandPermission = {
   GuildAdmin: 5,
   AppOwner: 100,
 } as const;
-export type CommandPermission = typeof CommandPermission[keyof typeof CommandPermission];
+export type CommandPermission = (typeof CommandPermission)[keyof typeof CommandPermission];
 
 const logger = getLogger("permissionManager");
 

@@ -1,8 +1,8 @@
 import { Collection, MessageActionRow } from "discord.js";
 
+import { selectMenuComponentHookValue } from "./componentHookWithValue";
 import { resolveLazy, resolveLazyParam } from "../../util/lazy";
 import { createSelectMenu } from "../wrapper/createSelectMenu";
-import { selectMenuComponentHookValue } from "./componentHookWithValue";
 
 import type { Lazy, LazyParam } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";

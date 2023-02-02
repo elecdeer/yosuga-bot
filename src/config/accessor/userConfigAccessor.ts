@@ -1,7 +1,7 @@
 import { getLogger } from "log4js";
 
-import { resolveValue } from "../../util/resolvable";
 import { ConfigAccessor } from "./configAccessor";
+import { resolveValue } from "../../util/resolvable";
 
 import type { UserId } from "../../types";
 import type { ValueResolvable } from "../../util/resolvable";

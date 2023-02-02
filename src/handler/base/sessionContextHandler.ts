@@ -1,9 +1,9 @@
-import { endSessionFilter } from "../filter/endSessionFilter";
 import { Handler } from "./handler";
+import { endSessionFilter } from "../filter/endSessionFilter";
 
+import type { EventArgs, EventKeysTuple, EventKeysUnion } from "./handler";
 import type { Session } from "../../session";
 import type { YosugaClient } from "../../yosugaClient";
-import type { EventArgs, EventKeysTuple, EventKeysUnion } from "./handler";
 import type { Client } from "discord.js";
 
 export abstract class SessionContextHandler<

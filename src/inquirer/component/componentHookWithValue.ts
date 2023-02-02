@@ -1,5 +1,5 @@
-import { resolveLazy } from "../../util/lazy";
 import { componentHook } from "./componentHook";
+import { resolveLazy } from "../../util/lazy";
 
 import type { Lazy } from "../../util/lazy";
 import type { PromptComponent } from "../promptTypes";

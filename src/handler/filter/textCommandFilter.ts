@@ -1,12 +1,12 @@
 import { getLogger } from "log4js";
 
-import { hasMemberPermission } from "../../application/permission";
-import { removeMentionInMessageContent } from "../../util/removeMention";
 import { filterGenerator } from "./eventFilter";
 import { isMessageMentionedCall } from "./messageMentionFilter";
+import { hasMemberPermission } from "../../application/permission";
+import { removeMentionInMessageContent } from "../../util/removeMention";
 
-import type { CommandPermission } from "../../application/permission";
 import type { FilterCheckerGenerator } from "./eventFilter";
+import type { CommandPermission } from "../../application/permission";
 import type { User } from "discord.js";
 
 const logger = getLogger("textCommandFilter");

@@ -1,5 +1,5 @@
-import { resolveValue } from "../../util/resolvable";
 import { ConfigAccessor } from "./configAccessor";
+import { resolveValue } from "../../util/resolvable";
 
 import type { AppId } from "../../types";
 import type { ValueResolvable } from "../../util/resolvable";
