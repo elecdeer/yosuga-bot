@@ -108,28 +108,6 @@ export class StartCommand extends CommandHandler {
       selfMute: false,
     });
 
-    // keepAlive issue workaround
-    // https://github.com/discordjs/discord.js/issues/9185#issuecomment-1452514375
-    connection.on("stateChange", (oldState, newState) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const oldNetworking = Reflect.get(oldState, "networking");
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const newNetworking = Reflect.get(newState, "networking");
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const networkStateChangeHandler = (oldNetworkState: any, newNetworkState: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-argument
-        const newUdp = Reflect.get(newNetworkState, "udp");
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-        clearInterval(newUdp?.keepAliveInterval);
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-      oldNetworking?.off("stateChange", networkStateChangeHandler);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-      newNetworking?.on("stateChange", networkStateChangeHandler);
-    });
-
     try {
       await entersState(connection, VoiceConnectionStatus.Ready, 30 * 1000);
       return connection;
