@@ -91,7 +91,7 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
   //リダイレクト
   if (redirectStatus.includes(res.status)) {
-    return checkUrlType(res.headers["Location"] as string);
+    return checkUrlType(res.headers["Location"]);
   }
 
   const contentType = String(res.headers["content-type"]);
