@@ -10,7 +10,7 @@ import type {
   MessageMentionOptions,
   TextChannel,
   ThreadChannel,
-  ThreadCreateOptions,
+  GuildTextThreadCreateOptions,
 } from "discord.js";
 
 export interface ReplyHelper {
@@ -44,7 +44,7 @@ export type ReplyScene =
   | {
       type: "newThread";
       channel: TextChannel;
-      option: ThreadCreateOptions<AllowedThreadTypeForTextChannel>;
+      option: GuildTextThreadCreateOptions<AllowedThreadTypeForTextChannel>;
     };
 
 export type ReplyTarget =
