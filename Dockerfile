@@ -1,5 +1,5 @@
 
-FROM node:24 as build
+FROM node:24 AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN npm ci
 COPY src src
 COPY imageenv.json ./
 
-FROM gcr.io/distroless/nodejs24-debian12
+FROM node:24-slim AS runtime
 COPY --from=build /app /app
 WORKDIR /app
 
