@@ -91,7 +91,8 @@ const checkUrlType: (url: string) => Promise<{ type: LinkType; read?: string }> 
 
   //リダイレクト
   if (redirectStatus.includes(res.status)) {
-    return checkUrlType(res.headers["Location"]);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return checkUrlType(res.headers.Location);
   }
 
   const contentType = String(res.headers["content-type"]);
