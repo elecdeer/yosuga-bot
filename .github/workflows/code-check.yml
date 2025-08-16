@@ -13,23 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v1
+      # setup-node + Node 24.x + npm cache
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-
-      - uses: actions/cache@v2
-        id: npm-cache
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+          node-version: 24.x
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install Dependencies
-        run: npm install --prefer-offline
+        run: npm ci
 
       - name: Code Check
         run: npm run check
-

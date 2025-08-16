@@ -25,9 +25,9 @@ import { DeployGuildHandler } from "./global/deployGuildHandler";
 import { UndeployGlobalHandler } from "./global/undeployGlobalHandler";
 import { UndeployGuildHandler } from "./global/undeployGuildHandler";
 
+import type { YosugaClient } from "../yosugaClient";
 import type { CommandHandler } from "./base/commandHandler";
 import type { Handler } from "./base/handler";
-import type { YosugaClient } from "../yosugaClient";
 import type { Client } from "discord.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

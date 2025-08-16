@@ -38,7 +38,7 @@ export class OpusEncodeStream extends Transform {
     callback();
   }
 
-  override _destroy(err: Error | null, cb: (error: Error | null) => void) {
+  override _destroy(err: Error | null, cb: (error: Error | null | undefined) => void) {
     super._destroy(err, cb);
   }
 }
