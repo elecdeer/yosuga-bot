@@ -1,3 +1,4 @@
+import { Team } from "discord.js";
 import { getLogger } from "log4js";
 
 import type { Guild, GuildMember, Role } from "discord.js";
@@ -56,7 +57,13 @@ export const getYosugaManagerRole = async (guild: Guild): Promise<Role | null> =
 export const getMemberPermission = async (member: GuildMember): Promise<CommandPermission> => {
   const managerRole = await getYosugaManagerRole(member.guild);
 
-  if (member.id === member.client.application?.owner?.id) return CommandPermission.AppOwner;
+  const appOwner = member.client.application?.owner;
+  if (
+    (appOwner instanceof Team && appOwner.members.has(member.id)) ||
+    (appOwner && member.id === appOwner.id)
+  ) {
+    return CommandPermission.AppOwner;
+  }
   if (managerRole && managerRole.members.has(member.id)) return CommandPermission.GuildAdmin;
   return CommandPermission.Everyone;
 };
