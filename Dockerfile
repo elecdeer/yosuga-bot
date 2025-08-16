@@ -7,8 +7,7 @@ COPY tsconfig.json ./
 COPY package*.json ./
 
 ENV NODE_ENV=production
-RUN npm install --omit=dev
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY src src
 COPY imageenv.json ./
