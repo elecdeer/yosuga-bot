@@ -27,16 +27,16 @@
   "author": "",
   "license": "MIT",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "devDependencies": {
     "@types/async": "^3.2.16",
     "@types/charset": "^1.0.2",
-    "@types/node": "^18.11.18",
+    "@types/node": "^24.3.0",
     "@types/open-graph-scraper": "^4.8.2",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
-    "@vitest/ui": "^0.28.3",
+    "@vitest/ui": "^3.2.4",
     "eslint": "^8.33.0",
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-prettier": "^4.2.1",
@@ -46,11 +46,11 @@
     "prettier": "^2.8.3",
     "type-fest": "^3.5.4",
     "typescript": "4.9.5",
-    "vitest": "^0.28.3"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@aspida/axios": "^1.11.0",
-    "@discordjs/opus": "^0.9.0",
+    "@discordjs/opus": "^0.10.0",
     "@discordjs/rest": "^1.5.0",
     "@discordjs/voice": "^0.15.0",
     "@elecdeer/emoji-pronunciation-ja": "^1.0.1",
@@ -58,7 +58,7 @@
     "@kvs/types": "^2.1.1",
     "@sap_oss/node-socketio-stream": "^1.0.3",
     "async": "^3.2.4",
-    "axios": "^0.27.2",
+    "axios": "^1.11.0",
     "bufferutil": "^4.0.7",
     "charset": "^1.0.1",
     "deepmerge": "^4.3.0",
@@ -75,7 +75,7 @@
     "sodium-native": "^4.0.1",
     "url-regex-safe": "^3.0.0",
     "utf-8-validate": "^6.0.2",
-    "vite-node": "^0.28.3"
+    "vite-node": "^3.2.4"
   },
   "eslintIgnore": [
     "/.eslintrc.cjs"
