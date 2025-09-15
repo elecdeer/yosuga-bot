@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: yosuga-bot
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: checkout
         uses: actions/checkout@v5
